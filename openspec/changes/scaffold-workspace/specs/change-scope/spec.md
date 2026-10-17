@@ -6,22 +6,36 @@ Decides whether a set of changed paths is documentation-only, so that the commit
 
 ### Requirement: A change is documentation-only only when every path is documentation
 
-The classifier SHALL judge a list of repository-relative paths as `docs-only` when the list is non-empty and every path is documentation, and as `full` otherwise. A path SHALL be documentation when it ends in `.md`, in any directory, or ends in `.yaml` and lies under `openspec/`. Suffixes SHALL be matched case-sensitively. A path that is absolute, starts with `./`, or contains an empty or `..` segment SHALL NOT be documentation. Paths are taken as given: the classifier does not read the files, and a deleted path or either side of a rename is judged like any other.
+The classifier SHALL judge a list of paths as `docs-only` when the list is non-empty and every path is documentation, and as `full` otherwise. Paths are taken as given: the classifier does not read the files, and a deleted path or either side of a rename is judged like any other.
 
 #### Scenario: Markdown only
 
 - **WHEN** the paths are `docs/backlog.md`, `AGENTS.md` and `libs/shared/core/README.md`
 - **THEN** the verdict is `docs-only`
 
-#### Scenario: A change record
-
-- **WHEN** the paths are `openspec/changes/archive/2026-10-17-x/proposal.md` and `openspec/changes/archive/2026-10-17-x/.openspec.yaml`
-- **THEN** the verdict is `docs-only`
-
 #### Scenario: Markdown beside code
 
 - **WHEN** the paths are `docs/backlog.md` and `libs/shared/core/src/index.ts`
 - **THEN** the verdict is `full`
+
+#### Scenario: A deleted or renamed source file
+
+- **WHEN** the paths are `docs/a.md` and `libs/shared/core/src/lib/result.ts`, the latter being deleted or the source side of a rename
+- **THEN** the verdict is `full`
+
+#### Scenario: Nothing changed
+
+- **WHEN** the list of paths is empty
+- **THEN** the verdict is `full`
+
+### Requirement: Documentation is Markdown, or YAML under the change records
+
+A path SHALL be documentation when it ends in `.md`, in any directory, or ends in `.yaml` and lies under `openspec/`. Suffixes SHALL be matched case-sensitively. A path that is absolute, starts with `./`, or contains an empty or `..` segment SHALL NOT be documentation.
+
+#### Scenario: A change record
+
+- **WHEN** the paths are `openspec/changes/archive/2026-10-17-x/proposal.md` and `openspec/changes/archive/2026-10-17-x/.openspec.yaml`
+- **THEN** the verdict is `docs-only`
 
 #### Scenario: YAML outside the change records
 
@@ -36,16 +50,6 @@ The classifier SHALL judge a list of repository-relative paths as `docs-only` wh
 #### Scenario: A path that is not repository-relative
 
 - **WHEN** the paths are `openspec/../x.yaml`, or `/abs/docs/a.md`, or `./docs/a.md`
-- **THEN** the verdict is `full`
-
-#### Scenario: A deleted or renamed source file
-
-- **WHEN** the paths are `docs/a.md` and `libs/shared/core/src/lib/result.ts`, the latter being deleted or the source side of a rename
-- **THEN** the verdict is `full`
-
-#### Scenario: Nothing changed
-
-- **WHEN** the list of paths is empty
 - **THEN** the verdict is `full`
 
 ### Requirement: Declared exceptions are never documentation

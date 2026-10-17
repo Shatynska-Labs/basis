@@ -1,0 +1,42 @@
+set -eu
+. "$(dirname "$0")/lib/change-scope.sh"
+
+# A push is judged only where the working tree is what is pushed, as the
+# pull-request gate would judge it: one ref, not a deletion, at HEAD, with a
+# clean working tree and one merge base with origin/main. Otherwise the full
+# checks run, and the hook says why.
+zero=0000000000000000000000000000000000000000
+refs=$(cat)
+reason=
+if [ "$(printf '%s\n' "$refs" | grep -c .)" -ne 1 ]; then
+  reason="the push carries more than one ref"
+else
+  read -r local_ref local_sha _remote_ref _remote_sha <<REFS
+$refs
+REFS
+  if [ "$local_sha" = "$zero" ]; then
+    reason="the push deletes $local_ref"
+  elif [ "$local_sha" != "$(git rev-parse HEAD)" ]; then
+    reason="$local_ref is not HEAD"
+  elif [ -n "$(git status --porcelain)" ]; then
+    reason="the working tree has uncommitted or untracked changes"
+  elif [ "$(git merge-base --all origin/main HEAD 2>/dev/null | grep -c .)" -ne 1 ]; then
+    reason="HEAD does not have exactly one merge base with origin/main"
+  fi
+fi
+
+if [ -n "$reason" ]; then
+  echo "pre-push: not judged ($reason); running the full checks."
+  pnpm nx run-many -t lint typecheck test integration build
+  exit 0
+fi
+
+echo "pre-push: judging $local_ref against origin/main."
+if ! changed=$(git diff --name-only --no-renames origin/main...HEAD); then
+  echo "pre-push: could not compute the pushed change; running the full checks." >&2
+  pnpm nx run-many -t lint typecheck test integration build
+elif [ "$(judge pre-push "$changed")" = docs-only ]; then
+  echo "pre-push: documentation-only push; lint, typecheck, test, integration and build not run."
+else
+  pnpm nx affected -t lint typecheck test integration build --base=origin/main --head=HEAD
+fi

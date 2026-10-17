@@ -8,7 +8,7 @@
 |---|---|---|
 | What this is | `README.md` (What it is, Scope), `docs/product/01-vision.md` | dropped |
 | Key product principles 1–7 | `docs/product/01-vision.md` Principles 1–9 (vision principle 10, "trends, not individual data points", has no counterpart in the draft); `excused` cap in `docs/product/04-domain-model.md` | pointer |
-| Key product principle 8 (deterministic logic in code, LLM suggestions confirmed by a human) | ADR-0007 (project-wide: deterministic logic outside the LLM; suggestions "always require human confirmation"), ADR-0012 §1 and `README.md` Architecture (for graphs); none in a file every session loads | deterministic half carried as a convention; the confirmation half left to backlog entry `reconcile-ai-suggestion-confirmation` |
+| Key product principle 8 (deterministic logic in code, LLM suggestions confirmed by a human) | ADR-0007 (project-wide: deterministic logic outside the LLM; suggestions "always require human confirmation"), ADR-0012 §1 and `README.md` Architecture (for graphs); none in a file every session loads | deterministic half and the uncontested oversight rules carried as a convention; confirmation before other AI output applies left to backlog entry `reconcile-ai-suggestion-confirmation` |
 | Stack | `README.md` Technology, ADR-0011, ADR-0013 | dropped (the draft lacks Drizzle, `@nestjs/cqrs`, Zod, Langfuse) |
 | Architecture: pragmatic DDD | `README.md` Architecture, ADR-0010, ADR-0012; "no implicit now" in `AGENTS.md` Testing Strategy | dropped (the draft's EventEmitter and "full layering only for habits and stake" contradict ADR-0012; its surviving rules — no reading another context's tables, a pure `domain` with time passed in, external formats kept out of `domain` — are recorded there) |
 | Monorepo structure, module boundaries | ADR-0012 tag table, `docs/architecture/context-map.md` | dropped (the draft cites ADR-0005's superseded table) |
@@ -30,7 +30,7 @@ Each is the draft's convention restated, with a pointer to the live document tha
 
 - Timestamps carry a time zone; a user's day and week (Mon–Sun) are computed in that user's local time zone (`docs/product/04-domain-model.md`, `03-prd-mvp.md`).
 - Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency, its status provisional until then, and a closed day is recalculated, and flagged, if late data arrives (`04-domain-model.md` §3).
-- Every user-owned entity carries a `user_id`; nothing global is tailored to a particular user. The reference to the owning user is persisted; its field and column name are the schema's, not this convention's (`Share.ownerId` in `04-domain-model.md` §8 is such a reference, beside `viewer.userId`, which is not).
+- Every user-owned entity carries a reference to its owning user; nothing global is tailored to a particular user. The reference to the owning user is persisted; its field and column name are the schema's, not this convention's (`Share.ownerId` in `04-domain-model.md` §8 is such a reference, beside `viewer.userId`, which is not).
 - Metrics are normalized and source-agnostic; each source reaches them through its own adapter (`04-domain-model.md` §1).
 - "Domain" is used only in the DDD sense; spheres of habits are life areas (ADR-0010).
 - Secrets (bank tokens, API keys) are encrypted and never logged. Carried from the draft; `06-risks-and-open-questions.md` covers only the monobank token's encryption.
@@ -39,7 +39,7 @@ Each is the draft's convention restated, with a pointer to the live document tha
 
 "Every entity has a `user_id`" is narrowed to user-owned entities: the health starter template (`04-domain-model.md`) is global by design, and the draft's own second clause ("no global settings tailored to a specific user") presumes that global data exists.
 
-### Human confirmation of AI suggestions is not carried
+### Contested confirmation of AI output is not carried
 
 The draft's "their suggestions are confirmed by a human" restates ADR-0007 ("their suggestions always require human confirmation"), which conflicts with the PRD: plate scores are applied at once and corrected afterwards (US-12, US-13; `04-domain-model.md` §5; "the user never waits for the AI"), and only the weekly review's goal change is accepted or rejected (US-15). Resolving that conflict changes an accepted ADR and is a decision of its own, which this change does not depend on. The convention carries what every source agrees on — deterministic logic in code, every AI assessment correctable, a goal change applied only once accepted — and names the open question, and the conflict is recorded in `docs/backlog.md` as `reconcile-ai-suggestion-confirmation` (operator decision, 2026-10-17).
 

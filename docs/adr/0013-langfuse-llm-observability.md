@@ -13,7 +13,7 @@ Traces carry what the graphs see: meal photos and health context. `docs/product/
 **Langfuse, self-hosted on the existing Hetzner infrastructure**, for tracing, datasets and evals.
 
 - Traces stay on Hetzner; no trace data leaves the system.
-- Traces are personal data: each carries the user's identifier, is kept for a bounded retention period, and is deleted with the account.
+- Traces are personal data: each carries the user's identifier, is kept for a bounded retention period, and is deleted with the account — trace records and the media Langfuse keeps in its blob storage alike. The retention value is set by the change that deploys Langfuse.
 - Evals measure quality; they are not part of the CI gate.
 - The Langfuse SDK is used only in `infrastructure` (ADR-0012).
 

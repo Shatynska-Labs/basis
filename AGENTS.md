@@ -147,7 +147,7 @@ It sits outside the change that recorded it, because a note kept inside one is a
 Tests are written at the lowest level that can show the behaviour; the `domain` layer carries most of them.
 
 - **Unit tests sit beside the file they test**, as `*.spec.ts` / `*.spec.tsx`: domain (pure, no database, framework or clock — time is passed in), application handlers (in-memory fakes for ports), LangGraph.js graphs (fake model, no network), ACL translation (recorded fixtures for Health Connect, the monobank webhook and the AI provider; no live external calls), web and mobile components.
-- **Integration tests live apart**, in `libs/<context>/<lib>/tests/integration/*.integration.spec.ts`: driven adapters against real PostgreSQL and Redis through Testcontainers, one throwaway instance per run. That per-run instance is this project's namespace under the workflow's shared-service rule.
+- **Integration tests live apart**, in `libs/<context>/<lib>/tests/integration/*.integration.spec.ts`: driven adapters against real PostgreSQL and Redis through Testcontainers, one throwaway instance per run. That per-run instance is this project's namespace under the workflow's shared-service rule; verification never uses the `docker compose` services, which are for manual local development only.
 - **API end-to-end tests** live in `apps/api-e2e/`: supertest against a booted app on Testcontainers.
 - **Runners:** Vitest for libraries, `apps/api` and `apps/web`, compiling Nest code through SWC (`unplugin-swc`); Jest with `jest-expo` for `apps/mobile`.
 - **Not automated:** Health Connect permissions, background sync and battery-optimization behaviour are verified by hand on the reference device.
@@ -155,7 +155,7 @@ Tests are written at the lowest level that can show the behaviour; the `domain` 
 
 **Test command:** `pnpm nx affected -t test` (CI), `pnpm nx run-many -t test` (whole suite); integration: `pnpm nx affected -t integration` (needs Docker); API end-to-end: `pnpm nx e2e api-e2e`.
 
-**Test-path glob:** `{apps,libs}/**/*.spec.{ts,tsx}`; integration specs are the `*.integration.spec.ts` files under `tests/integration/`.
+**Test-path glob:** `{apps,libs}/**/*.spec.{ts,tsx}`, excluding `**/*.integration.spec.ts` (the `test` target); integration: `{apps,libs}/**/tests/integration/*.integration.spec.ts` (the `integration` target).
 
 These commands exist once the workspace is scaffolded (roadmap Phase 1); until then the project has no test suite.
 
@@ -167,7 +167,7 @@ These commands exist once the workspace is scaffolded (roadmap Phase 1); until t
 - **Prettier** for formatting.
 - **Nx targets:** `lint`, `typecheck`, `test`, `integration`, `build`, `e2e`.
 - **CI:** GitHub Actions, `pnpm nx affected -t lint typecheck test integration build` with `nrwl/nx-set-shas`. CI is the authority; no local hook is.
-- **Local services:** `docker compose` for PostgreSQL, Redis and Langfuse.
+- **Local services:** `docker compose` for PostgreSQL, Redis and Langfuse, for manual development only; verification uses Testcontainers.
 - **Migrations:** drizzle-kit.
 - **Commits:** Conventional Commits.
 <!-- /ai-toolkit:project-foundation -->

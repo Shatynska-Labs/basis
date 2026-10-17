@@ -33,7 +33,7 @@ Never, by product principle: counting calories or macros; diagnosing or giving m
 
 Not in MVP: the Stake module (right after MVP), the coach role, correlations in the weekly review, the doctor report, public onboarding, the template library, group challenges, habits outside the health area, iOS and Apple Health, lab-result OCR.
 
-Not in the architecture, for now: microservices, event sourcing, full CQRS, a transactional outbox, a database per context.
+Not in the architecture, for now: microservices, event sourcing, separate read models (full CQRS — command and query separation at the application level is adopted), a transactional outbox, a database per context.
 
 ## Technology
 

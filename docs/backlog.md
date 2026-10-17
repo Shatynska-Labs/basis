@@ -4,7 +4,7 @@ Changes this project has identified but not yet opened, and what each depends on
 
 ## `integrate-the-context-draft`
 
-`docs/CLAUDE.md` is the discovery-phase draft of the project's context file. It was moved out of the root before initialization so the root `CLAUDE.md` could import `AGENTS.md`, and since then nothing loads it automatically. Integrate what is still true into the live documents and remove the draft:
+`docs/CLAUDE.md` is the discovery-phase draft of the project's context file. It was moved out of the root before initialization so the root `CLAUDE.md` could import `AGENTS.md`. Claude Code now loads it only when a session reads files under `docs/`, and then as stale guidance held back by its banner; a session working anywhere else never sees its conventions. Integrate what is still true into the live documents and remove the draft:
 
 - **its conventions first** — timestamps carry a time zone and a user's day is computed in their local time zone; sleep belongs to the day it ended and a day closes the next morning; every entity has a `user_id`; metrics are normalized and source-agnostic; "domain" is used only in the DDD sense and spheres of habits are life areas; secrets are encrypted and never logged; code, comments, commit messages and docs are in English. These shape every implementation change and belong where a session reads them without being told to look (`AGENTS.md`);
 - its product principles, already stated in `docs/product/01-vision.md`, need only a pointer;

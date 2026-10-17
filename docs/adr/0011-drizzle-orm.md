@@ -15,7 +15,7 @@ ADR-0006 chose PostgreSQL but no way to reach it from code. The data-access laye
 - **Each context owns its tables in its own PostgreSQL schema** (`pgSchema('<context>')`), defined in that context's `infrastructure` library, so Nx boundaries (ADR-0012) keep other contexts from importing them.
 - **Rule 1 — row types stay in `infrastructure`.** Drizzle's inferred types (`$inferSelect`, `$inferInsert`) never appear in `domain`, `application` or `contracts`. `contracts` define their types with hand-written Zod schemas, not schemas generated from tables.
 - **Rule 2 — transactions go through a port.** A transaction spanning several repositories is carried by a `TransactionManager` port in `application`, implemented with AsyncLocalStorage in `infrastructure`.
-- **One drizzle-kit migration history** covers the database.
+- **One drizzle-kit migration history** covers the database, owned by `apps/api`: its `drizzle.config.ts` collects every context's schema and its `migrations/` folder holds the history. An app may depend on any library (ADR-0012 §7), so collecting the schemas there crosses no boundary, while a library doing it would.
 - **The LangGraph.js checkpointer tables are the exception.** The checkpointer library creates and migrates them itself, so they sit outside drizzle-kit. Each context running a graph (`nutrition`, `insights`) gives its checkpointer its own schema (`nutrition_checkpoints`, `insights_checkpoints`) through the checkpointer's `schema` option, so every table is still owned by one context.
 
 ## Alternatives considered

@@ -25,7 +25,7 @@
 | Weight, measurements | High | Postgres | Only with explicit permission | No |
 | Body photos | Very high | Object Storage, encrypted | Data owner only by default | No |
 | Lab results | Very high (GDPR special category) | Postgres, encrypted | Data owner only by default | No (no AI interpretation in MVP) |
-| LLM traces (graph inputs and outputs, including meal photos and health context) | High | Self-hosted Langfuse on Hetzner (ADR-0013) | Data owner; developers for debugging and evals | No; kept for a bounded retention period and deleted with the account |
+| LLM traces (graph inputs and outputs, including meal photos and health context) | High | Self-hosted Langfuse on Hetzner (ADR-0013) | Data owner; developers for debugging and evals | No; kept for a bounded retention period (set when Langfuse is deployed) and deleted with the account, including media in Langfuse's blob storage |
 | monobank token | Critical | Encrypted (KMS/secret store) | No one | Only to the monobank API |
 | monobank transactions | High (financial) | Only relevant ones (transfers to the jar) | Data owner; referee — "settled" status only | No |
 

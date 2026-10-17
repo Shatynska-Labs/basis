@@ -13,10 +13,10 @@
 
 ## 3. Updated documents
 
-- [x] 3.1 Add to ADR-0004, ADR-0005 and ADR-0010 a status line "superseded in part by ADR-0012" and a one-line pointer naming what ADR-0012 replaces, leaving their decision text unchanged, and verify each pointer names a section ADR-0012 actually contains
+- [x] 3.1 Add to ADR-0004, ADR-0005 and ADR-0010 a status line "accepted; superseded in part by ADR-0012" and a one-line pointer naming what ADR-0012 replaces, leaving their decision text unchanged, and verify each pointer names a section ADR-0012 actually contains
 - [x] 3.2 Update `docs/architecture/context-map.md` (the Layering column and the Nx structure) and verify it agrees with ADR-0012
 - [x] 3.3 Add Langfuse traces to the DPIA table in `docs/product/06-risks-and-open-questions.md`, stating that traces stay on Hetzner, are kept for a bounded period and are deleted with the account, and verify the row matches ADR-0013
-- [x] 3.4 Add ADR-0011 to ADR-0013 to `docs/adr/README.md` and set the statuses of ADR-0004, ADR-0005 and ADR-0010 to "superseded in part by ADR-0012", and verify the index matches each ADR's own status line
+- [x] 3.4 Add ADR-0011 to ADR-0013 to `docs/adr/README.md` and set the statuses of ADR-0004, ADR-0005 and ADR-0010 to "accepted; superseded in part by ADR-0012", and verify the index matches each ADR's own status line
 - [x] 3.5 Put a banner at the top of `docs/CLAUDE.md` stating that it is the discovery-phase draft, superseded wherever it conflicts with `docs/adr/` and `AGENTS.md`, and that its integration is the backlog entry `integrate-the-context-draft`, and verify the banner names both
 - [x] 3.6 Create `docs/backlog.md` with the entry `integrate-the-context-draft` (what remains to integrate from `docs/CLAUDE.md`, starting with its conventions; argued in this change) and verify the entry is cited by name in the banner
 

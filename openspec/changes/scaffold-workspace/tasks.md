@@ -28,8 +28,8 @@ The plan is committed, then tests are derived from `specs/shared-core/spec.md` i
 
 ## 5. `tools/change-scope`
 
-- [ ] 5.1 Generate `tools/change-scope` as a Vitest-tested project tagged `scope:tooling`, `type:tooling`, keeping the derived `src/docs-only.spec.ts`; add the `type:tooling` row and set `erasableSyntaxOnly: true` (decision 11); verify `pnpm nx show project change-scope` lists `lint`, `typecheck` and `test`.
-- [ ] 5.2 Implement `src/docs-only.ts` (decision 11): the exported classifier and the standard-input entry point, standard library only; verify the derived tests pass and `printf 'docs/a.md\n' | node tools/change-scope/src/docs-only.ts` prints `docs-only`, `printf 'docs/a.md\nx.ts\n' | …` prints `full`, and an empty input prints `full`.
+- [x] 5.1 Generate `tools/change-scope` as a Vitest-tested project tagged `scope:tooling`, `type:tooling`, keeping the derived `src/docs-only.spec.ts`; add the `type:tooling` row and set `erasableSyntaxOnly: true` (decision 11); verify `pnpm nx show project change-scope` lists `lint`, `typecheck` and `test`.
+- [x] 5.2 Implement `src/docs-only.ts` (decision 11): the exported classifier and the standard-input entry point, standard library only; verify the derived tests pass and `printf 'docs/a.md\n' | node tools/change-scope/src/docs-only.ts` prints `docs-only`, `printf 'docs/a.md\nx.ts\n' | …` prints `full`, and an empty input prints `full`.
 
 ## 6. Hooks
 

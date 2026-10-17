@@ -232,6 +232,8 @@ importers:
 
   libs/shared/core: {}
 
+  tools/change-scope: {}
+
 packages:
 
   '@babel/code-frame@7.29.7':

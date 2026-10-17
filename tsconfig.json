@@ -5,6 +5,9 @@
   "references": [
     {
       "path": "./libs/shared/core"
+    },
+    {
+      "path": "./tools/change-scope"
     }
   ]
 }

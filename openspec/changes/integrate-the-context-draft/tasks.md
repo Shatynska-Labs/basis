@@ -1,13 +1,13 @@
 ## 1. Integration
 
-- [ ] 1.1 Add a `## Conventions` section to `AGENTS.md` after the `ai-toolkit:project-foundation` block and outside both delimited blocks, carrying the eight conventions listed in `design.md`, and verify each appears and none contradicts `docs/product/04-domain-model.md`, ADR-0010 or ADR-0012
-- [ ] 1.2 In the same section, point to `docs/product/01-vision.md` for the product principles, stating that it is read before any change touching evaluation, AI assessment or sharing, and verify the link resolves and the clause is present
-- [ ] 1.3 Delete `docs/CLAUDE.md`, and verify no file outside `openspec/changes/archive/`, this change's own artifacts and `docs/backlog.md`'s `integrate-the-context-draft` entry (deleted at archive, task 3.3) references it
+- [x] 1.1 Add a `## Conventions` section to `AGENTS.md` after the `ai-toolkit:project-foundation` block and outside both delimited blocks, carrying the eight conventions listed in `design.md`, and verify each appears and none contradicts `docs/product/04-domain-model.md`, ADR-0010 or ADR-0012
+- [x] 1.2 In the same section, point to `docs/product/01-vision.md` for the product principles, stating that it is read before any change touching evaluation, AI assessment or sharing, and verify the link resolves and the clause is present
+- [x] 1.3 Delete `docs/CLAUDE.md`, and verify no file outside `openspec/changes/archive/`, this change's own artifacts and `docs/backlog.md`'s `integrate-the-context-draft` entry (deleted at archive, task 3.3) references it
 
 ## 2. Verification
 
-- [ ] 2.1 Run `openspec validate integrate-the-context-draft` and verify it passes
-- [ ] 2.2 Verify that both delimited blocks in `AGENTS.md` are byte-identical to the trunk's
+- [x] 2.1 Run `openspec validate integrate-the-context-draft` and verify it passes
+- [x] 2.2 Verify that both delimited blocks in `AGENTS.md` are byte-identical to the trunk's
 
 ## 3. Ship
 

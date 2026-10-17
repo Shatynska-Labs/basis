@@ -171,3 +171,16 @@ These commands exist once the workspace is scaffolded (roadmap Phase 1); until t
 - **Migrations:** drizzle-kit.
 - **Commits:** Conventional Commits.
 <!-- /ai-toolkit:project-foundation -->
+
+## Conventions
+
+Product principles are in [`docs/product/01-vision.md`](docs/product/01-vision.md#principles); read them before any change touching evaluation, AI assessment or sharing.
+
+- **Time.** Timestamps carry a time zone; a user's day and week (Mon–Sun) are computed in that user's local time zone (`docs/product/04-domain-model.md`).
+- **Day boundaries.** Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency (`docs/product/04-domain-model.md`).
+- **Ownership.** Every user-owned entity carries a `user_id` — the persisted owning-user reference, whatever the TypeScript field is named (`Share.ownerId` is one); nothing global is tailored to a particular user.
+- **Metrics.** Metrics are normalized and source-agnostic; each source reaches them through its own adapter (`docs/product/04-domain-model.md` §1).
+- **Vocabulary.** "Domain" is used only in the DDD sense; spheres of habits — health, household, finances — are life areas (ADR-0010).
+- **Secrets.** Secrets (bank tokens, API keys) are encrypted and never logged.
+- **Deterministic logic lives in code, not in the LLM.** A graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain`. The human has the final say: an AI assessment is always correctable, and a suggested goal change is accepted or rejected (ADR-0012 §1, vision principle 7).
+- **Language.** Code, comments, commit messages and documentation are in English.

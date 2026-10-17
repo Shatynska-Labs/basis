@@ -7,10 +7,10 @@
 | Draft section | Live source | Outcome |
 |---|---|---|
 | What this is | `README.md` (What it is, Scope), `docs/product/01-vision.md` | dropped |
-| Key product principles 1–7 | `docs/product/01-vision.md` Principles 1–9; `excused` cap in `docs/product/04-domain-model.md` | pointer |
-| Key product principle 8 (deterministic logic in code, LLM suggestions confirmed by a human) | stated for graphs in ADR-0012 §1 and `README.md` Architecture, and as "the human has the final say" in vision principle 7, but not as a project-wide convention in a file every session loads | carried as a convention, reworded |
+| Key product principles 1–7 | `docs/product/01-vision.md` Principles 1–9 (vision principle 10, "trends, not individual data points", has no counterpart in the draft); `excused` cap in `docs/product/04-domain-model.md` | pointer |
+| Key product principle 8 (deterministic logic in code, LLM suggestions confirmed by a human) | ADR-0007 (project-wide: deterministic logic outside the LLM; suggestions "always require human confirmation"), ADR-0012 §1 and `README.md` Architecture (for graphs); none in a file every session loads | deterministic half carried as a convention; the confirmation half left to backlog entry `reconcile-ai-suggestion-confirmation` |
 | Stack | `README.md` Technology, ADR-0011, ADR-0013 | dropped (the draft lacks Drizzle, `@nestjs/cqrs`, Zod, Langfuse) |
-| Architecture: pragmatic DDD | `README.md` Architecture, ADR-0012 | dropped (the draft's EventEmitter and "full layering only for habits and stake" contradict ADR-0012) |
+| Architecture: pragmatic DDD | `README.md` Architecture, ADR-0010, ADR-0012; "no implicit now" in `AGENTS.md` Testing Strategy | dropped (the draft's EventEmitter and "full layering only for habits and stake" contradict ADR-0012; its surviving rules — no reading another context's tables, a pure `domain` with time passed in, external formats kept out of `domain` — are recorded there) |
 | Monorepo structure, module boundaries | ADR-0012 tag table, `docs/architecture/context-map.md` | dropped (the draft cites ADR-0005's superseded table) |
 | Development process | `AGENTS.md` Development workflow, `docs/README.md` How to use | dropped |
 | Conventions | partly in `docs/product/04-domain-model.md`, `03-prd-mvp.md`, ADR-0010; none in a file every session loads | carried |
@@ -29,21 +29,25 @@ Alternative: `README.md`. Rejected — sessions do not load it unless told to.
 Each is the draft's convention restated, with a pointer to the live document that argues it where one exists:
 
 - Timestamps carry a time zone; a user's day and week (Mon–Sun) are computed in that user's local time zone (`docs/product/04-domain-model.md`, `03-prd-mvp.md`).
-- Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency (`04-domain-model.md`).
-- Every user-owned entity carries a `user_id`; nothing global is tailored to a particular user. The convention concerns the persisted owning-user reference (the `user_id` column), whatever the TypeScript field is named — `Share.ownerId` in `04-domain-model.md` §8 is such a reference.
+- Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency, and a closed day is recalculated, and flagged, if late data arrives (`04-domain-model.md` §3).
+- Every user-owned entity carries a `user_id`; nothing global is tailored to a particular user. The persisted owning-user column is named `user_id` whatever the TypeScript field is named — `Share.ownerId` in `04-domain-model.md` §8 is persisted as `user_id`.
 - Metrics are normalized and source-agnostic; each source reaches them through its own adapter (`04-domain-model.md` §1).
 - "Domain" is used only in the DDD sense; spheres of habits are life areas (ADR-0010).
 - Secrets (bank tokens, API keys) are encrypted and never logged. Carried from the draft; `06-risks-and-open-questions.md` covers only the monobank token's encryption.
-- Deterministic logic lives in code, not in the LLM: a graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain`. The human has the final say: an AI assessment is always correctable, and a suggested goal change is accepted or rejected (ADR-0012 §1, `01-vision.md` principle 7).
+- Deterministic logic lives in code, not in the LLM: a graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain` (ADR-0007, ADR-0012 §1).
 - Code, comments, commit messages and documentation are in English.
 
 "Every entity has a `user_id`" is narrowed to user-owned entities: the health starter template (`04-domain-model.md`) is global by design, and the draft's own second clause ("no global settings tailored to a specific user") presumes that global data exists.
 
-The draft's "their suggestions are confirmed by a human" is reworded: plate scores are applied at once and corrected afterwards (PRD US-12, US-13; `04-domain-model.md` §5; "the user never waits for the AI"), and only the weekly review's goal change is accepted or rejected (US-15).
+### Human confirmation of AI suggestions is not carried
+
+The draft's "their suggestions are confirmed by a human" restates ADR-0007 ("their suggestions always require human confirmation"), which conflicts with the PRD: plate scores are applied at once and corrected afterwards (US-12, US-13; `04-domain-model.md` §5; "the user never waits for the AI"), and only the weekly review's goal change is accepted or rejected (US-15). Resolving that conflict changes an accepted ADR and is a decision of its own, which this change does not depend on. The convention carries only the uncontested half, and the conflict is recorded in `docs/backlog.md` as `reconcile-ai-suggestion-confirmation` (operator decision, 2026-10-17).
+
+Alternatives: supersede ADR-0007 in part within this change (rejected — widens a documentation move into an architectural decision); follow ADR-0007 (rejected — contradicts the PRD).
 
 ### Product principles: a pointer, not a copy
 
-`docs/product/01-vision.md` holds the principles and is the source of truth; a copy in `AGENTS.md` would drift. The section names that file and says it is read before any change touching evaluation, AI assessment or sharing.
+`docs/product/01-vision.md` holds the principles and is the source of truth; a copy in `AGENTS.md` would drift. The section names that file and says it is read before any change touching product behaviour.
 
 ### The backlog entry is deleted at archive
 
@@ -51,4 +55,5 @@ The draft's "their suggestions are confirmed by a human" is reworded: plate scor
 
 ## Risks
 
-- A convention judged "still true" may be stale on a point no live document settles. Mitigation: each carried convention was checked against the documents named above; the one that contradicted them (human confirmation of LLM suggestions) is reworded, and none contradicts ADR-0012.
+- A convention judged "still true" may be stale on a point no live document settles. Mitigation: each carried convention was checked against the documents named above, including ADR-0007; the one clause on which they disagree among themselves (human confirmation of LLM suggestions) is not carried and is recorded in the backlog.
+- Between the implementation merge and the archive merge, the trunk's `integrate-the-context-draft` backlog entry names the deleted `docs/CLAUDE.md`. Accepted: the backlog rule deletes an entry at archive.

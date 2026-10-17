@@ -8,11 +8,11 @@
 |---|---|---|---|---|
 | `habits` | core | habit rules, daily and weekly evaluation, "never miss twice", calibration, goal progression | `HabitRule`, `DayEvaluation`, `WeekEvaluation`, `Tier`, `HabitStatus`, `GoalChangeProposal` | yes |
 | `metrics` | supporting | ingestion and normalization of source data; idempotency | `MetricRecord`, `Source`, `SourceStatus` | yes; ACL to Health Connect (driving) |
-| `nutrition` | supporting | meals, slots, plate assessment, manual correction | `Meal`, `MealSlot`, `PlateAssessment` | yes; ACL to the AI provider (driven) |
+| `nutrition` | supporting | meals, slots, plate assessment, manual correction | `Meal`, `MealSlot`, `PlateAssessment` | yes; ACL to the AI provider (driven; the LangGraph.js graph behind a port) |
 | `results` | supporting | weight (trend), measurements, progress photos, lab results | `WeightEntry`, `Measurement`, `ProgressPhoto`, `LabResult` | no |
 | `sharing` | supporting | invitations, access, roles, reactions | `Share`, `Invitation`, `Scope`, `Role`, `Reaction` | no |
 | `stake` | supporting | virtual balance, buffer, settlements, confirmation | `StakeLedgerEntry`, `Settlement`, `Buffer`, `StakeSettings` | yes; ACL to monobank (webhook driving, API driven) |
-| `insights` | supporting | weekly reviews, change suggestions (LangGraph) | `WeeklyReview`, `Suggestion` | no (graphs in `application`); ACL to the AI provider (driven) |
+| `insights` | supporting | weekly reviews, change suggestions (LangGraph) | `WeeklyReview`, `Suggestion` | no; ACL to the AI provider (driven; the LangGraph.js graph behind a port) |
 | `identity` | generic | authentication, profile, time zone, heart-rate zones | `User`, `Profile` | no |
 | `notifications` | generic | push and reminders | `Notification`, `ReminderRule` | no |
 
@@ -35,7 +35,9 @@ Health Connect ──ACL──▶ metrics ──MetricRecorded──▶ habits �
 - `insights` only **proposes** a goal change; `habits` applies it after the user confirms.
 - `sharing` reads other contexts' aggregates through their public queries (contracts), never their tables.
 
-## Domain events (initial set)
+## Integration events (initial set)
+
+These are integration events (ADR-0012 §3): defined in the publishing context's `contracts`, published on the `EventBus` after commit. Domain events raised inside a context are not listed here and never leave it.
 
 | Event | Published by | Consumers | Payload |
 |---|---|---|---|

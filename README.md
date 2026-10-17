@@ -43,7 +43,7 @@ TypeScript throughout.
 |---|---|
 | Mobile (primary) | Expo (React Native) with a dev build, `react-native-health-connect` |
 | Web | Vite + React, TanStack Router, TanStack Query, ECharts (`echarts-for-react`) |
-| Backend | NestJS 12; `@nestjs/cqrs` for commands, queries and domain events; LangGraph.js (`@langchain/langgraph`) for AI workflows |
+| Backend | NestJS 12; `@nestjs/cqrs` for commands, queries and integration events; LangGraph.js (`@langchain/langgraph`) for AI workflows |
 | Data | PostgreSQL with Drizzle ORM and drizzle-kit migrations; Redis + BullMQ (`@nestjs/bullmq`) |
 | Files | Hetzner Object Storage (S3-compatible), presigned uploads |
 | LLM observability | Langfuse, self-hosted on Hetzner |
@@ -67,11 +67,12 @@ A modular monolith with pragmatic DDD and ports and adapters ([ADR-0010](docs/ad
     application/       commands/ and queries/ (command or query + handler), ports
     infrastructure/
       driving/         what calls the context: HTTP, event subscribers, BullMQ processors, schedules, webhooks
-      driven/          what the context calls: Drizzle repositories, AI provider, object storage, push, monobank API
+      driven/          what the context calls: Drizzle repositories, AI provider and LangGraph.js graphs, object storage, push, monobank API
     contracts/         the public surface: events, query interfaces, Zod DTOs
   ```
 
-- **CQRS at the application level:** `@nestjs/cqrs` command and query buses, separate read and write repositories over one database; domain events through its `EventBus`; async work through BullMQ.
+- **CQRS at the application level:** `@nestjs/cqrs` command and query buses, separate read and write repositories over one database; integration events (defined in `contracts`) through its `EventBus`, while domain events stay inside their context; async work through BullMQ.
+- **LangGraph.js graphs are driven adapters** behind `application` ports; deterministic decisions such as the plate score stay in `domain`.
 - **Where frameworks may appear:** `domain` is pure TypeScript (no Nest, ORM, HTTP or implicit "now"); `application` may use only `@nestjs/common` and `@nestjs/cqrs` decorators; everything else lives in `infrastructure`.
 - **Errors are values:** expected failures are returned as `Result<F, S>`, not thrown.
 - **`libs/shared`** is a Shared Kernel: `core` (`Result` and other language-level additions), `domain` (`Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`), `util` (dates, time zones, units), `api-client`.

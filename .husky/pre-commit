@@ -1,4 +1,5 @@
 set -eu
+# shellcheck source=.husky/lib/change-scope.sh
 . "$(dirname "$0")/lib/change-scope.sh"
 
 pnpm exec lint-staged
@@ -10,20 +11,22 @@ else
 fi
 
 # No --diff-filter and --no-renames: deletions and both sides of a rename count.
-if ! staged=$(git diff --cached --name-only --no-renames); then
+if staged=$(git diff --cached --name-only --no-renames); then
+  verdict=$(judge pre-commit "$staged")
+else
   echo "pre-commit: could not compute the staged change; running the full checks." >&2
-  pnpm nx run-many -t lint typecheck test
-  exit 0
+  staged=
+  verdict=unjudged
 fi
+# An empty staged change (an amend or --allow-empty) affects no file to scope by.
+[ -n "$staged" ] || verdict=unjudged
 
 if printf '%s\n' "$staged" | grep -q '^openspec/'; then
   pnpm exec openspec validate --all --strict --no-interactive
 fi
 
-if [ "$(judge pre-commit "$staged")" = docs-only ]; then
-  echo "pre-commit: documentation-only change; lint, typecheck and test not run."
-elif [ -z "$staged" ]; then
-  pnpm nx run-many -t lint typecheck test
-else
-  pnpm nx affected -t lint typecheck test --files="$(printf '%s\n' "$staged" | paste -sd, -)"
-fi
+case $verdict in
+  docs-only) echo "pre-commit: documentation-only change; lint, typecheck and test not run." ;;
+  full) pnpm nx affected -t lint typecheck test --files="$(printf '%s\n' "$staged" | paste -sd, -)" ;;
+  *) pnpm nx run-many -t lint typecheck test ;;
+esac

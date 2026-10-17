@@ -1,4 +1,5 @@
 set -eu
+# shellcheck source=.husky/lib/change-scope.sh
 . "$(dirname "$0")/lib/change-scope.sh"
 
 # A push is judged only where the working tree is what is pushed, as the
@@ -32,11 +33,15 @@ if [ -n "$reason" ]; then
 fi
 
 echo "pre-push: judging $local_ref against origin/main."
-if ! changed=$(git diff --name-only --no-renames origin/main...HEAD); then
-  echo "pre-push: could not compute the pushed change; running the full checks." >&2
-  pnpm nx run-many -t lint typecheck test integration build
-elif [ "$(judge pre-push "$changed")" = docs-only ]; then
-  echo "pre-push: documentation-only push; lint, typecheck, test, integration and build not run."
+if changed=$(git diff --name-only --no-renames origin/main...HEAD); then
+  verdict=$(judge pre-push "$changed")
 else
-  pnpm nx affected -t lint typecheck test integration build --base=origin/main --head=HEAD
+  echo "pre-push: could not compute the pushed change; running the full checks." >&2
+  verdict=unjudged
 fi
+
+case $verdict in
+  docs-only) echo "pre-push: documentation-only push; lint, typecheck, test, integration and build not run." ;;
+  full) pnpm nx affected -t lint typecheck test integration build --base=origin/main --head=HEAD ;;
+  *) pnpm nx run-many -t lint typecheck test integration build ;;
+esac

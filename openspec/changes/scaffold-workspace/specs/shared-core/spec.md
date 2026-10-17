@@ -42,6 +42,11 @@ Every result SHALL answer `isSuccess()` and `isFailure()`, exactly one of which 
 - **WHEN** a function returning `Result<string, number>` is checked with `isSuccess()` and the branch reads `value` as a `number`, and the other branch reads `value` as a `string`
 - **THEN** the code type-checks, and reading the success branch's `value` as a `string` does not
 
+#### Scenario: A check narrows when both types are the same
+
+- **WHEN** a function returning `Result<string, string>` is checked with `isSuccess()`, and the other branch reads `value`, and likewise with `isFailure()`
+- **THEN** the code type-checks, with `value` a `string` in every branch, and neither branch's result is narrowed to an impossible type
+
 ### Requirement: The shared core depends on nothing
 
 The shared core SHALL import no other library of the workspace and no third-party package, so that every layer, the API and the web and mobile apps can use it (ADR-0012 §6, §7).

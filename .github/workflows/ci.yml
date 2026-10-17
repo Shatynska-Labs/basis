@@ -67,7 +67,8 @@ jobs:
           echo "verdict: $verdict"
           echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
 
-      - run: pnpm install --frozen-lockfile
+      - id: install
+        run: pnpm install --frozen-lockfile
 
       - uses: nrwl/nx-set-shas@v5
         with:
@@ -89,11 +90,16 @@ jobs:
         if: steps.scope.outputs.verdict == 'unjudged'
         run: pnpm nx run-many -t lint typecheck test integration build e2e
 
-      - run: pnpm format:check
+      # These run whatever the verdict, and whatever failed before them, so
+      # every check reports on every pull request.
+      - if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm format:check
 
-      - run: pnpm audit --audit-level high
+      - if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm audit --audit-level high
 
-      - run: pnpm exec openspec validate --all --strict --no-interactive
+      - if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm exec openspec validate --all --strict --no-interactive
 
   secrets:
     name: secrets

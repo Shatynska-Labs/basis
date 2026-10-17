@@ -111,6 +111,21 @@ Including `tools/` widens `pnpm-workspace.yaml` to `tools/*` and the test-path g
 
 Alternatives rejected: relying on `nx affected` alone — Markdown at the root or under `docs/` belongs to no project and would already select nothing, but Markdown inside a project selects that project, and the hooks would print no stand-down line; GitHub's `paths-ignore` — a second spelling of the set, and a required check whose workflow does not start stays pending forever.
 
+## Deviations during apply
+
+Recorded where apply departed from the decisions above, and why.
+
+- **pnpm 12, not 10.** Decision 1 asks for the current stable release, which is 12. Since pnpm 11 its settings live in `pnpm-workspace.yaml` (`saveExact`, `engineStrict`, `allowBuilds` in place of `onlyBuiltDependencies`, `overrides`, `auditConfig`); `.npmrc` is no longer read for them, so there is none. pnpm 12 also refuses a release younger than its minimum release age: `eslint` is 10.12.0 and `@fission-ai/openspec` 1.14.2 rather than the day-old latest, and no exclusion was added.
+- **TypeScript 6.0.3, not 7.** typescript-eslint supports TypeScript below 6.1, and Nx 23.3 installs 6.0.
+- **Generator output removed.** The Nx library generator adds a root `vitest.config.mts` whose `**/vitest.config.*` project glob would descend into nested working trees (decision 5), a coverage provider (a non-goal), `importHelpers` (which needs `tslib`, a dependency `shared/core` may not have) and `customConditions`; all were removed.
+- **The derived `result.spec.ts` imports `'../index.js'`, not `'../index'`.** `nodenext` resolution requires the extension (TS2835), and without it the narrowing assertions passed vacuously over `any`. No assertion changed.
+- **A project's `eslint.config.mjs` may import the root one by relative path.** The boundary rule otherwise flags the import Nx itself generates; the exemption is an exact regular expression, in the configuration-file block only.
+- **OpenSpec's generated `.claude/commands/opsx/` and `.claude/skills/openspec-*/` are not formatted**, for the reason decision 4 gives for the generated workflow block: `openspec update` rewrites them.
+- **The `change-scope` requirement on what counts as documentation was split in two.** The pinned OpenSpec CLI rejects a requirement over 500 characters under `--strict`; the commit hook caught it. Behaviour and scenarios are unchanged.
+- **An unjudged change runs every project's checks.** The first cut of the hooks fell back to the affected projects, and a documentation-only change with a broken classifier reaches none; probing found it. `unjudged` now runs `nx run-many`.
+- **`undici` is overridden to 7.30.1** under `nx` 23.3.0, which pins 7.29.0, affected by two high advisories fixed in 7.29.1. **The `braces` advisory GHSA-vfj7-8cjw-p6xm is ignored**: no fixed release exists, and it is reached only through the OpenSpec CLI's globbing of this repository's own paths.
+- **commitlint 21 does not count URLs toward line length**, so the Dependabot exemption (decision 8) was verified with a long plain line rather than a long URL.
+
 ## Risks / Trade-offs
 
 - [Nx plugin and package names shift between majors, e.g. where the Vitest plugin lives] → decisions name what each tool must provide, not a package version; apply installs the current release and records the resolved names in `AGENTS.md` only where a contributor needs them.

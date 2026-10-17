@@ -25,3 +25,8 @@
 - [x] 4.1 Run `openspec validate project-foundation` and verify it passes
 - [x] 4.2 Verify that every `type:*` tag used in `docs/architecture/context-map.md` appears in ADR-0012's tag table, and that every relative link in `README.md`, `docs/README.md` and `docs/adr/README.md` resolves to an existing file
 - [x] 4.3 Read `README.md`, `AGENTS.md`, `docs/adr/` and `docs/architecture/context-map.md` together and verify no document contradicts another on the decisions recorded here
+
+## 5. Ship
+
+- [x] 5.1 Merge the implementation: pull request #1, merged 2026-10-17 as `6c23196`
+- [x] 5.2 Confirm — **waived** by the operator on 2026-10-17, class: *no observation can actually be made*. The change is documentation only (decisions, ADRs, `README.md`, `AGENTS.md`, `.gitignore`); nothing runs in production, so there is no effect to observe there. No successor is intended.

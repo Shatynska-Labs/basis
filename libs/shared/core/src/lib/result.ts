@@ -1,4 +1,4 @@
-// An expected failure is returned, not thrown (ADR-0012 §5): `domain` and
+// An expected failure is returned rather than thrown (ADR-0012 §5): `domain` and
 // application handlers return a `Result`, and driving adapters map it.
 
 // `kind` tells the two classes apart structurally, so a check still narrows

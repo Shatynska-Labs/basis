@@ -73,7 +73,7 @@ A modular monolith with pragmatic DDD and ports and adapters ([ADR-0010](docs/ad
 
 - **CQRS at the application level:** `@nestjs/cqrs` command and query buses, separate read and write repositories over one database; integration events (defined in `contracts`) through its `EventBus`, while domain events stay inside their context; async work through BullMQ.
 - **LangGraph.js graphs are driven adapters** behind `application` ports; deterministic decisions such as the plate score stay in `domain`.
-- **Where frameworks may appear:** `domain` is pure TypeScript (no Nest, ORM, HTTP or implicit "now"); `application` may use only `@nestjs/common` and `@nestjs/cqrs` decorators; everything else lives in `infrastructure`.
+- **Where frameworks may appear:** `domain` is pure TypeScript (no Nest, ORM, HTTP or implicit "now"); `application` may use only `@nestjs/common` and `@nestjs/cqrs` (decorators and the `EventBus`); everything else lives in `infrastructure`.
 - **Errors are values:** expected failures are returned as `Result<F, S>`, not thrown.
 - **`libs/shared`** is a Shared Kernel: `core` (`Result` and other language-level additions), `domain` (`Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`), `util` (dates, time zones, units), `api-client`.
 - **Boundaries are enforced** by `@nx/enforce-module-boundaries` with `scope:*` and `type:*` tags ([ADR-0005](docs/adr/0005-nx-monorepo.md), tag table superseded by [ADR-0012](docs/adr/0012-context-structure.md)); a violation is a lint error.

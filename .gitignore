@@ -38,3 +38,11 @@ pnpm-debug.log*
 
 # Change working trees
 .worktrees/
+
+# Mobile signing material
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision

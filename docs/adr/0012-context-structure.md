@@ -28,7 +28,7 @@ libs/<context>/
 - **`application`** — one folder per command or query, each holding the message and its handler; ports for read repositories, write repositories and gateways.
 - **`infrastructure/driving`** — adapters that call into the context: HTTP controllers, integration-event subscribers, BullMQ processors, schedules, webhooks.
 - **`infrastructure/driven`** — adapters the context calls: Drizzle repositories (ADR-0011), the AI provider and the LangGraph.js graphs built on it, object storage, push, the monobank API.
-- **`contracts`** — events, query interfaces and Zod DTOs: the only part another context or app may import.
+- **`contracts`** — events, query interfaces and Zod DTOs: the only part another context or app may import. Contracts hold plain TypeScript and Zod only: a cross-context query is a plain interface with its Zod result schema here, and the `@nestjs/cqrs` `Query` class that carries it lives in the consumer's `application`.
 
 `domain`, `application`, `infrastructure` and `contracts` are separate Nx libraries. `driving` and `driven` are folders inside `infrastructure`; a driving adapter reaches a driven one only through `application`, enforced with `no-restricted-imports`.
 
@@ -44,7 +44,7 @@ Commands and queries go through the `@nestjs/cqrs` `CommandBus` and `QueryBus`, 
 
 Supersedes ADR-0010 point 5, in mechanism and in meaning: contexts interact through integration events rather than domain events, and the in-process Nest EventEmitter gives way to the `EventBus`, so one mechanism carries commands, queries and events. Async work still goes through BullMQ.
 
-Two kinds of event are kept apart. A **domain event** is raised by an aggregate, is defined in that context's `domain`, and never leaves the context. An **integration event** — `DayClosed`, `WeekClosed` and the rest of the context map's table — is defined in `contracts` and is what other contexts subscribe to. A command handler in `application` maps the domain events of the aggregate it saved to integration events and publishes them on the `EventBus` once the transaction has committed. Domain events are not published on the `EventBus`: the handler collects them from the aggregate and acts on them in the same process. `domain` therefore never depends on `contracts`, and a context's internal model can change without changing its published language.
+Two kinds of event are kept apart. A **domain event** is raised by an aggregate, is defined in that context's `domain`, and never leaves the context. An **integration event** — `DayClosed`, `WeekClosed` and the rest of the context map's table — is defined in `contracts` and is what other contexts subscribe to. A command handler in `application` maps the domain events of the aggregate it saved to integration events and publishes them on the `EventBus` once the transaction has committed. Domain events are not published on the `EventBus`: the handler collects them from the aggregate and, in the same process, maps them to integration events and to follow-up commands in the same context. `domain` therefore never depends on `contracts`, and a context's internal model can change without changing its published language.
 
 ### 4. NestJS 12, and where its decorators may appear
 
@@ -85,7 +85,8 @@ Supersedes ADR-0005's boundary-rule table.
 | `type:data-access` | `type:contracts`, `type:core`, `type:util` |
 | `scope:<context>` | its own scope, `scope:shared`, and only `type:contracts` of other contexts |
 | `scope:shared` | its own scope; `type:data-access` (`shared/api-client`) may also depend on `type:contracts` of any scope |
-| apps | any library |
+| `apps/api` | any library |
+| `apps/web`, `apps/mobile` | `type:contracts`, `type:data-access`, `type:core`, `type:util`, and `type:domain` of `scope:shared` — never `application` or `infrastructure`, which hold server code |
 
 External imports are constrained in the same `depConstraints`:
 
@@ -102,7 +103,7 @@ A violation is a lint error and is fixed, never silenced with `eslint-disable`.
 - **Driving and driven as separate Nx libraries** (`type:driving`, `type:driven`) — Nx enforces the split, but every context doubles its infrastructure projects.
 - **Fastify or Hono with a hand-written composition root instead of NestJS** — no decorators anywhere, but the module system, the three buses and the queue wiring would be built by hand.
 - **Effect-TS** — typed errors and layered dependency injection in place of `Result` and Nest, but a new paradigm for the whole codebase.
-- **The Nest EventEmitter for domain events** — works, but a second mechanism beside the CQRS buses.
+- **The Nest EventEmitter for integration events** — works, but a second mechanism beside the CQRS buses.
 
 ## Consequences
 

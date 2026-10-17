@@ -15,7 +15,6 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2024",
-    "customConditions": ["@basis/source"]
+    "target": "es2024"
   }
 }

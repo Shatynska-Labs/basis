@@ -166,7 +166,8 @@ const boundaries = (withExternalImports) => [
   'error',
   {
     enforceBuildableLibDependency: true,
-    allow: [],
+    // A project's own ESLint configuration extends the root one by path.
+    allow: withExternalImports ? [] : ['^(\\.\\./)+eslint\\.config\\.mjs$'],
     depConstraints: depConstraints({ withExternalImports }),
   },
 ];

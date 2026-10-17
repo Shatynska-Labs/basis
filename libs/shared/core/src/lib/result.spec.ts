@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import { failure, success, type Result } from '../index';
+import { failure, success, type Result } from '../index.js';
 
 const falsyValues = [0, '', false, null, undefined] as const;
 

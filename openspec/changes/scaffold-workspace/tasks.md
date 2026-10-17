@@ -18,13 +18,13 @@ The plan is committed, then tests are derived from `specs/shared-core/spec.md` i
 - [x] 3.1 Write the strict TypeScript project-references base (`tsconfig.base.json`, root `tsconfig.json`) as decision 2 describes; verify `pnpm nx sync:check` passes.
 - [x] 3.2 Write `eslint.config.mjs`: Nx and typescript-eslint presets, `includeIgnoreFile` over `.gitignore`, `@nx/enforce-module-boundaries` with every ADR-0012 §7 row and external-import ban and the `type:app` tags of decision 3, `eslint-config-prettier` last; verify `pnpm eslint .` runs clean.
 - [x] 3.3 Write `.prettierrc` (`singleQuote: true`, `proseWrap: "preserve"`), `.prettierignore` (decision 4) and `.editorconfig` (utf-8, lf, two-space indent, final newline, trailing whitespace trimmed except in Markdown); add `format` and `format:check` scripts; wrap `AGENTS.md`'s workflow block in `prettier-ignore-start`/`-end` outside its markers (decision 4); run `pnpm prettier --write` over every non-Markdown file; verify `pnpm prettier --check . '!**/*.md'` passes.
-- [ ] 3.4 Commit the configuration so far (`build: scaffold the nx workspace`), then run `pnpm format` over the repository and commit only its output as `style: format markdown with prettier`; verify that commit's diff touches no file under `openspec/changes/archive/` and nothing between `AGENTS.md`'s workflow markers, `git diff --stat HEAD~1 -- ':!*.md'` is empty, and `pnpm format:check` passes.
+- [x] 3.4 Commit the configuration so far (`build: scaffold the nx workspace`), then run `pnpm format` over the repository and commit only its output as `style: format markdown with prettier`; verify that commit's diff touches no file under `openspec/changes/archive/` and nothing between `AGENTS.md`'s workflow markers, `git diff --stat HEAD~1 -- ':!*.md'` is empty, and `pnpm format:check` passes.
 
 ## 4. `libs/shared/core`
 
-- [ ] 4.1 Generate `libs/shared/core` as package `@basis/shared-core` with the Vitest test runner and no bundler, tagged `scope:shared`, `type:core`, its `package.json` declaring no dependency, keeping the derived `src/lib/result.spec.ts` and discarding generated sample code (decision 9); verify `pnpm nx show project shared-core` lists `lint`, `typecheck` and `test` and no `build`.
-- [ ] 4.2 Implement `Result`, `Failure`, `Success`, `failure` and `success` in `src/lib/result.ts` (decision 9) and export them from `src/index.ts`; verify the derived tests for `specs/shared-core/spec.md` pass with `pnpm nx run-many -t test`.
-- [ ] 4.3 Run `pnpm nx run-many -t lint typecheck test`; verify all pass.
+- [x] 4.1 Generate `libs/shared/core` as package `@basis/shared-core` with the Vitest test runner and no bundler, tagged `scope:shared`, `type:core`, its `package.json` declaring no dependency, keeping the derived `src/lib/result.spec.ts` and discarding generated sample code (decision 9); verify `pnpm nx show project shared-core` lists `lint`, `typecheck` and `test` and no `build`.
+- [x] 4.2 Implement `Result`, `Failure`, `Success`, `failure` and `success` in `src/lib/result.ts` (decision 9) and export them from `src/index.ts`; verify the derived tests for `specs/shared-core/spec.md` pass with `pnpm nx run-many -t test`.
+- [x] 4.3 Run `pnpm nx run-many -t lint typecheck test`; verify all pass.
 
 ## 5. `tools/change-scope`
 

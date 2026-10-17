@@ -1,0 +1,24 @@
+{
+  "name": "@basis/change-scope",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/docs-only.ts",
+  "types": "./src/docs-only.ts",
+  "exports": {
+    ".": {
+      "types": "./src/docs-only.ts",
+      "import": "./src/docs-only.ts",
+      "default": "./src/docs-only.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "nx": {
+    "name": "change-scope",
+    "tags": [
+      "scope:tooling",
+      "type:tooling"
+    ]
+  },
+  "dependencies": {}
+}

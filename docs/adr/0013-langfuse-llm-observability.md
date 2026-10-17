@@ -27,11 +27,11 @@ Without a rule, traces would carry what the graphs see: meal photos and health c
 
 ## Consequences
 
-+ Health data and meal photos never reach a third party for observability.
-+ One tool for traces, datasets and evals, with LangGraph.js support.
-+ The tool is already known from earlier projects.
-− More services to operate: self-hosted Langfuse brings its own PostgreSQL, ClickHouse, Redis and blob storage.
-− Account deletion has to reach Langfuse as well as the application's tables.
-− Upgrades and backups of the Langfuse stack are ours.
-− On the open-source build, retention and access logging are ours to build (a purge job, proxy access logs), or an Enterprise licence is a cost.
-− The trace-masking function is security-relevant code: a gap in it puts a photo in a second store.
+- Health data and meal photos never reach a third party for observability.
+- One tool for traces, datasets and evals, with LangGraph.js support.
+- The tool is already known from earlier projects.
+  − More services to operate: self-hosted Langfuse brings its own PostgreSQL, ClickHouse, Redis and blob storage.
+  − Account deletion has to reach Langfuse as well as the application's tables.
+  − Upgrades and backups of the Langfuse stack are ours.
+  − On the open-source build, retention and access logging are ours to build (a purge job, proxy access logs), or an Enterprise licence is a cost.
+  − The trace-masking function is security-relevant code: a gap in it puts a photo in a second store.

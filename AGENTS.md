@@ -1,3 +1,4 @@
+<!-- prettier-ignore-start -->
 <!-- ai-toolkit:development-workflow v4 -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong below the closing marker. -->
@@ -140,8 +141,10 @@ It sits outside the change that recorded it, because a note kept inside one is a
 
 **Markdown prose.** Do not hard-wrap prose. Keep each paragraph on a single line whatever its length. Use a line break only where Markdown's own structure requires one.
 <!-- /ai-toolkit:development-workflow -->
+<!-- prettier-ignore-end -->
 
 <!-- ai-toolkit:project-foundation -->
+
 ## Testing Strategy
 
 Tests are written at the lowest level that can show the behaviour; the `domain` layer carries most of them.
@@ -155,21 +158,32 @@ Tests are written at the lowest level that can show the behaviour; the `domain` 
 
 **Test command:** `pnpm nx affected -t test` (CI), `pnpm nx run-many -t test` (whole suite); integration: `pnpm nx affected -t integration` (needs Docker); API end-to-end: `pnpm nx e2e api-e2e`.
 
-**Test-path glob:** `{apps,libs}/**/*.spec.{ts,tsx}`, excluding `**/*.integration.spec.ts` and `apps/api-e2e/**` (the `test` target); end-to-end: `apps/api-e2e/**/*.spec.ts` (the `e2e` target); integration: `{apps,libs}/**/tests/integration/**/*.integration.spec.ts` (the `integration` target).
-
-These commands exist once the workspace is scaffolded (roadmap Phase 1); until then the project has no test suite.
+**Test-path glob:** `{apps,libs,tools}/**/*.spec.{ts,tsx}`, excluding `**/*.integration.spec.ts` and `apps/api-e2e/**` (the `test` target); end-to-end: `apps/api-e2e/**/*.spec.ts` (the `e2e` target); integration: `{apps,libs}/**/tests/integration/**/*.integration.spec.ts` (the `integration` target).
 
 ## Development Tooling
 
-- **Node.js 24 LTS** (`.nvmrc`, `engines`); **pnpm** pinned through `packageManager` and Corepack.
+- **Node.js 24 LTS** (`.nvmrc`, `engines`); **pnpm** pinned through `packageManager` and Corepack. pnpm's settings live in `pnpm-workspace.yaml`, not `.npmrc`: exact versions, a refused install on the wrong Node major, `allowBuilds` for the dependencies that may run install scripts, and pnpm's minimum release age, which a too-new release is waited out under rather than excluded from.
 - **TypeScript `strict`**; `experimentalDecorators` and `emitDecoratorMetadata` only in projects compiling Nest code.
 - **ESLint** flat config with the Nx and typescript-eslint presets and `@nx/enforce-module-boundaries`. ESLint stays the linter even though NestJS 12 generates oxlint: the boundary rule exists only for ESLint. Boundary violations are fixed, never silenced with `eslint-disable`.
 - **Prettier** for formatting.
 - **Nx targets:** `lint`, `typecheck`, `test`, `integration`, `build`, `e2e`.
-- **CI:** GitHub Actions, `pnpm nx affected -t lint typecheck test integration build e2e` with `nrwl/nx-set-shas`. CI is the authority; no local hook is.
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`). `check`: `pnpm nx sync:check` and `pnpm nx affected -t lint typecheck test integration build e2e` with `nrwl/nx-set-shas`, then `pnpm format:check`, `pnpm audit --audit-level high` and `openspec validate --all --strict`. `secrets`: gitleaks over the full history, from a checksummed release binary. `commits`: commitlint over a pull request's commits. CI is the authority; no local hook is.
+- **Hooks** (husky, installed by `pnpm install`) catch failures before CI does, and are not a gate: `--no-verify` skips them, and a clone that never ran `pnpm install` has none. `pre-commit` runs lint-staged (ESLint and Prettier on staged files), gitleaks if it is installed, `openspec validate` when records are staged, and `lint`, `typecheck` and `test` over the projects the staged change affects. `pre-push` runs `lint`, `typecheck`, `test`, `integration` and `build` over the projects the push affects against `origin/main`, judging the push only when it is one ref at `HEAD` with a clean working tree. `commit-msg` runs commitlint.
+- **Documentation-only changes stand down.** `tools/change-scope` is the one declaration of what is documentation: Markdown anywhere, or YAML under `openspec/`. Where every changed path is documentation, the hooks and CI skip the project checks and say so; Prettier, `openspec validate`, gitleaks and commitlint still run. Anything the classifier cannot judge receives the full checks. **A change that makes code, a test or a build read, import, bundle or copy a Markdown file adds that file to `DOCUMENTATION_EXCEPTIONS` in `tools/change-scope/src/docs-only.ts`**, or edits to it will stand down unchecked.
+- **Dependencies:** Dependabot opens weekly grouped npm updates and monthly GitHub Actions updates. An advisory with no fixed release is ignored in `pnpm-workspace.yaml` `auditConfig.ignoreGhsas`, with its reason beside it; the audit level is never lowered.
 - **Local services:** `docker compose` for PostgreSQL, Redis and Langfuse, for manual development only; verification uses Testcontainers.
 - **Migrations:** drizzle-kit.
-- **Commits:** Conventional Commits.
+- **Commits:** Conventional Commits, enforced by commitlint.
+
+## Provisioning
+
+A new working tree is provisioned when every step below is reached; until then, verification is reported as not run. Each step is safe to repeat.
+
+1. Node.js from `.nvmrc` on `PATH` (`nvm use`; where a global npm `prefix` stops `nvm use`, put `~/.nvm/versions/node/<v24>/bin` first on `PATH`). The hooks run under the Node on `PATH` when Git invokes them, so it must be 24 there too.
+2. `corepack enable`, so `pnpm` is the version `packageManager` pins.
+3. `pnpm install --frozen-lockfile`, which also installs the hooks.
+4. Optionally, `gitleaks` on `PATH`, for the local secret scan; CI runs it regardless.
+
 <!-- /ai-toolkit:project-foundation -->
 
 ## Conventions

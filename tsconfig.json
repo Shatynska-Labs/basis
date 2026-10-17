@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./libs/shared/core"
+    },
+    {
+      "path": "./tools/change-scope"
+    }
+  ]
+}

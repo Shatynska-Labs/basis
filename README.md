@@ -1,6 +1,7 @@
 # Basis
 
 <!-- ai-toolkit:project-foundation -->
+
 ## What it is
 
 **Basis** is a framework for building the regular habits that form the foundation of a person's life. It credits habits automatically from data wherever possible, with manual input as a first-class fallback, and evaluates adherence through tiers and weekly goals rather than a binary daily check-off. Habits can belong to any life area; the first is health: physical activity and sleep from wearables via Health Connect, nutrition with AI assessment of meal photos, and long-term results such as weight and lab results.
@@ -39,17 +40,17 @@ Not in the architecture, for now: microservices, event sourcing, separate read m
 
 TypeScript throughout.
 
-| Layer | Choice |
-|---|---|
-| Mobile (primary) | Expo (React Native) with a dev build, `react-native-health-connect` |
-| Web | Vite + React, TanStack Router, TanStack Query, ECharts (`echarts-for-react`) |
-| Backend | NestJS 12; `@nestjs/cqrs` for commands, queries and integration events; LangGraph.js (`@langchain/langgraph`) for AI workflows |
-| Data | PostgreSQL with Drizzle ORM and drizzle-kit migrations; Redis + BullMQ (`@nestjs/bullmq`) |
-| Files | Hetzner Object Storage (S3-compatible), presigned uploads |
-| LLM observability | Langfuse, self-hosted on Hetzner |
-| Contracts and validation | Zod, through Standard Schema in NestJS route decorators |
-| Infrastructure | the existing Hetzner server and infrastructure repository |
-| Monorepo | Nx on pnpm workspaces |
+| Layer                    | Choice                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Mobile (primary)         | Expo (React Native) with a dev build, `react-native-health-connect`                                                            |
+| Web                      | Vite + React, TanStack Router, TanStack Query, ECharts (`echarts-for-react`)                                                   |
+| Backend                  | NestJS 12; `@nestjs/cqrs` for commands, queries and integration events; LangGraph.js (`@langchain/langgraph`) for AI workflows |
+| Data                     | PostgreSQL with Drizzle ORM and drizzle-kit migrations; Redis + BullMQ (`@nestjs/bullmq`)                                      |
+| Files                    | Hetzner Object Storage (S3-compatible), presigned uploads                                                                      |
+| LLM observability        | Langfuse, self-hosted on Hetzner                                                                                               |
+| Contracts and validation | Zod, through Standard Schema in NestJS route decorators                                                                        |
+| Infrastructure           | the existing Hetzner server and infrastructure repository                                                                      |
+| Monorepo                 | Nx on pnpm workspaces                                                                                                          |
 
 Decisions and alternatives: [`docs/adr/`](docs/adr/README.md).
 
@@ -78,6 +79,7 @@ A modular monolith with pragmatic DDD and ports and adapters ([ADR-0010](docs/ad
 - **`libs/shared`** is a Shared Kernel: `core` (`Result` and other language-level additions), `domain` (`Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`), `util` (dates, time zones, units), `api-client`.
 - **Boundaries are enforced** by `@nx/enforce-module-boundaries` with `scope:*` and `type:*` tags ([ADR-0005](docs/adr/0005-nx-monorepo.md), tag table superseded by [ADR-0012](docs/adr/0012-context-structure.md)); a violation is a lint error.
 - **One PostgreSQL database**; each context's tables live in PostgreSQL schemas it owns (one Drizzle schema per context, plus a checkpointer schema where a context runs a graph), and Drizzle row types never leave `infrastructure` ([ADR-0011](docs/adr/0011-drizzle-orm.md)).
+
 <!-- /ai-toolkit:project-foundation -->
 
 ## Documentation

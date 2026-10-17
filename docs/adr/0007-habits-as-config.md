@@ -17,6 +17,6 @@ A habit is a `HabitRule` record (metric, filter, window, aggregation, tiers, wee
 
 ## Consequences
 
-+ Habit templates and new life areas without changing the core.
-+ Every status can be expanded down to its source data.
-− The rule schema must be expressive enough (windows, direction, ranges) — design carefully in OpenSpec.
+- Habit templates and new life areas without changing the core.
+- Every status can be expanded down to its source data.
+  − The rule schema must be expressive enough (windows, direction, ranges) — design carefully in OpenSpec.

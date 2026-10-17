@@ -61,12 +61,12 @@ Expected failures are returned as `Result<F, S>` (`failure` / `success`) by `dom
 
 ### 6. `libs/shared` is a Shared Kernel
 
-| Library | Holds | Tag |
-|---|---|---|
-| `shared/core` | additions where the language falls short, starting with `Result` | `type:core` |
-| `shared/domain` | `Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule` | `type:domain` |
-| `shared/util` | dates, time zones, units | `type:util` |
-| `shared/api-client` | the typed client and TanStack Query hooks | `type:data-access` |
+| Library             | Holds                                                            | Tag                |
+| ------------------- | ---------------------------------------------------------------- | ------------------ |
+| `shared/core`       | additions where the language falls short, starting with `Result` | `type:core`        |
+| `shared/domain`     | `Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`  | `type:domain`      |
+| `shared/util`       | dates, time zones, units                                         | `type:util`        |
+| `shared/api-client` | the typed client and TanStack Query hooks                        | `type:data-access` |
 
 `core`, `domain` and `util` are usable from any context's `domain` and from the web and mobile apps.
 
@@ -74,18 +74,18 @@ Expected failures are returned as `Result<F, S>` (`failure` / `success`) by `dom
 
 Supersedes ADR-0005's boundary-rule table.
 
-| Tag | May depend on |
-|---|---|
-| `type:core` | nothing |
-| `type:util` | `type:core`, `type:util` |
-| `type:contracts` | `type:contracts`, `type:core`, `type:util` |
-| `type:domain` | `type:domain` of the same scope or `scope:shared`, `type:core`, `type:util` |
-| `type:application` | `type:domain` and `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util` |
-| `type:infrastructure` | `type:application`, `type:domain`, `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util` |
-| `type:data-access` | `type:contracts`, `type:core`, `type:util` |
-| `scope:<context>` | its own scope, `scope:shared`, and only `type:contracts` of other contexts |
-| `scope:shared` | its own scope; `type:data-access` (`shared/api-client`) may also depend on `type:contracts` of any scope |
-| `apps/api` | any library |
+| Tag                       | May depend on                                                                                                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type:core`               | nothing                                                                                                                                                               |
+| `type:util`               | `type:core`, `type:util`                                                                                                                                              |
+| `type:contracts`          | `type:contracts`, `type:core`, `type:util`                                                                                                                            |
+| `type:domain`             | `type:domain` of the same scope or `scope:shared`, `type:core`, `type:util`                                                                                           |
+| `type:application`        | `type:domain` and `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util`                     |
+| `type:infrastructure`     | `type:application`, `type:domain`, `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util`    |
+| `type:data-access`        | `type:contracts`, `type:core`, `type:util`                                                                                                                            |
+| `scope:<context>`         | its own scope, `scope:shared`, and only `type:contracts` of other contexts                                                                                            |
+| `scope:shared`            | its own scope; `type:data-access` (`shared/api-client`) may also depend on `type:contracts` of any scope                                                              |
+| `apps/api`                | any library                                                                                                                                                           |
 | `apps/web`, `apps/mobile` | `type:contracts`, `type:data-access`, `type:core`, `type:util`, and `type:domain` of `scope:shared` — never `application` or `infrastructure`, which hold server code |
 
 External imports are constrained in the same `depConstraints`:
@@ -107,10 +107,10 @@ A violation is a lint error and is fixed, never silenced with `eslint-disable`.
 
 ## Consequences
 
-+ One shape for every context: a simple context grows a `domain` without restructuring.
-+ Every invocation path is a driving adapter over the same use case, so HTTP, events, queues and schedules share the handlers.
-+ Framework use is bounded by lint, not by review.
-− Simple contexts carry `application` and `contracts` even when their logic is thin.
-− `application` depends on `@nestjs/common` and `@nestjs/cqrs`.
-− Integration events are published after commit without an outbox, so a crash between the commit and the publish loses the event. ADR-0010 accepts this for now; `stake` (post-MVP), whose settlements are driven by `WeekClosed`, is where its "add an outbox if guaranteed delivery becomes necessary" trigger is likely to fire first.
-− Legacy decorators need tooling support: Vitest compiles Nest code through SWC, because esbuild does not emit decorator metadata.
+- One shape for every context: a simple context grows a `domain` without restructuring.
+- Every invocation path is a driving adapter over the same use case, so HTTP, events, queues and schedules share the handlers.
+- Framework use is bounded by lint, not by review.
+  − Simple contexts carry `application` and `contracts` even when their logic is thin.
+  − `application` depends on `@nestjs/common` and `@nestjs/cqrs`.
+  − Integration events are published after commit without an outbox, so a crash between the commit and the publish loses the event. ADR-0010 accepts this for now; `stake` (post-MVP), whose settlements are driven by `WeekClosed`, is where its "add an outbox if guaranteed delivery becomes necessary" trigger is likely to fire first.
+  − Legacy decorators need tooling support: Vitest compiles Nest code through SWC, because esbuild does not emit decorator metadata.

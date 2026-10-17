@@ -18,7 +18,7 @@ Backend on **NestJS** as a modular monolith (ADR-0010); AI workflows on **LangGr
 
 ## Consequences
 
-+ One language across the monorepo; Zod schemas and habit rules shared by backend, web, and mobile.
-+ A familiar framework.
-− Some LangGraph features sometimes land in Python first.
-− Serious statistics/ML in the future — a separate Python service if needed.
+- One language across the monorepo; Zod schemas and habit rules shared by backend, web, and mobile.
+- A familiar framework.
+  − Some LangGraph features sometimes land in Python first.
+  − Serious statistics/ML in the future — a separate Python service if needed.

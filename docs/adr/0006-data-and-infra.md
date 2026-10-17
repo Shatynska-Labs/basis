@@ -18,6 +18,6 @@ We need relational data (metrics, rules, statuses), asynchronous photo processin
 
 ## Consequences
 
-+ Everything stays within the existing Hetzner infrastructure.
-+ The user never waits for the AI: photo → queue → result → push.
-− Two more services to operate (Redis, Object Storage).
+- Everything stays within the existing Hetzner infrastructure.
+- The user never waits for the AI: photo → queue → result → push.
+  − Two more services to operate (Redis, Object Storage).

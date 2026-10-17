@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A pull request's runs share a group, so a newer push cancels an older run.
+# A push to main gets a group of its own commit, so no merge commit's run is
+# cancelled or replaced while queued.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# nrwl/nx-set-shas lists earlier workflow runs to find the last successful
+# base on main.
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # tools/change-scope is the one declaration of what is
+      # documentation-only (scaffold-workspace design decision 11), and
+      # .husky/lib/change-scope.sh the one wrapper that fails closed around
+      # it, shared with the hooks. Both are taken from the base commit, so a
+      # pull request is not judged by a classifier or wrapper it changes,
+      # short of changing this workflow, which review covers; a base without
+      # them leaves the change unjudged, which runs the full checks.
+      - name: Judge the change
+        id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          verdict=full
+          if [ "$EVENT" = pull_request ]; then
+            trunk="$RUNNER_TEMP/trunk-change-scope"
+            mkdir -p "$trunk"
+            if ! git show "$BASE:.husky/lib/change-scope.sh" > "$trunk/change-scope.sh" ||
+              ! git show "$BASE:tools/change-scope/src/docs-only.ts" > "$trunk/docs-only.ts"; then
+              echo "ci: the base commit has no classifier; running the full checks."
+              verdict=unjudged
+            elif ! changed=$(git -c core.quotePath=false diff --name-only --no-renames "$BASE...$HEAD"); then
+              echo "ci: could not compute the change; running the full checks."
+              verdict=unjudged
+            else
+              . "$trunk/change-scope.sh"
+              verdict=$(CHANGE_SCOPE_CLASSIFIER="$trunk/docs-only.ts" judge ci "$changed")
+            fi
+          fi
+          echo "verdict: $verdict"
+          echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: nrwl/nx-set-shas@v5
+        with:
+          main-branch-name: main
+
+      - name: Project checks stood down
+        if: steps.scope.outputs.verdict == 'docs-only'
+        run: echo "Documentation-only change; nx sync:check and nx affected (lint, typecheck, test, integration, build, e2e) not run."
+
+      - name: nx sync:check
+        if: steps.scope.outputs.verdict != 'docs-only'
+        run: pnpm nx sync:check
+
+      - name: nx affected
+        if: steps.scope.outputs.verdict == 'full'
+        run: pnpm nx affected -t lint typecheck test integration build e2e
+
+      - name: nx run-many (unjudged)
+        if: steps.scope.outputs.verdict == 'unjudged'
+        run: pnpm nx run-many -t lint typecheck test integration build e2e
+
+      - run: pnpm format:check
+
+      - run: pnpm audit --audit-level high
+
+      - run: pnpm exec openspec validate --all --strict --no-interactive
+
+  secrets:
+    name: secrets
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # The release binary rather than gitleaks-action, which needs a paid
+      # licence for repositories owned by an organisation.
+      - name: Install gitleaks
+        run: |
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSLo "$RUNNER_TEMP/$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/$archive"
+          echo "$GITLEAKS_SHA256  $RUNNER_TEMP/$archive" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" gitleaks
+
+      - name: gitleaks
+        run: '"$RUNNER_TEMP/gitleaks" git --redact --no-banner --verbose'
+
+  commits:
+    name: commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: commitlint
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE" --to "$HEAD" --verbose

@@ -18,7 +18,7 @@ Read data from **Health Connect** on Android. Samsung Health syncs its data ther
 
 ## Consequences
 
-+ Independence from the wearable brand (Pixel Watch and others that write to Health Connect).
-+ No Samsung partnership needed.
-− Background reads require a separate permission; Samsung battery optimization may throttle sync.
-− The data set is limited to what Samsung writes to Health Connect (validate in Phase 0).
+- Independence from the wearable brand (Pixel Watch and others that write to Health Connect).
+- No Samsung partnership needed.
+  − Background reads require a separate permission; Samsung battery optimization may throttle sync.
+  − The data set is limited to what Samsung writes to Health Connect (validate in Phase 0).

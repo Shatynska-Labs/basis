@@ -18,6 +18,6 @@ The mobile app is the primary interface (camera, weight, day status) and must re
 
 ## Consequences
 
-+ Familiar stack (React, TS), one language with web and backend.
-+ A path to iOS via `@kingstinct/react-native-healthkit` without a rewrite.
-− Native modules require a dev build and prebuild.
+- Familiar stack (React, TS), one language with web and backend.
+- A path to iOS via `@kingstinct/react-native-healthkit` without a rewrite.
+  − Native modules require a dev build and prebuild.

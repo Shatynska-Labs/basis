@@ -1,7 +1,10 @@
 // An expected failure is returned, not thrown (ADR-0012 §5): `domain` and
 // application handlers return a `Result`, and driving adapters map it.
 
+// `kind` tells the two classes apart structurally, so a check still narrows
+// when the failure and success types are the same.
 export class Failure<F, S> {
+  readonly kind = 'failure';
   readonly value: F;
 
   constructor(value: F) {
@@ -18,6 +21,7 @@ export class Failure<F, S> {
 }
 
 export class Success<F, S> {
+  readonly kind = 'success';
   readonly value: S;
 
   constructor(value: S) {

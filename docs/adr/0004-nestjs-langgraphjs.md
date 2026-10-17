@@ -1,6 +1,8 @@
 # ADR-0004: NestJS + LangGraph.js instead of FastAPI + LangGraph (Python)
 
-**Status:** accepted · **Date:** 2026-10-17
+**Status:** accepted; superseded in part by ADR-0012 · **Date:** 2026-10-17
+
+> ADR-0012 §4 fixes the version (NestJS 12) and where Nest decorators may appear.
 
 ## Context
 

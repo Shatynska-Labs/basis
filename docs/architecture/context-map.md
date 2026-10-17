@@ -1,20 +1,20 @@
 # Context Map
 
-**Status:** draft v0.1 · **Date:** 2026-10-17 · Decision: ADR-0010.
+**Status:** draft v0.1 · **Date:** 2026-10-17 · Decisions: ADR-0010, ADR-0012.
 
 ## Contexts
 
-| Context | Type | Responsibility | Key concepts | Layering |
+| Context | Type | Responsibility | Key concepts | `domain` layer; ACL |
 |---|---|---|---|---|
-| `habits` | core | habit rules, daily and weekly evaluation, "never miss twice", calibration, goal progression | `HabitRule`, `DayEvaluation`, `WeekEvaluation`, `Tier`, `HabitStatus`, `GoalChangeProposal` | full |
-| `metrics` | supporting | ingestion and normalization of source data; idempotency | `MetricRecord`, `Source`, `SourceStatus` | moderate; ACL to Health Connect |
-| `nutrition` | supporting | meals, slots, plate assessment, manual correction | `Meal`, `MealSlot`, `PlateAssessment` | moderate; ACL to the AI provider |
-| `results` | supporting | weight (trend), measurements, progress photos, lab results | `WeightEntry`, `Measurement`, `ProgressPhoto`, `LabResult` | simple module |
-| `sharing` | supporting | invitations, access, roles, reactions | `Share`, `Invitation`, `Scope`, `Role`, `Reaction` | simple module |
-| `stake` | supporting | virtual balance, buffer, settlements, confirmation | `StakeLedgerEntry`, `Settlement`, `Buffer`, `StakeSettings` | full; ACL to monobank |
-| `insights` | supporting | weekly reviews, change suggestions (LangGraph) | `WeeklyReview`, `Suggestion` | moderate; ACL to the AI provider |
-| `identity` | generic | authentication, profile, time zone, heart-rate zones | `User`, `Profile` | simple module |
-| `notifications` | generic | push and reminders | `Notification`, `ReminderRule` | simple module |
+| `habits` | core | habit rules, daily and weekly evaluation, "never miss twice", calibration, goal progression | `HabitRule`, `DayEvaluation`, `WeekEvaluation`, `Tier`, `HabitStatus`, `GoalChangeProposal` | yes |
+| `metrics` | supporting | ingestion and normalization of source data; idempotency | `MetricRecord`, `Source`, `SourceStatus` | yes; ACL to Health Connect (driving) |
+| `nutrition` | supporting | meals, slots, plate assessment, manual correction | `Meal`, `MealSlot`, `PlateAssessment` | yes; ACL to the AI provider (driven) |
+| `results` | supporting | weight (trend), measurements, progress photos, lab results | `WeightEntry`, `Measurement`, `ProgressPhoto`, `LabResult` | no |
+| `sharing` | supporting | invitations, access, roles, reactions | `Share`, `Invitation`, `Scope`, `Role`, `Reaction` | no |
+| `stake` | supporting | virtual balance, buffer, settlements, confirmation | `StakeLedgerEntry`, `Settlement`, `Buffer`, `StakeSettings` | yes; ACL to monobank (webhook driving, API driven) |
+| `insights` | supporting | weekly reviews, change suggestions (LangGraph) | `WeeklyReview`, `Suggestion` | no (graphs in `application`); ACL to the AI provider (driven) |
+| `identity` | generic | authentication, profile, time zone, heart-rate zones | `User`, `Profile` | no |
+| `notifications` | generic | push and reminders | `Notification`, `ReminderRule` | no |
 
 ## Relationships
 
@@ -58,21 +58,22 @@ full data through the owning context's public query.
 
 ## Nx structure
 
+Every context has the same shape (ADR-0012 §1): `application`, `infrastructure` (with `driving/` and `driven/` folders) and `contracts`, plus `domain` where the table above says so.
+
 ```
 libs/
   habits/
     domain/          scope:habits  type:domain          # pure TS
-    application/     scope:habits  type:application     # use cases, ports
-    infrastructure/  scope:habits  type:infrastructure  # Nest, ORM, adapters
-    contracts/       scope:habits  type:contracts       # events, DTOs, Zod
-  stake/             # same split
-  metrics/           # domain + infrastructure (ACL) + contracts
-  nutrition/         # domain + infrastructure (ACL) + contracts
-  insights/          # application (graphs) + infrastructure + contracts
-  results/  sharing/  identity/  notifications/   # feature + contracts
+    application/     scope:habits  type:application     # commands/, queries/, ports
+    infrastructure/  scope:habits  type:infrastructure  # driving/, driven/
+    contracts/       scope:habits  type:contracts       # events, query interfaces, Zod DTOs
+  stake/  metrics/  nutrition/                          # same four libraries
+  insights/  results/  sharing/  identity/  notifications/   # application + infrastructure + contracts
   shared/
-    util/            scope:shared  type:util
-    api-client/      scope:shared  type:data-access
+    core/            scope:shared  type:core            # Result and other language-level additions
+    domain/          scope:shared  type:domain          # Entity, AggregateRoot, ValueObject, DomainError, Rule
+    util/            scope:shared  type:util            # dates, time zones, units
+    api-client/      scope:shared  type:data-access     # typed client + TanStack Query hooks
 ```
 
-Dependency rules — ADR-0005.
+Dependency rules and external-import constraints — ADR-0012 §7.

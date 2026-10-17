@@ -1,6 +1,8 @@
 # ADR-0005: Nx monorepo on top of pnpm workspaces
 
-**Status:** accepted · **Date:** 2026-10-17
+**Status:** accepted; superseded in part by ADR-0012 · **Date:** 2026-10-17
+
+> ADR-0012 §7 replaces the boundary-rule table below (`type:application` in place of `type:feature`, `type:core` added, external-import constraints).
 
 ## Context
 

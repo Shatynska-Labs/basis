@@ -27,3 +27,4 @@ Discovery-phase outputs — the top-level source of truth for every OpenSpec cha
 - A resolved open question → move the answer into the relevant document.
 
 Test line.
+x

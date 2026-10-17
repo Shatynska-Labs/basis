@@ -177,10 +177,10 @@ These commands exist once the workspace is scaffolded (roadmap Phase 1); until t
 Product principles are in [`docs/product/01-vision.md`](docs/product/01-vision.md#principles); read them before any change touching product behaviour.
 
 - **Time.** Timestamps carry a time zone; a user's day and week (Mon–Sun) are computed in that user's local time zone (`docs/product/04-domain-model.md`, `docs/product/03-prd-mvp.md`).
-- **Day boundaries.** Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency, and a closed day is recalculated, and flagged, if late data arrives (`docs/product/04-domain-model.md` §3).
-- **Ownership.** Every user-owned entity carries a `user_id`; nothing global is tailored to a particular user. The persisted owning-user column is named `user_id` whatever the TypeScript field is named — `Share.ownerId` (`docs/product/04-domain-model.md` §8) is persisted as `user_id`.
+- **Day boundaries.** Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency, its status provisional until then, and a closed day is recalculated, and flagged, if late data arrives (`docs/product/04-domain-model.md` §3).
+- **Ownership.** Every user-owned entity carries a reference to its owning user; nothing global is tailored to a particular user. The reference to the owning user is persisted; its field and column name are the schema's (`Share.ownerId` in `docs/product/04-domain-model.md` §8 is one, beside `viewer.userId`, which is not).
 - **Metrics.** Metrics are normalized and source-agnostic; each source reaches them through its own adapter (`docs/product/04-domain-model.md` §1).
 - **Vocabulary.** "Domain" is used only in the DDD sense; spheres of habits — health, household, finances — are life areas (ADR-0010).
 - **Secrets.** Secrets (bank tokens, API keys) are encrypted and never logged.
-- **Deterministic logic lives in code, not in the LLM.** A graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain` (ADR-0007, ADR-0012 §1).
+- **Deterministic logic lives in code, not in the LLM.** A graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain` (ADR-0007, ADR-0012 §1). An AI assessment is always correctable, and a suggested goal change takes effect only after the user accepts it (vision principle 7). Whether other AI output, such as a plate score, needs confirmation before it applies is open: `reconcile-ai-suggestion-confirmation` in `docs/backlog.md`.
 - **Language.** Code, comments, commit messages and documentation are in English.

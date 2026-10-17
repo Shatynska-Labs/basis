@@ -7,8 +7,9 @@ set -eu
 # clean working tree and one merge base with origin/main. Otherwise the full
 # checks run, and the hook says why.
 zero=0000000000000000000000000000000000000000
-# Tags carry no change of their own to check (e.g. `git push --follow-tags`).
-refs=$(grep -v '^refs/tags/' || true)
+# A ref updating a tag on the remote carries no change of its own to check
+# (e.g. `git push --follow-tags`); the remote ref is the third field.
+refs=$(awk '$3 !~ /^refs\/tags\//' || true)
 reason=
 if [ -z "$refs" ]; then
   echo "pre-push: only tags are pushed; nothing to check."

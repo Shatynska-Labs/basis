@@ -5,6 +5,8 @@
 //
 // It runs as `node tools/change-scope/src/docs-only.ts` before dependencies are
 // installed, so it imports Node built-ins only and uses erasable syntax only.
+// It stays one file: CI copies this file alone from a pull request's base
+// commit to judge the pull request.
 
 import { readFileSync } from 'node:fs';
 

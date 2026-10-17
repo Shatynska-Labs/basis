@@ -9,3 +9,6 @@ ADR-0007 states that LLM suggestions "always require human confirmation". The PR
 **Argued in**: `integrate-the-context-draft`, whose code review found the conflict.
 
 **Depends on**: nothing. Best done before the `nutrition` change (roadmap Phase 3).
+*   unformatted
+
+

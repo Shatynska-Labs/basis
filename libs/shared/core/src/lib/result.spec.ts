@@ -24,21 +24,27 @@ describe('Result: a result is either a success or a failure', () => {
     expect(result.value).toBe('not-found');
   });
 
-  it.each(falsyValues)('a falsy value is still carried by success: %s', (carried) => {
-    const result = success(carried);
+  it.each(falsyValues)(
+    'a falsy value is still carried by success: %s',
+    (carried) => {
+      const result = success(carried);
 
-    expect(result.isSuccess()).toBe(true);
-    expect(result.isFailure()).toBe(false);
-    expect(result.value).toBe(carried);
-  });
+      expect(result.isSuccess()).toBe(true);
+      expect(result.isFailure()).toBe(false);
+      expect(result.value).toBe(carried);
+    },
+  );
 
-  it.each(falsyValues)('a falsy value is still carried by failure: %s', (carried) => {
-    const result = failure(carried);
+  it.each(falsyValues)(
+    'a falsy value is still carried by failure: %s',
+    (carried) => {
+      const result = failure(carried);
 
-    expect(result.isFailure()).toBe(true);
-    expect(result.isSuccess()).toBe(false);
-    expect(result.value).toBe(carried);
-  });
+      expect(result.isFailure()).toBe(true);
+      expect(result.isSuccess()).toBe(false);
+      expect(result.value).toBe(carried);
+    },
+  );
 });
 
 describe('Result: a result reports which it is', () => {
@@ -93,11 +99,17 @@ describe('Result: a result reports which it is', () => {
  * Runtime means `dependencies`, `peerDependencies` and `optionalDependencies`;
  * `devDependencies` are not shipped to consumers.
  */
-const declaredRuntimeDependencies = (manifest: Record<string, unknown>): string[] =>
-  ['dependencies', 'peerDependencies', 'optionalDependencies'].flatMap((field) => {
-    const declared = manifest[field];
-    return declared && typeof declared === 'object' ? Object.keys(declared) : [];
-  });
+const declaredRuntimeDependencies = (
+  manifest: Record<string, unknown>,
+): string[] =>
+  ['dependencies', 'peerDependencies', 'optionalDependencies'].flatMap(
+    (field) => {
+      const declared = manifest[field];
+      return declared && typeof declared === 'object'
+        ? Object.keys(declared)
+        : [];
+    },
+  );
 
 describe('Result: the shared core depends on nothing', () => {
   it('the shared core is used without a framework', () => {
@@ -115,18 +127,25 @@ describe('Result: the shared core depends on nothing', () => {
   });
 
   it('the dependency check detects a declared runtime dependency (fixture)', () => {
-    expect(declaredRuntimeDependencies({ dependencies: { 'left-pad': '1.3.0' } })).toEqual([
-      'left-pad',
-    ]);
-    expect(declaredRuntimeDependencies({ peerDependencies: { react: '19.0.0' } })).toEqual([
-      'react',
-    ]);
-    expect(declaredRuntimeDependencies({ optionalDependencies: { fsevents: '2.3.3' } })).toEqual([
-      'fsevents',
-    ]);
-    expect(declaredRuntimeDependencies({ name: '@basis/shared-core', dependencies: {} })).toEqual(
-      [],
-    );
-    expect(declaredRuntimeDependencies({ devDependencies: { vitest: '3.0.0' } })).toEqual([]);
+    expect(
+      declaredRuntimeDependencies({ dependencies: { 'left-pad': '1.3.0' } }),
+    ).toEqual(['left-pad']);
+    expect(
+      declaredRuntimeDependencies({ peerDependencies: { react: '19.0.0' } }),
+    ).toEqual(['react']);
+    expect(
+      declaredRuntimeDependencies({
+        optionalDependencies: { fsevents: '2.3.3' },
+      }),
+    ).toEqual(['fsevents']);
+    expect(
+      declaredRuntimeDependencies({
+        name: '@basis/shared-core',
+        dependencies: {},
+      }),
+    ).toEqual([]);
+    expect(
+      declaredRuntimeDependencies({ devDependencies: { vitest: '3.0.0' } }),
+    ).toEqual([]);
   });
 });

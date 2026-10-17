@@ -4,20 +4,20 @@ The plan is committed, then tests are derived from `specs/shared-core/spec.md` i
 
 ## 1. Provisioning
 
-- [ ] 1.1 Install Node.js 24 LTS (`nvm install 24`), write `.nvmrc` with `24`, run `nvm use` and `corepack enable`; verify `node -v` reports v24 in the working tree.
+- [x] 1.1 Install Node.js 24 LTS (`nvm install 24`), write `.nvmrc` with `24`, run `nvm use` and `corepack enable`; verify `node -v` reports v24 in the working tree.
 
 ## 2. Workspace
 
-- [ ] 2.1 Write the root `package.json` (private, `engines.node` `>=24 <25`, `packageManager` pinned to the current pnpm 10 release), `pnpm-workspace.yaml` (`apps/*`, `libs/**`, `tools/*`) and `.npmrc` (`save-exact=true`, `engine-strict=true`); verify `pnpm install` succeeds and refuses under Node 22 (`nvm exec 22 pnpm install` fails on the engine check).
-- [ ] 2.2 Run `nx init` declining Nx Cloud, set `neverConnectToCloud: true` in `nx.json`, and `nx add` the JS, ESLint and Vitest plugins (design decision 1); verify `pnpm nx report` lists them and `pnpm nx show projects` runs.
-- [ ] 2.3 Add `.claude/worktrees/` to `.gitignore`; verify `git check-ignore .claude/worktrees/x` matches.
-- [ ] 2.4 List the packages `pnpm install` reports as having ignored build scripts in `pnpm.onlyBuiltDependencies`; verify a fresh `pnpm install --frozen-lockfile` prints no ignored-build warning.
+- [x] 2.1 Write the root `package.json` (private, `engines.node` `>=24 <25`, `packageManager` pinned to the current pnpm 10 release), `pnpm-workspace.yaml` (`apps/*`, `libs/**`, `tools/*`) and `.npmrc` (`save-exact=true`, `engine-strict=true`); verify `pnpm install` succeeds and refuses under Node 22 (`nvm exec 22 pnpm install` fails on the engine check).
+- [x] 2.2 Run `nx init` declining Nx Cloud, set `neverConnectToCloud: true` in `nx.json`, and `nx add` the JS, ESLint and Vitest plugins (design decision 1); verify `pnpm nx report` lists them and `pnpm nx show projects` runs.
+- [x] 2.3 Add `.claude/worktrees/` to `.gitignore`; verify `git check-ignore .claude/worktrees/x` matches.
+- [x] 2.4 List the packages `pnpm install` reports as having ignored build scripts in `pnpm.onlyBuiltDependencies`; verify a fresh `pnpm install --frozen-lockfile` prints no ignored-build warning.
 
 ## 3. TypeScript, ESLint, Prettier, EditorConfig
 
-- [ ] 3.1 Write the strict TypeScript project-references base (`tsconfig.base.json`, root `tsconfig.json`) as decision 2 describes; verify `pnpm nx sync:check` passes.
-- [ ] 3.2 Write `eslint.config.mjs`: Nx and typescript-eslint presets, `includeIgnoreFile` over `.gitignore`, `@nx/enforce-module-boundaries` with every ADR-0012 §7 row and external-import ban and the `type:app` tags of decision 3, `eslint-config-prettier` last; verify `pnpm eslint .` runs clean.
-- [ ] 3.3 Write `.prettierrc` (`singleQuote: true`, `proseWrap: "preserve"`), `.prettierignore` (decision 4) and `.editorconfig` (utf-8, lf, two-space indent, final newline, trailing whitespace trimmed except in Markdown); add `format` and `format:check` scripts; wrap `AGENTS.md`'s workflow block in `prettier-ignore-start`/`-end` outside its markers (decision 4); run `pnpm prettier --write` over every non-Markdown file; verify `pnpm prettier --check . '!**/*.md'` passes.
+- [x] 3.1 Write the strict TypeScript project-references base (`tsconfig.base.json`, root `tsconfig.json`) as decision 2 describes; verify `pnpm nx sync:check` passes.
+- [x] 3.2 Write `eslint.config.mjs`: Nx and typescript-eslint presets, `includeIgnoreFile` over `.gitignore`, `@nx/enforce-module-boundaries` with every ADR-0012 §7 row and external-import ban and the `type:app` tags of decision 3, `eslint-config-prettier` last; verify `pnpm eslint .` runs clean.
+- [x] 3.3 Write `.prettierrc` (`singleQuote: true`, `proseWrap: "preserve"`), `.prettierignore` (decision 4) and `.editorconfig` (utf-8, lf, two-space indent, final newline, trailing whitespace trimmed except in Markdown); add `format` and `format:check` scripts; wrap `AGENTS.md`'s workflow block in `prettier-ignore-start`/`-end` outside its markers (decision 4); run `pnpm prettier --write` over every non-Markdown file; verify `pnpm prettier --check . '!**/*.md'` passes.
 - [ ] 3.4 Commit the configuration so far (`build: scaffold the nx workspace`), then run `pnpm format` over the repository and commit only its output as `style: format markdown with prettier`; verify that commit's diff touches no file under `openspec/changes/archive/` and nothing between `AGENTS.md`'s workflow markers, `git diff --stat HEAD~1 -- ':!*.md'` is empty, and `pnpm format:check` passes.
 
 ## 4. `libs/shared/core`

@@ -15,17 +15,23 @@ import { classify, DOCUMENTATION_EXCEPTIONS } from './docs-only.ts';
 const script = fileURLToPath(new URL('./docs-only.ts', import.meta.url));
 
 const runCommand = (input: string, path = script, cwd?: string) =>
-  spawnSync(process.execPath, [path], { input, encoding: 'utf8', timeout: 10_000, cwd });
+  spawnSync(process.execPath, [path], {
+    input,
+    encoding: 'utf8',
+    timeout: 10_000,
+    cwd,
+  });
 
 // "prints exactly `docs-only` or `full`": the verdict word, optionally followed
 // by a single line terminator, and nothing else.
-const verdictOutput = (verdict: 'docs-only' | 'full') => new RegExp(`^${verdict}\\r?\\n?$`);
+const verdictOutput = (verdict: 'docs-only' | 'full') =>
+  new RegExp(`^${verdict}\\r?\\n?$`);
 
 describe('classify: a change is documentation-only only when every path is documentation', () => {
   it('markdown only', () => {
-    expect(classify(['docs/backlog.md', 'AGENTS.md', 'libs/shared/core/README.md'])).toBe(
-      'docs-only',
-    );
+    expect(
+      classify(['docs/backlog.md', 'AGENTS.md', 'libs/shared/core/README.md']),
+    ).toBe('docs-only');
   });
 
   it('a change record', () => {
@@ -38,7 +44,9 @@ describe('classify: a change is documentation-only only when every path is docum
   });
 
   it('markdown beside code', () => {
-    expect(classify(['docs/backlog.md', 'libs/shared/core/src/index.ts'])).toBe('full');
+    expect(classify(['docs/backlog.md', 'libs/shared/core/src/index.ts'])).toBe(
+      'full',
+    );
   });
 
   it('yaml outside the change records', () => {
@@ -57,7 +65,9 @@ describe('classify: a change is documentation-only only when every path is docum
   );
 
   it('a deleted or renamed source file', () => {
-    expect(classify(['docs/a.md', 'libs/shared/core/src/lib/result.ts'])).toBe('full');
+    expect(classify(['docs/a.md', 'libs/shared/core/src/lib/result.ts'])).toBe(
+      'full',
+    );
   });
 
   it('nothing changed', () => {
@@ -102,12 +112,16 @@ describe('classify: a change is documentation-only only when every path is docum
 
 describe('classify: declared exceptions are never documentation', () => {
   it('a declared exception', () => {
-    expect(classify(['docs/read-by-a-test.md'], ['docs/read-by-a-test.md'])).toBe('full');
+    expect(
+      classify(['docs/read-by-a-test.md'], ['docs/read-by-a-test.md']),
+    ).toBe('full');
   });
 
   it('nothing is excepted by default', () => {
     expect(classify(['docs/backlog.md'])).toBe('docs-only');
-    expect(classify(['docs/backlog.md'], DOCUMENTATION_EXCEPTIONS)).toBe('docs-only');
+    expect(classify(['docs/backlog.md'], DOCUMENTATION_EXCEPTIONS)).toBe(
+      'docs-only',
+    );
   });
 
   // Requirement text beyond the scenarios.
@@ -116,13 +130,18 @@ describe('classify: declared exceptions are never documentation', () => {
   });
 
   it('a declared exception among documentation still makes the list full', () => {
-    expect(classify(['docs/a.md', 'docs/read-by-a-test.md'], ['docs/read-by-a-test.md'])).toBe(
-      'full',
-    );
+    expect(
+      classify(
+        ['docs/a.md', 'docs/read-by-a-test.md'],
+        ['docs/read-by-a-test.md'],
+      ),
+    ).toBe('full');
   });
 
   it('an exception does not affect paths it does not name', () => {
-    expect(classify(['docs/a.md'], ['docs/read-by-a-test.md'])).toBe('docs-only');
+    expect(classify(['docs/a.md'], ['docs/read-by-a-test.md'])).toBe(
+      'docs-only',
+    );
   });
 });
 

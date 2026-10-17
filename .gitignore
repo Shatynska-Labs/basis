@@ -38,6 +38,7 @@ pnpm-debug.log*
 
 # Change working trees
 .worktrees/
+.claude/worktrees/
 
 # Mobile signing material
 *.jks
@@ -46,3 +47,5 @@ pnpm-debug.log*
 *.p12
 *.key
 *.mobileprovision
+vitest.config.*.timestamp*
+.vitest

@@ -1,3 +1,4 @@
+<!-- prettier-ignore-start -->
 <!-- ai-toolkit:development-workflow v4 -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong below the closing marker. -->
@@ -140,6 +141,7 @@ It sits outside the change that recorded it, because a note kept inside one is a
 
 **Markdown prose.** Do not hard-wrap prose. Keep each paragraph on a single line whatever its length. Use a line break only where Markdown's own structure requires one.
 <!-- /ai-toolkit:development-workflow -->
+<!-- prettier-ignore-end -->
 
 <!-- ai-toolkit:project-foundation -->
 ## Testing Strategy

@@ -1,0 +1,9 @@
+packages:
+  - 'apps/*'
+  - 'libs/**'
+  - 'tools/*'
+
+allowBuilds:
+  nx: true
+engineStrict: true
+saveExact: true

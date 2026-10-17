@@ -14,33 +14,33 @@ key logic: `min/target` tiers, weekly goals, meal time windows, and gradual habi
 
 ### Habit trackers with automatic data
 
-| Product | What it has | What it lacks |
-|---|---|---|
-| **Habitify** | Native Health Connect integration (since Nov 2025): steps, sleep, and workout minutes credited to habits automatically | No time windows, tiers, "never miss twice", or nutrition |
-| **Habit Tracker – Track your day** (iOS) | Transparent source status: sync active / permission missing / manual override for the day | Apple Health only |
-| **Fitsly** (coaching) | Health Connect data rules: steps = daily total as computed by Health Connect; sleep = only asleep stages when the device records them | B2B for coaches |
+| Product                                  | What it has                                                                                                                           | What it lacks                                            |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Habitify**                             | Native Health Connect integration (since Nov 2025): steps, sleep, and workout minutes credited to habits automatically                | No time windows, tiers, "never miss twice", or nutrition |
+| **Habit Tracker – Track your day** (iOS) | Transparent source status: sync active / permission missing / manual override for the day                                             | Apple Health only                                        |
+| **Fitsly** (coaching)                    | Health Connect data rules: steps = daily total as computed by Health Connect; sleep = only asleep stages when the device records them | B2B for coaches                                          |
 
 **Adopt:** source status next to each habit; the same aggregation rules as Health Connect, so
 numbers match what users see in Samsung Health.
 
 ### Social accountability
 
-| Product | What it has | Limitations |
-|---|---|---|
-| **HabitShare** | Different habits shared with different groups, private habits, encouragement (GIFs), contacts notified on check-off | Observers must install the app |
-| **Samsung Health Together** | Group challenges of up to 10 people; challenge participants walk ~22% more on average | Walking only |
+| Product                     | What it has                                                                                                         | Limitations                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **HabitShare**              | Different habits shared with different groups, private habits, encouragement (GIFs), contacts notified on check-off | Observers must install the app |
+| **Samsung Health Together** | Group challenges of up to 10 people; challenge participants walk ~22% more on average                               | Walking only                   |
 
 **Adopt:** granular access per habit/section; observer reactions; group challenges (later).
 Basis's advantage: observers view progress on the web via a link, without installing anything.
 
 ### Nutrition from photos
 
-| Product | Approach |
-|---|---|
-| **Ate / AteMate** | Calorie-free photo food journal; AI tags; prompts "why did you eat, where, with whom, how did you feel"; dashboard for coaches/nutritionists |
-| **Platr** (iOS) | Assessment based on the Harvard Healthy Eating Plate, but also calories and macros |
-| **SnapFood AI** | A grade plus one line: what's good, what to watch, one realistic tip; streaks reward showing up, not perfection |
-| **Calories Are Nothing, Clean Diet, MyFoodyAI** | A single overall "health score" per meal |
+| Product                                         | Approach                                                                                                                                     |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ate / AteMate**                               | Calorie-free photo food journal; AI tags; prompts "why did you eat, where, with whom, how did you feel"; dashboard for coaches/nutritionists |
+| **Platr** (iOS)                                 | Assessment based on the Harvard Healthy Eating Plate, but also calories and macros                                                           |
+| **SnapFood AI**                                 | A grade plus one line: what's good, what to watch, one realistic tip; streaks reward showing up, not perfection                              |
+| **Calories Are Nothing, Clean Diet, MyFoodyAI** | A single overall "health score" per meal                                                                                                     |
 
 Research basis: a meal-quality index from photos with 9 components (meat/substitutes, cooking
 method, vegetables, whole foods, variety, ultra-processed food, fruit, carbohydrates, fats)
@@ -52,11 +52,11 @@ one tip" format; optional "why did I eat" reflection; coach role.
 
 ### All-in-one platforms
 
-| Product | What it has | How Basis differs |
-|---|---|---|
-| **Noom** | AI food logging, steps, psychology lessons, communities, coaching, GLP-1 programs | Calorie-centric |
-| **Gyroscope** | Fat-loss protocol as a daily checklist, AI coach, food photos, ~$39/month | Calories, iOS focus, expensive |
-| **Exist.io** | Correlations between metrics (needs ≥3 weeks of data, updated weekly), honest "correlation, not causation" framing | Not a habit tracker |
+| Product       | What it has                                                                                                        | How Basis differs              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| **Noom**      | AI food logging, steps, psychology lessons, communities, coaching, GLP-1 programs                                  | Calorie-centric                |
+| **Gyroscope** | Fat-loss protocol as a daily checklist, AI coach, food photos, ~$39/month                                          | Calories, iOS focus, expensive |
+| **Exist.io**  | Correlations between metrics (needs ≥3 weeks of data, updated weekly), honest "correlation, not causation" framing | Not a habit tracker            |
 
 **Adopt:** correlations in the weekly review, phrased as "coincides with".
 
@@ -69,12 +69,12 @@ biomarker trends, AI explanations, doctor reports, retest reminders.
 
 ### Material incentives
 
-| Product | Mechanics | What's valuable | Limitations |
-|---|---|---|---|
-| **stickK** | A "contract with your future self": goal, deadline, optional money stake. A referee (friend, colleague) verifies reports, and their word outweighs the user's. A lost stake goes to a friend, a charity, or an "anti-charity" — an organization the user opposes (the most popular choice) | Referee with the final say; choice of penalty destination | Manual reporting; no public effectiveness data |
-| **Beeminder** | A graph with a "bright red line" — the minimum trajectory toward the goal. Crossing it means being charged. Getting ahead builds a **buffer** of safe days. **Akrasia horizon:** making a goal easier, adding breaks, quitting, or lowering the stake only takes effect after 7 days | Buffer instead of a rigid daily requirement; protection against impulsive "I'll ease off, today is hard" | Complex for non-technical users; punishment-focused |
-| **DietBet / WayBetter** (StepBet, etc.) | Participants pay into a shared pot; those who reach the goal (e.g., −4% body weight in 4 weeks) split it. Weigh-ins are verified by scale photos with a keyword within a 48-hour window; video audits possible. The service keeps 10–25% of the pot | Group format where winnings come from those who didn't make it; photo-with-code verification | Betting on an **outcome** (weight) over a short period encourages fast rather than sustainable weight loss; fees |
-| **Pact (GymPact)** — shut down | Penalties for missed workouts, payouts from the penalty pool to those who met goals. In 2017 the FTC found that tens of thousands of users were charged despite meeting goals or canceling, and no one received the promised payouts; the company refunded over $940K | Cautionary example | Trust in money mechanics is destroyed by the first erroneous charge |
+| Product                                 | Mechanics                                                                                                                                                                                                                                                                                  | What's valuable                                                                                          | Limitations                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **stickK**                              | A "contract with your future self": goal, deadline, optional money stake. A referee (friend, colleague) verifies reports, and their word outweighs the user's. A lost stake goes to a friend, a charity, or an "anti-charity" — an organization the user opposes (the most popular choice) | Referee with the final say; choice of penalty destination                                                | Manual reporting; no public effectiveness data                                                                   |
+| **Beeminder**                           | A graph with a "bright red line" — the minimum trajectory toward the goal. Crossing it means being charged. Getting ahead builds a **buffer** of safe days. **Akrasia horizon:** making a goal easier, adding breaks, quitting, or lowering the stake only takes effect after 7 days       | Buffer instead of a rigid daily requirement; protection against impulsive "I'll ease off, today is hard" | Complex for non-technical users; punishment-focused                                                              |
+| **DietBet / WayBetter** (StepBet, etc.) | Participants pay into a shared pot; those who reach the goal (e.g., −4% body weight in 4 weeks) split it. Weigh-ins are verified by scale photos with a keyword within a 48-hour window; video audits possible. The service keeps 10–25% of the pot                                        | Group format where winnings come from those who didn't make it; photo-with-code verification             | Betting on an **outcome** (weight) over a short period encourages fast rather than sustainable weight loss; fees |
+| **Pact (GymPact)** — shut down          | Penalties for missed workouts, payouts from the penalty pool to those who met goals. In 2017 the FTC found that tens of thousands of users were charged despite meeting goals or canceling, and no one received the promised payouts; the company refunded over $940K                      | Cautionary example                                                                                       | Trust in money mechanics is destroyed by the first erroneous charge                                              |
 
 **Research.** In a randomized trial (Volpp et al., JAMA, 2008), both a deposit contract (own money
 at risk) and a **lottery** (a chance to win for reaching the goal) produced significantly more
@@ -83,6 +83,7 @@ the 16 lb / 16 week target versus ~10% of controls. After incentives stopped, pa
 partially regained weight, though they remained lighter than at baseline.
 
 **Takeaways for the Stake module:**
+
 - **Stake on behavior, not outcomes.** Credits are for weekly habit goals, not kilograms; this avoids encouraging dangerously fast weight loss.
 - **Safety buffer** (Beeminder): a week completed with a margin earns a "buffer day" that automatically covers one future miss without penalty.
 - **7-day change horizon** (Beeminder): lowering a goal, reducing the stake, or disabling penalties takes effect after a week; tightening applies immediately.
@@ -95,18 +96,18 @@ partially regained weight, though they remained lighter than at baseline.
 
 ## Candidate ideas
 
-| # | Idea | Source | Where |
-|---|---|---|---|
-| 1 | Post-meal reflection ("why did I eat?", optional) | Ate | MVP candidate |
-| 2 | "Coach" observer role (access to the food journal) | Ate Coach Dashboard | Post-MVP |
-| 3 | Group challenges | Samsung Health Together | Product expansion |
-| 4 | Correlations in the weekly review | Exist.io | Post-MVP |
-| 5 | Doctor report (export for a period) | Labin, Biomark | Post-MVP |
-| 6 | Data source status next to each habit | Habit Tracker | MVP |
-| 7 | Material incentives (Stake) | stickK, Beeminder | Right after MVP |
-| 8 | Safety buffer and 7-day change horizon for Stake | Beeminder | Together with Stake |
-| 9 | Lottery reward and planned stake fade-out | Volpp et al., 2008 | Together with Stake |
-| 10 | Group pot for challenges | DietBet / WayBetter | Product expansion, after legal review |
+| #   | Idea                                               | Source                  | Where                                 |
+| --- | -------------------------------------------------- | ----------------------- | ------------------------------------- |
+| 1   | Post-meal reflection ("why did I eat?", optional)  | Ate                     | MVP candidate                         |
+| 2   | "Coach" observer role (access to the food journal) | Ate Coach Dashboard     | Post-MVP                              |
+| 3   | Group challenges                                   | Samsung Health Together | Product expansion                     |
+| 4   | Correlations in the weekly review                  | Exist.io                | Post-MVP                              |
+| 5   | Doctor report (export for a period)                | Labin, Biomark          | Post-MVP                              |
+| 6   | Data source status next to each habit              | Habit Tracker           | MVP                                   |
+| 7   | Material incentives (Stake)                        | stickK, Beeminder       | Right after MVP                       |
+| 8   | Safety buffer and 7-day change horizon for Stake   | Beeminder               | Together with Stake                   |
+| 9   | Lottery reward and planned stake fade-out          | Volpp et al., 2008      | Together with Stake                   |
+| 10  | Group pot for challenges                           | DietBet / WayBetter     | Product expansion, after legal review |
 
 ## What we deliberately don't do
 

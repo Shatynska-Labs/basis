@@ -144,6 +144,7 @@ It sits outside the change that recorded it, because a note kept inside one is a
 <!-- prettier-ignore-end -->
 
 <!-- ai-toolkit:project-foundation -->
+
 ## Testing Strategy
 
 Tests are written at the lowest level that can show the behaviour; the `domain` layer carries most of them.
@@ -172,6 +173,7 @@ These commands exist once the workspace is scaffolded (roadmap Phase 1); until t
 - **Local services:** `docker compose` for PostgreSQL, Redis and Langfuse, for manual development only; verification uses Testcontainers.
 - **Migrations:** drizzle-kit.
 - **Commits:** Conventional Commits.
+
 <!-- /ai-toolkit:project-foundation -->
 
 ## Conventions

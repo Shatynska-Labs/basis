@@ -11,16 +11,16 @@ contexts — `docs/architecture/context-map.md`.
 A habit never talks to a data source directly — only to a metric. Each source
 (Health Connect, manual input, later Apple Health) has an adapter into the normalized form.
 
-| Metric | Meaning | Sources |
-|---|---|---|
-| `steps` | steps over an interval | Health Connect |
-| `hr_zone_minutes` | minutes in a heart-rate zone (zones derived from max HR in the profile) | Health Connect (heart rate) |
-| `workout` | session: type, start, end, duration | Health Connect, manual |
-| `sleep` | session: sleep onset, wake-up, duration (asleep stages only, if available) | Health Connect |
-| `meal` | meal: time, photo, slot, plate score | app (`nutrition` context) |
-| `resting_hr` | resting heart rate | Health Connect |
-| `body` | weight, measurements | manual (later smart scales) |
-| `lab_result` | lab indicator | manual |
+| Metric            | Meaning                                                                    | Sources                     |
+| ----------------- | -------------------------------------------------------------------------- | --------------------------- |
+| `steps`           | steps over an interval                                                     | Health Connect              |
+| `hr_zone_minutes` | minutes in a heart-rate zone (zones derived from max HR in the profile)    | Health Connect (heart rate) |
+| `workout`         | session: type, start, end, duration                                        | Health Connect, manual      |
+| `sleep`           | session: sleep onset, wake-up, duration (asleep stages only, if available) | Health Connect              |
+| `meal`            | meal: time, photo, slot, plate score                                       | app (`nutrition` context)   |
+| `resting_hr`      | resting heart rate                                                         | Health Connect              |
+| `body`            | weight, measurements                                                       | manual (later smart scales) |
+| `lab_result`      | lab indicator                                                              | manual                      |
 
 Generic metric record:
 
@@ -28,7 +28,7 @@ Generic metric record:
 type MetricRecord = {
   userId: string;
   metric: MetricType;
-  start: string;           // ISO with time zone
+  start: string; // ISO with time zone
   end?: string;
   value?: number;
   payload?: Record<string, unknown>; // workout type, sleep stages, etc.
@@ -50,49 +50,51 @@ type HabitRule = {
   title: string;
   metric: MetricType;
   filter?: { zoneMin?: number; workoutTypes?: string[]; mealSlot?: string };
-  window?: { from: string; to: string };   // local time, e.g. '05:00'–'10:00'
+  window?: { from: string; to: string }; // local time, e.g. '05:00'–'10:00'
   aggregate: 'sum' | 'max' | 'count' | 'duration' | 'time_of';
   tiers: { min: number; target: number; stretch?: number };
   direction?: 'higher_is_better' | 'within_range' | 'earlier_is_better';
   weeklyGoal: { level: 'min' | 'target'; days: number }; // e.g. target 5/7
-  enabledFrom?: string;    // enablement date (gradual start)
+  enabledFrom?: string; // enablement date (gradual start)
   manualAllowed: boolean;
 };
 ```
 
 ### Health starter template (values are assumptions until calibration)
 
-| Habit | Metric and window | Minimum | Target | Week |
-|---|---|---|---|---|
-| Steps | `steps`, whole day | from calibration | 10,000 | target 5/7 |
-| Morning intensity | `hr_zone_minutes` zone 3+, 05:00–10:00 | 5 min | 10 min | target 4/7 |
-| Evening strength | `workout` type strength, 17:00–23:00 | 5 min | 10 min | target 4/7 |
-| Sleep duration | `sleep`, duration | 6 h | 7 h | target 5/7 |
-| Sleep schedule | `sleep`, onset time | before 00:00 | 22:30–23:30 | target 5/7 |
-| Regular meals | `meal` within windows: breakfast by 08:00, lunch by 14:00, dinner by 20:00 | 2 on time | 3 on time | target 5/7 |
-| Healthy plate | `meal` with score ≥ 3/4 | 1 | 2 | target 4/7 |
+| Habit             | Metric and window                                                          | Minimum          | Target      | Week       |
+| ----------------- | -------------------------------------------------------------------------- | ---------------- | ----------- | ---------- |
+| Steps             | `steps`, whole day                                                         | from calibration | 10,000      | target 5/7 |
+| Morning intensity | `hr_zone_minutes` zone 3+, 05:00–10:00                                     | 5 min            | 10 min      | target 4/7 |
+| Evening strength  | `workout` type strength, 17:00–23:00                                       | 5 min            | 10 min      | target 4/7 |
+| Sleep duration    | `sleep`, duration                                                          | 6 h              | 7 h         | target 5/7 |
+| Sleep schedule    | `sleep`, onset time                                                        | before 00:00     | 22:30–23:30 | target 5/7 |
+| Regular meals     | `meal` within windows: breakfast by 08:00, lunch by 14:00, dinner by 20:00 | 2 on time        | 3 on time   | target 5/7 |
+| Healthy plate     | `meal` with score ≥ 3/4                                                    | 1                | 2           | target 4/7 |
 
 ## 3. Daily evaluation
 
 ### Habit status per day
 
-| Status | Meaning |
-|---|---|
-| `stretch` | ≥ stretch tier |
-| `target` | ≥ target |
-| `min` | ≥ minimum — "held the line" |
-| `miss` | data present, minimum not reached |
-| `no_data` | no data — neutral, counts neither for nor against |
-| `excused` | illness / travel / holiday; capped, e.g. 3 per month |
-| `calibration` | calibration period, no evaluation |
+| Status        | Meaning                                              |
+| ------------- | ---------------------------------------------------- |
+| `stretch`     | ≥ stretch tier                                       |
+| `target`      | ≥ target                                             |
+| `min`         | ≥ minimum — "held the line"                          |
+| `miss`        | data present, minimum not reached                    |
+| `no_data`     | no data — neutral, counts neither for nor against    |
+| `excused`     | illness / travel / holiday; capped, e.g. 3 per month |
+| `calibration` | calibration period, no evaluation                    |
 
 ### Day boundaries
+
 - Sleep belongs to the day it **ended**.
 - A day is "closed" the next morning (e.g., 10:00 local time) to account for sync latency.
   Until then the status is provisional.
 - After closing, the status is recalculated if late data arrives (and flagged as such).
 
 ### Day summary (human language)
+
 - all active habits ≥ `min` → "held the line";
 - most ≥ `target` → "strong day";
 - otherwise → "today happened, tomorrow is new".
@@ -116,24 +118,30 @@ type HabitRule = {
 
 Components (0/1 each, total 0–4, plus drink separately):
 
-| Component | Criterion |
-|---|---|
-| Vegetables/fruit | ≈ half the plate, mostly vegetables |
-| Protein | a healthy protein source (fish, poultry, legumes, eggs) |
-| Whole grains | whole grains instead of refined |
-| Fats | healthy oils, minimal ultra-processed food |
-| Drink (separate) | water / tea / coffee without sugar |
+| Component        | Criterion                                               |
+| ---------------- | ------------------------------------------------------- |
+| Vegetables/fruit | ≈ half the plate, mostly vegetables                     |
+| Protein          | a healthy protein source (fish, poultry, legumes, eggs) |
+| Whole grains     | whole grains instead of refined                         |
+| Fats             | healthy oils, minimal ultra-processed food              |
+| Drink (separate) | water / tea / coffee without sugar                      |
 
 AI output (structured):
 
 ```ts
 type PlateAssessment = {
-  components: { vegetables: 0|1; protein: 0|1; wholeGrains: 0|1; fats: 0|1; drink?: 0|1|null };
-  score: number;             // 0–4; recomputed in `domain` as the sum of the components — any score the model returns is ignored (ADR-0012)
+  components: {
+    vegetables: 0 | 1;
+    protein: 0 | 1;
+    wholeGrains: 0 | 1;
+    fats: 0 | 1;
+    drink?: 0 | 1 | null;
+  };
+  score: number; // 0–4; recomputed in `domain` as the sum of the components — any score the model returns is ignored (ADR-0012)
   confidence: 'low' | 'medium' | 'high';
-  good: string;              // what's good
-  improve?: string;          // what to watch
-  tip?: string;              // one realistic tip, only when relevant
+  good: string; // what's good
+  improve?: string; // what to watch
+  tip?: string; // one realistic tip, only when relevant
   notFood?: boolean;
 };
 ```
@@ -167,10 +175,10 @@ Material incentives without the server ever touching money.
 ```ts
 type StakeLedgerEntry = {
   userId: string;
-  week: string;              // ISO week
+  week: string; // ISO week
   kind: 'reward' | 'penalty' | 'buffer' | 'settlement';
-  amount: number;            // UAH, minor units
-  reason: string;            // reference to habit/week
+  amount: number; // UAH, minor units
+  reason: string; // reference to habit/week
   settledBy?: 'mono_webhook' | 'manual';
   externalTxId?: string;
 };
@@ -190,10 +198,19 @@ type StakeLedgerEntry = {
 type Share = {
   ownerId: string;
   viewer: { userId?: string; inviteToken?: string };
-  scopes: Array<'habits_weekly' | 'habits_daily' | 'meals' | 'weight' | 'measurements'
-              | 'progress_photos' | 'labs' | 'stake'>;
+  scopes: Array<
+    | 'habits_weekly'
+    | 'habits_daily'
+    | 'meals'
+    | 'weight'
+    | 'measurements'
+    | 'progress_photos'
+    | 'labs'
+    | 'stake'
+  >;
   role: 'observer' | 'coach' | 'referee';
-  createdAt: string; revokedAt?: string;
+  createdAt: string;
+  revokedAt?: string;
 };
 ```
 
@@ -203,14 +220,14 @@ type Share = {
 
 ## 9. Glossary (ubiquitous language)
 
-| Term | Meaning |
-|---|---|
-| Calibration | data collection period without evaluation, used to set thresholds |
-| Tiers | `min / target / stretch` |
-| Weekly goal | "tier X on N days out of 7" |
-| Held the line | a day where all active habits are ≥ `min` |
-| Never miss twice | rule: two consecutive misses trigger a nudge |
-| Life area | a sphere of habits (health, household, finances, ...); not a DDD "domain" |
-| Stake | the material incentive module |
-| Buffer | spare days earned by exceeding a weekly goal |
-| Referee | an observer with the final say on disputed check-offs in Stake |
+| Term             | Meaning                                                                   |
+| ---------------- | ------------------------------------------------------------------------- |
+| Calibration      | data collection period without evaluation, used to set thresholds         |
+| Tiers            | `min / target / stretch`                                                  |
+| Weekly goal      | "tier X on N days out of 7"                                               |
+| Held the line    | a day where all active habits are ≥ `min`                                 |
+| Never miss twice | rule: two consecutive misses trigger a nudge                              |
+| Life area        | a sphere of habits (health, household, finances, ...); not a DDD "domain" |
+| Stake            | the material incentive module                                             |
+| Buffer           | spare days earned by exceeding a weekly goal                              |
+| Referee          | an observer with the final say on disputed check-offs in Stake            |

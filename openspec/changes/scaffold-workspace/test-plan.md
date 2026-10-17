@@ -26,35 +26,35 @@ The type-level assertions (`expectTypeOf`, `// @ts-expect-error`) in the narrowi
 
 ### specs/shared-core/spec.md (7 scenarios)
 
-| # | Requirement | Scenario | Test(s) in `result.spec.ts` |
-|---|---|---|---|
-| 1 | A result is either a success or a failure | A success carries its value | `Result: a result is either a success or a failure > a success carries its value` |
-| 2 | same | A failure carries its value | `Result: a result is either a success or a failure > a failure carries its value` |
-| 3 | same | A falsy value is still carried | `Result: a result is either a success or a failure > a falsy value is still carried by success: %s` and `... by failure: %s` (each over `0`, `""`, `false`, `null`, `undefined`) |
-| 4 | A result reports which it is | A success reports success | `Result: a result reports which it is > a success reports success` |
-| 5 | same | A failure reports failure | `Result: a result reports which it is > a failure reports failure` |
-| 6 | same | A check narrows the value's type | `Result: a result reports which it is > a check narrows the value type` (typecheck-enforced) |
-| 7 | The shared core depends on nothing | The shared core is used without a framework | `Result: the shared core depends on nothing > the shared core is used without a framework` |
+| #   | Requirement                               | Scenario                                    | Test(s) in `result.spec.ts`                                                                                                                                                      |
+| --- | ----------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | A result is either a success or a failure | A success carries its value                 | `Result: a result is either a success or a failure > a success carries its value`                                                                                                |
+| 2   | same                                      | A failure carries its value                 | `Result: a result is either a success or a failure > a failure carries its value`                                                                                                |
+| 3   | same                                      | A falsy value is still carried              | `Result: a result is either a success or a failure > a falsy value is still carried by success: %s` and `... by failure: %s` (each over `0`, `""`, `false`, `null`, `undefined`) |
+| 4   | A result reports which it is              | A success reports success                   | `Result: a result reports which it is > a success reports success`                                                                                                               |
+| 5   | same                                      | A failure reports failure                   | `Result: a result reports which it is > a failure reports failure`                                                                                                               |
+| 6   | same                                      | A check narrows the value's type            | `Result: a result reports which it is > a check narrows the value type` (typecheck-enforced)                                                                                     |
+| 7   | The shared core depends on nothing        | The shared core is used without a framework | `Result: the shared core depends on nothing > the shared core is used without a framework`                                                                                       |
 
 Fixture-driven discriminator for scenario 7's static manifest read: `Result: the shared core depends on nothing > the dependency check detects a declared runtime dependency (fixture)`.
 
 ### specs/change-scope/spec.md (13 scenarios)
 
-| # | Requirement | Scenario | Test(s) in `docs-only.spec.ts` |
-|---|---|---|---|
-| 8 | Documentation-only only when every path is documentation | Markdown only | `classify: a change is documentation-only only when every path is documentation > markdown only` |
-| 9 | same | A change record | `... > a change record` |
-| 10 | same | Markdown beside code | `... > markdown beside code` |
-| 11 | same | YAML outside the change records | `... > yaml outside the change records` |
-| 12 | same | A suffix in another case | `... > a suffix in another case` |
-| 13 | same | A path that is not repository-relative | `... > a path that is not repository-relative: %s` (over `openspec/../x.yaml`, `/abs/docs/a.md`, `./docs/a.md`) |
-| 14 | same | A deleted or renamed source file | `... > a deleted or renamed source file` |
-| 15 | same | Nothing changed | `... > nothing changed` |
-| 16 | Declared exceptions are never documentation | A declared exception | `classify: declared exceptions are never documentation > a declared exception` |
-| 17 | same | Nothing is excepted by default | `classify: declared exceptions are never documentation > nothing is excepted by default` |
-| 18 | Runs without installed dependencies and fails closed | Verdict on standard input | `docs-only command: runs without installed dependencies and fails closed > verdict on standard input` |
-| 19 | same | Empty input | `docs-only command: ... > empty input` |
-| 20 | same | Mixed input | `docs-only command: ... > mixed input` |
+| #   | Requirement                                              | Scenario                               | Test(s) in `docs-only.spec.ts`                                                                                  |
+| --- | -------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 8   | Documentation-only only when every path is documentation | Markdown only                          | `classify: a change is documentation-only only when every path is documentation > markdown only`                |
+| 9   | same                                                     | A change record                        | `... > a change record`                                                                                         |
+| 10  | same                                                     | Markdown beside code                   | `... > markdown beside code`                                                                                    |
+| 11  | same                                                     | YAML outside the change records        | `... > yaml outside the change records`                                                                         |
+| 12  | same                                                     | A suffix in another case               | `... > a suffix in another case`                                                                                |
+| 13  | same                                                     | A path that is not repository-relative | `... > a path that is not repository-relative: %s` (over `openspec/../x.yaml`, `/abs/docs/a.md`, `./docs/a.md`) |
+| 14  | same                                                     | A deleted or renamed source file       | `... > a deleted or renamed source file`                                                                        |
+| 15  | same                                                     | Nothing changed                        | `... > nothing changed`                                                                                         |
+| 16  | Declared exceptions are never documentation              | A declared exception                   | `classify: declared exceptions are never documentation > a declared exception`                                  |
+| 17  | same                                                     | Nothing is excepted by default         | `classify: declared exceptions are never documentation > nothing is excepted by default`                        |
+| 18  | Runs without installed dependencies and fails closed     | Verdict on standard input              | `docs-only command: runs without installed dependencies and fails closed > verdict on standard input`           |
+| 19  | same                                                     | Empty input                            | `docs-only command: ... > empty input`                                                                          |
+| 20  | same                                                     | Mixed input                            | `docs-only command: ... > mixed input`                                                                          |
 
 Scenario 14 is exercised as stated: the classifier takes paths as given, so a deleted path or a rename's source side is just a path in the list; producing that list (`git diff --name-only --no-renames`) is the callers', not the classifier's, and is not in this spec.
 

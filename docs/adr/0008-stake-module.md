@@ -17,7 +17,7 @@ The server **never moves money**. The `stake` context keeps a virtual ledger; we
 
 ## Consequences
 
-+ Minimal risk: a compromised server gives no access to funds.
-+ The weekly transfer ritual is motivating in itself.
-− Requires discipline to make the transfer; mitigated by reminders and a referee-observer.
-− The jar transfer's description format in statements must be validated in a prototype.
+- Minimal risk: a compromised server gives no access to funds.
+- The weekly transfer ritual is motivating in itself.
+  − Requires discipline to make the transfer; mitigated by reminders and a referee-observer.
+  − The jar transfer's description format in statements must be validated in a prototype.

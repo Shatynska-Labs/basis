@@ -37,8 +37,8 @@ How to model life areas (health, household, finances, etc.) — as separate cont
 
 ## Consequences
 
-+ New features are added as subscribers to existing events, without changing the core.
-+ The `habits` core is tested in isolation, without a database or framework.
-+ Context boundaries are checked by the Nx linter (ADR-0005).
-− More files and layers in `habits` and `stake`.
-− Requires discipline: no shortcuts via direct imports of another context.
+- New features are added as subscribers to existing events, without changing the core.
+- The `habits` core is tested in isolation, without a database or framework.
+- Context boundaries are checked by the Nx linter (ADR-0005).
+  − More files and layers in `habits` and `stake`.
+  − Requires discipline: no shortcuts via direct imports of another context.

@@ -16,5 +16,5 @@ We need a weight trend with a moving average over raw points, habit adherence he
 
 ## Consequences
 
-+ A wide range of chart types, good performance.
-− A steeper learning curve (large options object).
+- A wide range of chart types, good performance.
+  − A steeper learning curve (large options object).

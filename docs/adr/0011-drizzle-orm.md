@@ -26,9 +26,9 @@ ADR-0006 chose PostgreSQL but no way to reach it from code. The data-access laye
 
 ## Consequences
 
-+ The domain cannot depend on the ORM by construction.
-+ Table ownership is enforced by schemas and Nx boundaries, not by agreement.
-+ SQL-first queries are predictable for read repositories (CQRS, ADR-0012).
-− Mappers between rows and domain objects are written by hand, mainly in `habits` and `stake`.
-− The Unit of Work is ours to write: the `TransactionManager` port and its adapter.
-− NestJS integration is a small provider of our own, not an official module.
+- The domain cannot depend on the ORM by construction.
+- Table ownership is enforced by schemas and Nx boundaries, not by agreement.
+- SQL-first queries are predictable for read repositories (CQRS, ADR-0012).
+  − Mappers between rows and domain objects are written by hand, mainly in `habits` and `stake`.
+  − The Unit of Work is ours to write: the `TransactionManager` port and its adapter.
+  − NestJS integration is a small provider of our own, not an official module.

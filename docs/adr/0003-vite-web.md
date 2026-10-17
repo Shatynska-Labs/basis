@@ -17,6 +17,6 @@ The web app is the analysis and management tool (trends, settings, observers) wi
 
 ## Consequences
 
-+ Simple deployment (static files).
-+ Hooks and API client shared with mobile.
-− Link previews for invitations in messengers — serve meta tags from the backend if needed.
+- Simple deployment (static files).
+- Hooks and API client shared with mobile.
+  − Link previews for invitations in messengers — serve meta tags from the backend if needed.

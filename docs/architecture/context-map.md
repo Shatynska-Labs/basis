@@ -4,17 +4,17 @@
 
 ## Contexts
 
-| Context | Type | Responsibility | Key concepts | `domain` layer; ACL |
-|---|---|---|---|---|
-| `habits` | core | habit rules, daily and weekly evaluation, "never miss twice", calibration, goal progression | `HabitRule`, `DayEvaluation`, `WeekEvaluation`, `Tier`, `HabitStatus`, `GoalChangeProposal` | yes |
-| `metrics` | supporting | ingestion and normalization of source data; idempotency | `MetricRecord`, `Source`, `SourceStatus` | yes; ACL to Health Connect (driving) |
-| `nutrition` | supporting | meals, slots, plate assessment, manual correction | `Meal`, `MealSlot`, `PlateAssessment` | yes; ACL to the AI provider (driven; the LangGraph.js graph behind a port) |
-| `results` | supporting | weight (trend), measurements, progress photos, lab results | `WeightEntry`, `Measurement`, `ProgressPhoto`, `LabResult` | no |
-| `sharing` | supporting | invitations, access, roles, reactions | `Share`, `Invitation`, `Scope`, `Role`, `Reaction` | no |
-| `stake` | supporting | virtual balance, buffer, settlements, confirmation | `StakeLedgerEntry`, `Settlement`, `Buffer`, `StakeSettings` | yes; ACL to monobank (webhook driving, API driven) |
-| `insights` | supporting | weekly reviews, change suggestions (LangGraph) | `WeeklyReview`, `Suggestion` | no; ACL to the AI provider (driven; the LangGraph.js graph behind a port) |
-| `identity` | generic | authentication, profile, time zone, heart-rate zones | `User`, `Profile` | no |
-| `notifications` | generic | push and reminders | `Notification`, `ReminderRule` | no |
+| Context         | Type       | Responsibility                                                                              | Key concepts                                                                                | `domain` layer; ACL                                                        |
+| --------------- | ---------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `habits`        | core       | habit rules, daily and weekly evaluation, "never miss twice", calibration, goal progression | `HabitRule`, `DayEvaluation`, `WeekEvaluation`, `Tier`, `HabitStatus`, `GoalChangeProposal` | yes                                                                        |
+| `metrics`       | supporting | ingestion and normalization of source data; idempotency                                     | `MetricRecord`, `Source`, `SourceStatus`                                                    | yes; ACL to Health Connect (driving)                                       |
+| `nutrition`     | supporting | meals, slots, plate assessment, manual correction                                           | `Meal`, `MealSlot`, `PlateAssessment`                                                       | yes; ACL to the AI provider (driven; the LangGraph.js graph behind a port) |
+| `results`       | supporting | weight (trend), measurements, progress photos, lab results                                  | `WeightEntry`, `Measurement`, `ProgressPhoto`, `LabResult`                                  | no                                                                         |
+| `sharing`       | supporting | invitations, access, roles, reactions                                                       | `Share`, `Invitation`, `Scope`, `Role`, `Reaction`                                          | no                                                                         |
+| `stake`         | supporting | virtual balance, buffer, settlements, confirmation                                          | `StakeLedgerEntry`, `Settlement`, `Buffer`, `StakeSettings`                                 | yes; ACL to monobank (webhook driving, API driven)                         |
+| `insights`      | supporting | weekly reviews, change suggestions (LangGraph)                                              | `WeeklyReview`, `Suggestion`                                                                | no; ACL to the AI provider (driven; the LangGraph.js graph behind a port)  |
+| `identity`      | generic    | authentication, profile, time zone, heart-rate zones                                        | `User`, `Profile`                                                                           | no                                                                         |
+| `notifications` | generic    | push and reminders                                                                          | `Notification`, `ReminderRule`                                                              | no                                                                         |
 
 ## Relationships
 
@@ -39,21 +39,21 @@ Health Connect ──ACL──▶ metrics ──MetricRecorded──▶ habits �
 
 These are integration events (ADR-0012 §3): defined in the publishing context's `contracts`, published on the `EventBus` after commit. Domain events raised inside a context are not listed here and never leave it.
 
-| Event | Published by | Consumers | Payload |
-|---|---|---|---|
-| `MetricRecorded` | metrics | habits | userId, metric, interval, source |
-| `SourceStatusChanged` | metrics | habits, notifications | userId, source, status |
-| `MealAssessed` | nutrition | habits, notifications | userId, mealId, slot, score |
-| `AssessmentCorrected` | nutrition | habits | userId, mealId, newScore |
-| `DayEvaluated` | habits | notifications | userId, date, provisional statuses |
-| `DayClosed` | habits | stake, sharing, notifications | userId, date, final statuses |
-| `HabitMissedTwice` | habits | notifications, sharing | userId, habitId, dates |
-| `WeekClosed` | habits | stake, insights, sharing, notifications | userId, week, goal summary |
-| `GoalChangeProposed` | insights | habits, notifications | userId, habitId, proposal |
-| `GoalChanged` | habits | stake, insights | userId, habitId, old/new, effectiveFrom |
-| `SettlementDue` | stake | notifications | userId, week, amount |
-| `SettlementConfirmed` | stake | sharing, notifications | userId, week, by (mono / manual) |
-| `ShareGranted` / `ShareRevoked` | sharing | notifications | ownerId, viewer, scopes |
+| Event                           | Published by | Consumers                               | Payload                                 |
+| ------------------------------- | ------------ | --------------------------------------- | --------------------------------------- |
+| `MetricRecorded`                | metrics      | habits                                  | userId, metric, interval, source        |
+| `SourceStatusChanged`           | metrics      | habits, notifications                   | userId, source, status                  |
+| `MealAssessed`                  | nutrition    | habits, notifications                   | userId, mealId, slot, score             |
+| `AssessmentCorrected`           | nutrition    | habits                                  | userId, mealId, newScore                |
+| `DayEvaluated`                  | habits       | notifications                           | userId, date, provisional statuses      |
+| `DayClosed`                     | habits       | stake, sharing, notifications           | userId, date, final statuses            |
+| `HabitMissedTwice`              | habits       | notifications, sharing                  | userId, habitId, dates                  |
+| `WeekClosed`                    | habits       | stake, insights, sharing, notifications | userId, week, goal summary              |
+| `GoalChangeProposed`            | insights     | habits, notifications                   | userId, habitId, proposal               |
+| `GoalChanged`                   | habits       | stake, insights                         | userId, habitId, old/new, effectiveFrom |
+| `SettlementDue`                 | stake        | notifications                           | userId, week, amount                    |
+| `SettlementConfirmed`           | stake        | sharing, notifications                  | userId, week, by (mono / manual)        |
+| `ShareGranted` / `ShareRevoked` | sharing      | notifications                           | ownerId, viewer, scopes                 |
 
 Events are named in the past tense and carry only identifiers and minimal data; consumers fetch
 full data through the owning context's public query.

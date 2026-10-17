@@ -92,6 +92,44 @@ describe('Result: a result reports which it is', () => {
       }
     }
   });
+
+  it('a check narrows when both types are the same', () => {
+    const lookUp = (found: boolean): Result<string, string> =>
+      found ? success('found') : failure('not-found');
+
+    for (const found of [true, false]) {
+      const result = lookUp(found);
+      const expected = found ? 'found' : 'not-found';
+
+      if (result.isSuccess()) {
+        expectTypeOf(result).not.toBeNever();
+        expectTypeOf(result.value).toEqualTypeOf<string>();
+        const asString: string = result.value;
+        expect(found).toBe(true);
+        expect(asString).toBe(expected);
+      } else {
+        expectTypeOf(result).not.toBeNever();
+        expectTypeOf(result.value).toEqualTypeOf<string>();
+        const asString: string = result.value;
+        expect(found).toBe(false);
+        expect(asString).toBe(expected);
+      }
+
+      if (result.isFailure()) {
+        expectTypeOf(result).not.toBeNever();
+        expectTypeOf(result.value).toEqualTypeOf<string>();
+        const asString: string = result.value;
+        expect(found).toBe(false);
+        expect(asString).toBe(expected);
+      } else {
+        expectTypeOf(result).not.toBeNever();
+        expectTypeOf(result.value).toEqualTypeOf<string>();
+        const asString: string = result.value;
+        expect(found).toBe(true);
+        expect(asString).toBe(expected);
+      }
+    }
+  });
 });
 
 /**

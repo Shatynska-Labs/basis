@@ -18,23 +18,24 @@ The design leaves these open; the tests fix them, and the implementation must us
 
 Select a single test with Vitest's file filter and name filter, e.g. `pnpm vitest run libs/shared/core/src/lib/result.spec.ts -t "a success carries its value"`, or through Nx once the project names exist: `pnpm nx test <project> -- -t "<test name>"`. Test names below are the full Vitest names (`describe` + `it`).
 
-The type-level assertions (`expectTypeOf`, `// @ts-expect-error`) in the narrowing test are enforced by the **`typecheck`** target over the spec file, not by the `test` target: Vitest's runtime treats `expectTypeOf` as a no-op. That scenario is satisfied only when both `test` and `typecheck` pass.
+The type-level assertions (`expectTypeOf`, `// @ts-expect-error`) in the two narrowing tests are enforced by the **`typecheck`** target over the spec file, not by the `test` target: Vitest's runtime treats `expectTypeOf` as a no-op. That scenario is satisfied only when both `test` and `typecheck` pass.
 
 ## Scenario coverage
 
-20 scenarios in the delta specs; 20 accounted for below (20 covered, 0 uncovered).
+21 scenarios in the delta specs; 21 accounted for below (21 covered, 0 uncovered).
 
-### specs/shared-core/spec.md (7 scenarios)
+### specs/shared-core/spec.md (8 scenarios)
 
-| #   | Requirement                               | Scenario                                    | Test(s) in `result.spec.ts`                                                                                                                                                      |
-| --- | ----------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | A result is either a success or a failure | A success carries its value                 | `Result: a result is either a success or a failure > a success carries its value`                                                                                                |
-| 2   | same                                      | A failure carries its value                 | `Result: a result is either a success or a failure > a failure carries its value`                                                                                                |
-| 3   | same                                      | A falsy value is still carried              | `Result: a result is either a success or a failure > a falsy value is still carried by success: %s` and `... by failure: %s` (each over `0`, `""`, `false`, `null`, `undefined`) |
-| 4   | A result reports which it is              | A success reports success                   | `Result: a result reports which it is > a success reports success`                                                                                                               |
-| 5   | same                                      | A failure reports failure                   | `Result: a result reports which it is > a failure reports failure`                                                                                                               |
-| 6   | same                                      | A check narrows the value's type            | `Result: a result reports which it is > a check narrows the value type` (typecheck-enforced)                                                                                     |
-| 7   | The shared core depends on nothing        | The shared core is used without a framework | `Result: the shared core depends on nothing > the shared core is used without a framework`                                                                                       |
+| #   | Requirement                               | Scenario                                     | Test(s) in `result.spec.ts`                                                                                                                                                      |
+| --- | ----------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | A result is either a success or a failure | A success carries its value                  | `Result: a result is either a success or a failure > a success carries its value`                                                                                                |
+| 2   | same                                      | A failure carries its value                  | `Result: a result is either a success or a failure > a failure carries its value`                                                                                                |
+| 3   | same                                      | A falsy value is still carried               | `Result: a result is either a success or a failure > a falsy value is still carried by success: %s` and `... by failure: %s` (each over `0`, `""`, `false`, `null`, `undefined`) |
+| 4   | A result reports which it is              | A success reports success                    | `Result: a result reports which it is > a success reports success`                                                                                                               |
+| 5   | same                                      | A failure reports failure                    | `Result: a result reports which it is > a failure reports failure`                                                                                                               |
+| 6   | same                                      | A check narrows the value's type             | `Result: a result reports which it is > a check narrows the value type` (typecheck-enforced)                                                                                     |
+| 6b  | same                                      | A check narrows when both types are the same | `Result: a result reports which it is > a check narrows when both types are the same` (typecheck-enforced)                                                                       |
+| 7   | The shared core depends on nothing        | The shared core is used without a framework  | `Result: the shared core depends on nothing > the shared core is used without a framework`                                                                                       |
 
 Fixture-driven discriminator for scenario 7's static manifest read: `Result: the shared core depends on nothing > the dependency check detects a declared runtime dependency (fixture)`.
 
@@ -66,7 +67,8 @@ Scenario 14 is exercised as stated: the classifier takes paths as given, so a de
 
 **Specified** (traces to a scenario or to requirement text):
 
-- Every scenario assertion in rows 1 to 20.
+- Every scenario assertion in rows 1 to 20 and 6b.
+- Row 6b: in all four branches (`isSuccess()` true and false, `isFailure()` true and false) over `Result<string, string>`, `result` is not `never` and `result.value` is exactly `string` (scenario: "`value` a `string` in every branch, and neither branch's result is narrowed to an impossible type"). The runtime checks that each branch is reached for the expected input and carries the expected value are derived scaffolding to make every branch execute, not part of the scenario's claim.
 - `isSuccess()`/`isFailure()` returning exactly one `true` inside the falsy-value tests (requirement: "it is a success, or a failure respectively").
 - Narrowing after `isFailure()` in the narrowing test (requirement text: "after `isFailure()` returns `true` its `value` has the failure type"; the scenario names only `isSuccess()`).
 - `libs/shared/core/package.json` declares no `dependencies` entry (scenario 7: "declares no runtime dependency").
@@ -98,6 +100,8 @@ Scenario 14 is exercised as stated: the classifier takes paths as given, so a de
 - **Command output matcher**: `the output check rejects anything but the bare verdict (fixture)` falsifies the `verdictOutput` matcher on wrong verdicts, prefixed output and two-line output. Not executed (no runner).
 - **Narrowing**: `expectTypeOf(...).toEqualTypeOf<number>()` discriminates where the `@ts-expect-error` alone would not (an un-narrowed `string | number` value also fails assignment to `string`, satisfying the directive). Not executed: no TypeScript configuration or Vitest types exist. A syntax-only compile in a scratch directory showed only the expected missing-module and dependent errors.
 
+- **Narrowing when both types are the same (row 6b)**: `expectTypeOf(result).not.toBeNever()` is the discriminator for "narrowed to an impossible type" — `toEqualTypeOf<string>()` on `result.value` alone would surface only as a missing-property error on `never`. Observed red at authoring (2026-10-17) on exactly that property: `pnpm nx typecheck shared-core --skip-nx-cache` failed with 6 errors, all in the two else-branches of this test (lines 111-113 after `isSuccess()`, 125-127 after `isFailure()`): TS2349 on `not.toBeNever` and TS2339 "Property 'value' does not exist on type 'never'". The branches after a `true` check type-check. The runtime half passes (`test`: 18 passed), as expected, since the defect is type-level only.
+
 ## Obsolete tests
 
 Not applicable: both delta specs contain `ADDED` requirements only, so nothing is superseded. (Also, no test exists anywhere in the repository; the glob `{apps,libs,tools}/**/*.spec.{ts,tsx}` matched nothing before this pass.)
@@ -112,5 +116,9 @@ Not applicable: both delta specs contain `ADDED` requirements only, so nothing i
 - **Q6. Nx project names.** Unknown until generation (`@basis/shared-core`, `change-scope`, or other); the Nx selection form above uses `<project>`.
 
 ## Baseline
+
+**Second pass (2026-10-17, scenario 6b only), scoped to project `shared-core`:** before adding the test, `pnpm nx typecheck shared-core --skip-nx-cache` succeeded and `pnpm nx test shared-core --skip-nx-cache` succeeded (17 tests). After adding it, `typecheck` fails with the 6 errors recorded under Discriminator records, all attributable to the new test; `test` passes (18 tests). The other scenarios' baselines were not re-taken on this pass.
+
+**First pass:**
 
 **No baseline was taken.** The workspace does not exist at authoring: no `package.json`, no Nx, no Vitest, no `tsconfig`, and no test file anywhere in the repository. `pnpm nx run-many -t test` cannot execute. Every test in both files will fail on first run in the target-absent state (`../index` and `./docs-only.ts` do not exist; `libs/shared/core/package.json` does not exist), which establishes only that the targets are absent, not that the assertions are sound. A test that passes before its target exists is an alarm to investigate, not coverage.

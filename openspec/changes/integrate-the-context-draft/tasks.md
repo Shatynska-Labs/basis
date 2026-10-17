@@ -13,5 +13,5 @@
 ## 3. Ship
 
 - [ ] 3.1 Open the implementation pull request and wait for the operator's confirmation that it merged
-- [ ] 3.2 Confirm the effect: a fresh session started outside `docs/` states the time-zone and sleep-day conventions when asked, without reading any file
+- [ ] 3.2 Confirm the effect: a fresh session started outside `docs/` states the time-zone, sleep-day and "domain"-versus-life-area conventions when asked, without reading any file
 - [ ] 3.3 Archive: delete the `integrate-the-context-draft` entry from `docs/backlog.md`, archive the change, and open its pull request

@@ -6,7 +6,7 @@
 
 - Add a `## Conventions` section to `AGENTS.md`, outside both delimited blocks, carrying the draft's implementation conventions: time zones and the user's local day, sleep-day attribution and day closing, `user_id` ownership, normalized source-agnostic metrics, the meaning of "domain" against "life area", secret handling, and English as the working language.
 - Carry the deterministic half of the draft's product principle 8 — "deterministic logic lives in code, not in the LLM", stated in ADR-0007 and ADR-0012 but in no file every session loads — into the same section as a convention, and point to `docs/product/01-vision.md` for the product principles.
-- Leave out the principle's other half, "suggestions are confirmed by a human": ADR-0007 and the PRD disagree on it. Record the conflict in `docs/backlog.md` as `reconcile-ai-suggestion-confirmation`.
+- Carry what every source agrees on about human oversight — every AI assessment is correctable, a suggested goal change applies only once accepted — and leave out the contested "suggestions always require human confirmation": ADR-0007 and the PRD disagree on it. Record the conflict in `docs/backlog.md` as `reconcile-ai-suggestion-confirmation`.
 - Delete `docs/CLAUDE.md`. Its stack, architecture, monorepo-structure and module-boundary sections are superseded by `README.md`, ADR-0011 to ADR-0013 and ADR-0012's tag table; its development-process and documents sections by `AGENTS.md` and `docs/README.md`.
 - Delete the `integrate-the-context-draft` entry from `docs/backlog.md` when the change is archived.
 

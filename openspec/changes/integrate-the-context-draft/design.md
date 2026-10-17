@@ -29,19 +29,19 @@ Alternative: `README.md`. Rejected — sessions do not load it unless told to.
 Each is the draft's convention restated, with a pointer to the live document that argues it where one exists:
 
 - Timestamps carry a time zone; a user's day and week (Mon–Sun) are computed in that user's local time zone (`docs/product/04-domain-model.md`, `03-prd-mvp.md`).
-- Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency, and a closed day is recalculated, and flagged, if late data arrives (`04-domain-model.md` §3).
-- Every user-owned entity carries a `user_id`; nothing global is tailored to a particular user. The persisted owning-user column is named `user_id` whatever the TypeScript field is named — `Share.ownerId` in `04-domain-model.md` §8 is persisted as `user_id`.
+- Sleep belongs to the day it ended; a day closes the next morning, to allow for sync latency, its status provisional until then, and a closed day is recalculated, and flagged, if late data arrives (`04-domain-model.md` §3).
+- Every user-owned entity carries a `user_id`; nothing global is tailored to a particular user. The reference to the owning user is persisted; its field and column name are the schema's, not this convention's (`Share.ownerId` in `04-domain-model.md` §8 is such a reference, beside `viewer.userId`, which is not).
 - Metrics are normalized and source-agnostic; each source reaches them through its own adapter (`04-domain-model.md` §1).
 - "Domain" is used only in the DDD sense; spheres of habits are life areas (ADR-0010).
 - Secrets (bank tokens, API keys) are encrypted and never logged. Carried from the draft; `06-risks-and-open-questions.md` covers only the monobank token's encryption.
-- Deterministic logic lives in code, not in the LLM: a graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain` (ADR-0007, ADR-0012 §1).
+- Deterministic logic lives in code, not in the LLM: a graph does only what needs content understanding (meal photos, weekly reviews); deterministic decisions such as the plate score and the bounds of a goal change stay in `domain` (ADR-0007, ADR-0012 §1). An AI assessment is always correctable, and a suggested goal change takes effect only after the user accepts it (vision principle 7, PRD US-13 and US-15, `docs/architecture/context-map.md`). Whether other AI output, such as a plate score, needs confirmation before it applies is open: `reconcile-ai-suggestion-confirmation`.
 - Code, comments, commit messages and documentation are in English.
 
 "Every entity has a `user_id`" is narrowed to user-owned entities: the health starter template (`04-domain-model.md`) is global by design, and the draft's own second clause ("no global settings tailored to a specific user") presumes that global data exists.
 
 ### Human confirmation of AI suggestions is not carried
 
-The draft's "their suggestions are confirmed by a human" restates ADR-0007 ("their suggestions always require human confirmation"), which conflicts with the PRD: plate scores are applied at once and corrected afterwards (US-12, US-13; `04-domain-model.md` §5; "the user never waits for the AI"), and only the weekly review's goal change is accepted or rejected (US-15). Resolving that conflict changes an accepted ADR and is a decision of its own, which this change does not depend on. The convention carries only the uncontested half, and the conflict is recorded in `docs/backlog.md` as `reconcile-ai-suggestion-confirmation` (operator decision, 2026-10-17).
+The draft's "their suggestions are confirmed by a human" restates ADR-0007 ("their suggestions always require human confirmation"), which conflicts with the PRD: plate scores are applied at once and corrected afterwards (US-12, US-13; `04-domain-model.md` §5; "the user never waits for the AI"), and only the weekly review's goal change is accepted or rejected (US-15). Resolving that conflict changes an accepted ADR and is a decision of its own, which this change does not depend on. The convention carries what every source agrees on — deterministic logic in code, every AI assessment correctable, a goal change applied only once accepted — and names the open question, and the conflict is recorded in `docs/backlog.md` as `reconcile-ai-suggestion-confirmation` (operator decision, 2026-10-17).
 
 Alternatives: supersede ADR-0007 in part within this change (rejected — widens a documentation move into an architectural decision); follow ADR-0007 (rejected — contradicts the PRD).
 

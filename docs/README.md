@@ -25,3 +25,4 @@ Discovery-phase outputs — the top-level source of truth for every OpenSpec cha
 - New feature → take a user story from the PRD → create an OpenSpec change.
 - A decision that contradicts these documents → update the document or add an ADR first.
 - A resolved open question → move the answer into the relevant document.
+Probe.

@@ -1,6 +1,8 @@
 # ADR-0010: Pragmatic DDD and a modular monolith
 
-**Status:** accepted · **Date:** 2026-10-17
+**Status:** accepted; superseded in part by ADR-0012 · **Date:** 2026-10-17
+
+> ADR-0012 §1 replaces point 3 (every context has the same shape, `domain` optional), and §3 replaces point 5 in mechanism and in meaning: contexts interact through integration events defined in `contracts`, published on the `@nestjs/cqrs` `EventBus`, while domain events stay inside their context. Point 2's "contexts do not import each other's domain" and point 4 still hold.
 
 ## Context
 

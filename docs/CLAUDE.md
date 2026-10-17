@@ -1,3 +1,5 @@
+> **Discovery-phase draft — not authoritative.** Wherever this file conflicts with `docs/adr/` (ADR-0011 to ADR-0013 and the ADRs they supersede in part) or with the root `AGENTS.md`, those win. Its integration into the live documents is the backlog entry `integrate-the-context-draft` in `docs/backlog.md`.
+
 # CLAUDE.md
 
 Project context for Claude Code sessions. Detailed decisions live in `docs/`.

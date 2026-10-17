@@ -14,6 +14,9 @@ Discovery-phase outputs — the top-level source of truth for every OpenSpec cha
 - [Context map](architecture/context-map.md)
 - [ADRs](adr/README.md)
 
+## Backlog
+- [Identified changes not yet opened](backlog.md)
+
 ## How to use
 - New feature → take a user story from the PRD → create an OpenSpec change.
 - A decision that contradicts these documents → update the document or add an ADR first.

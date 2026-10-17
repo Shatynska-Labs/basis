@@ -129,7 +129,7 @@ AI output (structured):
 ```ts
 type PlateAssessment = {
   components: { vegetables: 0|1; protein: 0|1; wholeGrains: 0|1; fats: 0|1; drink?: 0|1|null };
-  score: number;             // 0–4
+  score: number;             // 0–4; recomputed in `domain` as the sum of the components — any score the model returns is ignored (ADR-0012)
   confidence: 'low' | 'medium' | 'high';
   good: string;              // what's good
   improve?: string;          // what to watch

@@ -54,4 +54,10 @@ Each probe is made in a commit or on a scratch branch and undone with version co
 ## 9. Conventions
 
 - [x] 9.1 Update `AGENTS.md` "Development Tooling" with the hooks (convenience, not a gate), gitleaks, Dependabot and the CI steps beyond `nx affected`; add the hooks' documentation-only stand-down and its declaration (decision 11); write the obligation that a change making code, a test or a build read, import, bundle or copy a Markdown file adds it to `tools/change-scope`'s exceptions; add the provisioning steps of decision 10; remove "These commands exist once the workspace is scaffolded" from "Testing Strategy"; verify `pnpm format:check` passes and the managed workflow block is untouched (`git diff` shows no change inside it).
-- [ ] 9.2 Ask the operator to require the `check`, `secrets` and `commits` jobs on `main` in the repository's branch protection once they have run; record the answer in this change. After the first merge, verify the push-to-`main` run passes, which exercises `nx-set-shas`'s base lookup (decision 7).
+- [x] 9.2 Ask the operator to require the `check`, `secrets` and `commits` jobs on `main` in the repository's branch protection once they have run; record the answer in this change. After the first merge, verify the push-to-`main` run passes, which exercises `nx-set-shas`'s base lookup (decision 7).
+
+  Operator's answer, 2026-10-17: yes. `main` requires `check`, `secrets` and `commits` (GitHub Actions) and a pull request with no approvals; force pushes and deletion are off; admins are not bound. Applied by the operator through the API. The push-to-`main` runs on `d0710ef` (#5) and `2a043d8` (#10) passed.
+
+## Confirmation
+
+Confirmed by the operator, 2026-10-17, after checking the gate by hand in a throwaway working tree off `main` (PR #14): a documentation-only commit stood down; a code commit ran `shared-core`'s lint, typecheck and test; a type error and a non-conventional message were each refused at commit; the push was judged against `origin/main`; CI on #14 judged `full`, ran `nx affected` for `shared-core` and passed; a `--no-verify` commit with a bad message turned `check` and `commits` red and branch protection blocked the merge. The same was observed beforehand on draft PRs #6–#8 and #11–#13 and on the push-to-`main` runs of `d0710ef` and `2a043d8`.

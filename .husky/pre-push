@@ -7,9 +7,13 @@ set -eu
 # clean working tree and one merge base with origin/main. Otherwise the full
 # checks run, and the hook says why.
 zero=0000000000000000000000000000000000000000
-refs=$(cat)
+# Tags carry no change of their own to check (e.g. `git push --follow-tags`).
+refs=$(grep -v '^refs/tags/' || true)
 reason=
-if [ "$(printf '%s\n' "$refs" | grep -c .)" -ne 1 ]; then
+if [ -z "$refs" ]; then
+  echo "pre-push: only tags are pushed; nothing to check."
+  exit 0
+elif [ "$(printf '%s\n' "$refs" | grep -c .)" -ne 1 ]; then
   reason="the push carries more than one ref"
 else
   read -r local_ref local_sha _remote_ref _remote_sha <<REFS
@@ -33,7 +37,7 @@ if [ -n "$reason" ]; then
 fi
 
 echo "pre-push: judging $local_ref against origin/main."
-if changed=$(git diff --name-only --no-renames origin/main...HEAD); then
+if changed=$(git -c core.quotePath=false diff --name-only --no-renames origin/main...HEAD); then
   verdict=$(judge pre-push "$changed")
 else
   echo "pre-push: could not compute the pushed change; running the full checks." >&2

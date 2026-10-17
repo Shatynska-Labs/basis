@@ -7,7 +7,8 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # A run on main is never cancelled: every merge commit gets a finished run.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # nrwl/nx-set-shas lists earlier workflow runs to find the last successful
 # base on main.
@@ -32,8 +33,11 @@ jobs:
           cache: pnpm
 
       # tools/change-scope is the one declaration of what is
-      # documentation-only (scaffold-workspace design decision 11). It runs
-      # on Node alone, and anything it does not answer cleanly is `full`.
+      # documentation-only (scaffold-workspace design decision 11), and
+      # .husky/lib/change-scope.sh the one wrapper that fails closed around
+      # it, shared with the hooks. Both are taken from the base commit, so a
+      # pull request is never judged by a classifier it changes; a base
+      # without them leaves the change unjudged, which runs the full checks.
       - name: Judge the change
         id: scope
         env:
@@ -43,12 +47,18 @@ jobs:
         run: |
           verdict=full
           if [ "$EVENT" = pull_request ]; then
-            if changed=$(git diff --name-only --no-renames "$BASE...$HEAD") &&
-              answer=$(printf '%s\n' "$changed" | node tools/change-scope/src/docs-only.ts) &&
-              { [ "$answer" = docs-only ] || [ "$answer" = full ]; }; then
-              verdict=$answer
+            trunk="$RUNNER_TEMP/trunk-change-scope"
+            mkdir -p "$trunk"
+            if ! git show "$BASE:.husky/lib/change-scope.sh" > "$trunk/change-scope.sh" ||
+              ! git show "$BASE:tools/change-scope/src/docs-only.ts" > "$trunk/docs-only.ts"; then
+              echo "ci: the base commit has no classifier; running the full checks."
+              verdict=unjudged
+            elif ! changed=$(git -c core.quotePath=false diff --name-only --no-renames "$BASE...$HEAD"); then
+              echo "ci: could not compute the change; running the full checks."
+              verdict=unjudged
             else
-              echo "Could not judge the change (tools/change-scope failed); running the full checks."
+              . "$trunk/change-scope.sh"
+              verdict=$(CHANGE_SCOPE_CLASSIFIER="$trunk/docs-only.ts" judge ci "$changed")
             fi
           fi
           echo "verdict: $verdict"
@@ -69,8 +79,12 @@ jobs:
         run: pnpm nx sync:check
 
       - name: nx affected
-        if: steps.scope.outputs.verdict != 'docs-only'
+        if: steps.scope.outputs.verdict == 'full'
         run: pnpm nx affected -t lint typecheck test integration build e2e
+
+      - name: nx run-many (unjudged)
+        if: steps.scope.outputs.verdict == 'unjudged'
+        run: pnpm nx run-many -t lint typecheck test integration build e2e
 
       - run: pnpm format:check
 

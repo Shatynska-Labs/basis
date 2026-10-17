@@ -11,15 +11,18 @@ else
 fi
 
 # No --diff-filter and --no-renames: deletions and both sides of a rename count.
-if staged=$(git diff --cached --name-only --no-renames); then
+if staged=$(git -c core.quotePath=false diff --cached --name-only --no-renames); then
   verdict=$(judge pre-commit "$staged")
 else
   echo "pre-commit: could not compute the staged change; running the full checks." >&2
   staged=
   verdict=unjudged
 fi
-# An empty staged change (an amend or --allow-empty) affects no file to scope by.
+# An empty staged change (an amend or --allow-empty) affects no file to scope by,
+# and `nx affected --files` takes a comma-separated list, so a path holding a
+# comma cannot be passed to it: both run every project's checks.
 [ -n "$staged" ] || verdict=unjudged
+case $staged in *,*) verdict=unjudged ;; esac
 
 if printf '%s\n' "$staged" | grep -q '^openspec/'; then
   pnpm exec openspec validate --all --strict --no-interactive

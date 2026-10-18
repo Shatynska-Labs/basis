@@ -8,7 +8,7 @@ ENV NX_DAEMON=false NX_NO_CLOUD=true
 RUN corepack enable
 COPY . .
 RUN pnpm install --frozen-lockfile
-RUN pnpm nx build api
+RUN false # throwaway: task 5.1 provokes the image job
 RUN pnpm deploy --filter api --prod /deploy
 
 FROM node:24.22.0-trixie-slim@sha256:7f486cabe892bff8fef04c0f7da8dba84a560be3e4e2740b7a86afc57ebec315

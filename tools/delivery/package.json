@@ -1,0 +1,44 @@
+{
+  "name": "@basis/delivery",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "nx": {
+    "name": "delivery",
+    "tags": [
+      "scope:tooling",
+      "type:tooling"
+    ],
+    "targets": {
+      "test": {
+        "inputs": [
+          "default",
+          "^production",
+          {
+            "fileset": "{projectRoot}/tsconfig.spec.json",
+            "dependencies": true
+          },
+          {
+            "json": "{workspaceRoot}/tsconfig.json",
+            "fields": [
+              "compilerOptions"
+            ]
+          },
+          {
+            "externalDependencies": [
+              "vitest",
+              "yaml"
+            ]
+          },
+          {
+            "env": "CI"
+          },
+          "{workspaceRoot}/.github/workflows/**",
+          "{workspaceRoot}/.github/actions/**",
+          "{workspaceRoot}/deploy/api/**"
+        ]
+      }
+    }
+  },
+  "dependencies": {}
+}

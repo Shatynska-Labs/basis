@@ -58,24 +58,27 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy:
-    name: Deploy (production)
+  # Deploys arrive in the order their CI runs finish, not in commit order.
+  # A commit main has moved past delivers nothing, so production never goes
+  # back to a superseded commit; a re-run is exempt, since re-running an older
+  # run is the rollback. The guard runs twice. Here, before the deploy job asks
+  # for its concurrency group: GitHub keeps one pending job per group and a
+  # newly queued one cancels it, so a superseded commit that queued would
+  # cancel the newer commit's pending deploy and then skip itself, leaving
+  # main's head undeployed. Skipped here, it never queues. And again in the
+  # deploy job, once it holds the group, for a newer commit that delivered
+  # while this one waited.
+  supersession:
+    name: Skip a superseded commit
     needs: build-and-push
     runs-on: ubuntu-latest
-    environment: production
-    # No two deploys overlap, and none is cancelled: the guard below decides
-    # which of them delivers.
-    concurrency:
-      group: deploy-production
-      cancel-in-progress: false
     permissions:
       contents: read
+    outputs:
+      deliver: ${{ steps.superseded.outputs.deliver }}
     steps:
-      # Deploys arrive in the order their CI runs finish, not in commit order.
-      # Once this job holds the group, a commit main has moved past delivers
-      # nothing, so production never goes back to a superseded commit. A
-      # re-run is exempt: re-running an older run is the rollback.
-      - name: Skip a superseded commit
+      - &superseded-guard
+        name: Skip a superseded commit
         id: superseded
         env:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
@@ -94,11 +97,27 @@ jobs:
             exit 1
           fi
           if [ "$tip" != "$HEAD_SHA" ]; then
-            echo "::notice::main is now at $tip, so $HEAD_SHA is superseded and is not deployed; the newer commit's own run deploys it."
+            echo "::notice::main is now at $tip, so $HEAD_SHA is superseded and is not deployed; the newer commit's own run deploys it once its CI succeeds."
             echo "deliver=false" >>"$GITHUB_OUTPUT"
             exit 0
           fi
           echo "deliver=true" >>"$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy (production)
+    needs: supersession
+    if: needs.supersession.outputs.deliver == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    # No two deploys overlap, and none in progress is cancelled. Only the
+    # supersession job above keeps a superseded commit from queueing here.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    steps:
+      - *superseded-guard
 
       - name: Refuse without the production secrets
         if: steps.superseded.outputs.deliver == 'true'
@@ -192,10 +211,11 @@ jobs:
           EXPECTED_VERSION: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -uo pipefail
-          attempts="${POLL_ATTEMPTS:-12}"
+          attempts="${POLL_ATTEMPTS:-8}"
           interval="${POLL_INTERVAL:-10}"
           version=''
-          for _ in $(seq 1 "$attempts"); do
+          # Eight attempts of at most 5 s, 10 s apart: under two minutes.
+          for attempt in $(seq 1 "$attempts"); do
             if body=$(curl -fsS --max-time 5 "$URL"); then
               version=$(printf '%s' "$body" | jq -r '.version // empty' 2>/dev/null || true)
               if [ "$version" = "$EXPECTED_VERSION" ]; then
@@ -203,7 +223,9 @@ jobs:
                 exit 0
               fi
             fi
-            sleep "$interval"
+            if [ "$attempt" -lt "$attempts" ]; then
+              sleep "$interval"
+            fi
           done
           if [ -n "$version" ]; then
             echo "::warning::$URL reports version '$version', not $EXPECTED_VERSION."

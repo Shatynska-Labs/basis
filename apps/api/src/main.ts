@@ -8,4 +8,5 @@ const app = await NestFactory.create(AppModule);
 // Exit with status 0 after a clean close on SIGTERM, rather than re-raising the
 // signal (design decision 3, task 1.3).
 app.enableShutdownHooks([], { useProcessExit: true });
-await app.listen(Number(process.env['PORT'] ?? 3000));
+// An empty PORT means the default too, not an OS-assigned port.
+await app.listen(Number(process.env['PORT'] || 3000));

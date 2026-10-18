@@ -8,6 +8,12 @@
     },
     {
       "path": "./tools/change-scope"
+    },
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/api-e2e"
     }
   ]
 }

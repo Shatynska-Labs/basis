@@ -1,0 +1,34 @@
+# What the production host runs from /opt/basis-api, delivered with a
+# rendered .env by .github/workflows/deploy.yml (deploy-api-skeleton design
+# decision 6). Nothing is persisted: the service has no volume.
+services:
+  api:
+    image: ghcr.io/shatynska-labs/basis-api:${IMAGE_TAG}
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://127.0.0.1:3000/health').then((r) => process.exit(r.status === 200 ? 0 : 1), () => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks: [platform_edge]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.basis-api.rule=Host(`api.basis.shatynska.com`)
+      - traefik.http.services.basis-api.loadbalancer.server.port=3000
+
+networks:
+  platform_edge:
+    external: true

@@ -4,6 +4,7 @@ packages:
   - 'tools/*'
 
 allowBuilds:
+  '@swc/core': true
   nx: true
 engineStrict: true
 saveExact: true

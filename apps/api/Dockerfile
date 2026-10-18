@@ -2,7 +2,7 @@
 #   docker build -f apps/api/Dockerfile --build-arg APP_VERSION=<sha> .
 # (deploy-api-skeleton design decision 5)
 
-FROM node:24.22.0-trixie-slim@sha256:7f486cabe892bff8fef04c0f7da8dba84a560be3e4e2740b7a86afc57ebec315 AS build
+FROM node:26.12.0-trixie-slim@sha256:0d1e33586362bb9e608c4e751e7a9e7edb55c9ac11461ed5666af696cc461dd4 AS build
 WORKDIR /workspace
 ENV NX_DAEMON=false NX_NO_CLOUD=true
 RUN corepack enable
@@ -11,7 +11,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm nx build api
 RUN pnpm deploy --filter api --prod /deploy
 
-FROM node:24.22.0-trixie-slim@sha256:7f486cabe892bff8fef04c0f7da8dba84a560be3e4e2740b7a86afc57ebec315
+FROM node:26.12.0-trixie-slim@sha256:0d1e33586362bb9e608c4e751e7a9e7edb55c9ac11461ed5666af696cc461dd4
 ARG APP_VERSION=
 ENV NODE_ENV=production APP_VERSION=${APP_VERSION}
 WORKDIR /app

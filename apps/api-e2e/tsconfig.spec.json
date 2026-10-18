@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/vitest",
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["vitest.e2e.config.mts", "src/**/*.ts"],
+  "references": []
+}

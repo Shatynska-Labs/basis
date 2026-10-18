@@ -1,0 +1,38 @@
+{
+  "name": "api-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "nx": {
+    "name": "api-e2e",
+    "tags": [
+      "type:app",
+      "scope:api"
+    ],
+    "implicitDependencies": [
+      "api"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          {
+            "projects": [
+              "api"
+            ],
+            "target": "build"
+          }
+        ],
+        "inputs": [
+          "default",
+          "^production"
+        ],
+        "options": {
+          "cwd": "apps/api-e2e",
+          "command": "vitest run --config vitest.e2e.config.mts"
+        }
+      }
+    }
+  },
+  "dependencies": {}
+}

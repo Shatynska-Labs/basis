@@ -119,23 +119,28 @@ jobs:
     steps:
       - *superseded-guard
 
-      - name: Refuse without the production secrets
+      # The host's tailnet address and the tailnet client are organisation
+      # settings, shared by every application deploying to main-production;
+      # the deploy key is this application's own, a secret of the production
+      # Environment. An organisation variable has one value everywhere, so the
+      # host is chosen by the variable's name.
+      - name: Refuse without the production settings
         if: steps.superseded.outputs.deliver == 'true'
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          MAIN_PRODUCTION_DEPLOY_HOST: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
           BASIS_API_DEPLOY_SSH_KEY: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
           TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
           TAILSCALE_OAUTH_SECRET: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
         run: |
           set -euo pipefail
           missing=''
-          for name in DEPLOY_HOST BASIS_API_DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET; do
+          for name in MAIN_PRODUCTION_DEPLOY_HOST BASIS_API_DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET; do
             if [ -z "${!name:-}" ]; then
               missing="$missing $name"
             fi
           done
           if [ -n "$missing" ]; then
-            echo "::error::The production Environment lacks:$missing. Nothing was joined or delivered."
+            echo "::error::Not available to this job (organisation settings, or the production Environment):$missing. Nothing was joined or delivered."
             exit 1
           fi
 
@@ -152,7 +157,7 @@ jobs:
           oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
           tags: tag:ci
-          ping: ${{ secrets.DEPLOY_HOST }}
+          ping: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
 
       # The escaping rule is the infrastructure repository's, copied from its
       # platform-deploy.yml: each value double-quoted with `\` -> `\\`,
@@ -186,7 +191,7 @@ jobs:
       - name: Deliver and deploy
         if: steps.superseded.outputs.deliver == 'true'
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_HOST: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
           DEPLOY_SSH_KEY: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
         run: |
           set -euo pipefail

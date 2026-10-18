@@ -19,3 +19,11 @@ ADR-0006 puts PostgreSQL, Redis/BullMQ and Object Storage "within the existing H
 **Argued in**: the session that opened `deploy-api-skeleton`.
 
 **Depends on**: nothing. Must be done before Basis stores data its user would not accept losing — at the latest, before the calibration period starts (roadmap Phase 1 outcome).
+
+## `move-portfolio-to-main-production-deploy-host`
+
+`Shatynska-Labs` now holds main-production's tailnet address twice: the organisation variable `DEPLOY_HOST`, which `portfolio`'s deploy reads as `vars.DEPLOY_HOST`, and `MAIN_PRODUCTION_DEPLOY_HOST`, named for its host so that more hosts can follow, which Basis reads (`deploy-api-skeleton` design decision 8). Move `portfolio`'s deploy to `vars.MAIN_PRODUCTION_DEPLOY_HOST`, confirm a deploy through it, then delete `DEPLOY_HOST` from the organisation after checking nothing else reads it. The change belongs to the `portfolio` repository, not this one; it is recorded here because Basis's change surfaced it.
+
+**Argued in**: the session that opened `deploy-api-skeleton`, when the operator chose organisation-level deploy settings.
+
+**Depends on**: `MAIN_PRODUCTION_DEPLOY_HOST` existing in the organisation (`deploy-api-skeleton` task 6.2). Until then, deleting `DEPLOY_HOST` breaks `portfolio`'s deploy.

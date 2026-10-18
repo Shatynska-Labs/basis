@@ -30,5 +30,9 @@ updates:
     directory: /apps/api
     schedule:
       interval: monthly
+    # The base image follows the Node.js major in .nvmrc, as @types/node does.
+    ignore:
+      - dependency-name: node
+        update-types: ['version-update:semver-major']
     commit-message:
       prefix: chore(deps)

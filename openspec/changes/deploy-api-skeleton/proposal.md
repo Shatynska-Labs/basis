@@ -10,7 +10,7 @@ Nothing Basis builds can reach a device or a user yet: there is no application, 
 - **`deploy/api/docker-compose.yml`**: the service definition the host runs, joining the external `platform_edge` network with Traefik labels routing `api.basis.shatynska.com`, a Compose healthcheck, `env_file: .env` and no persisted store.
 - **CI**: the pull-request workflow also builds the image, without pushing it, so a broken `Dockerfile` fails before merge.
 - **Deploy workflow** (`.github/workflows/deploy.yml`): once CI has succeeded on a push to `main`, build and push the image from the commit CI judged, then, in the `production` GitHub Environment, join the tailnet, render `.env` with the infrastructure repository's escaping rule, and deliver `docker-compose.yml` and `.env` to the host's forced-command deploy, which pulls the image and waits for the service to become healthy.
-- **Operator steps** outside this repository, listed in tasks: the deploy keypair and the probe keypair, the `production` Environment and its secrets, read access to the image package for the host, and the DNS `A` record for `api.basis.shatynska.com`.
+- **Operator steps** outside this repository, listed in tasks: the deploy keypair and the probe keypair, the organisation variable naming the production host, the `production` Environment and its deploy-key secret, read access to the image package for the host, and the DNS `A` record for `api.basis.shatynska.com`.
 
 Not in this change: a database, Redis or Object Storage (`docs/backlog.md` `choose-durable-data-storage`), any bounded context, authentication, a staging target (staging is off), the web and mobile apps.
 
@@ -34,5 +34,5 @@ None. The image, the Compose file and the two workflows are tooling: their requi
 - New files: `apps/api/Dockerfile`, `.dockerignore`, `deploy/api/docker-compose.yml`, `.github/workflows/deploy.yml`; `ci.yml` gains an image-build job.
 - New dependencies: `@nestjs/core`, `@nestjs/common`, `@nestjs/platform-express`, `reflect-metadata`, `rxjs`; development: `supertest`, `@types/supertest`, `unplugin-swc`, `@swc/core`, `@swc/cli`. `@swc/core` needs `allowBuilds` in `pnpm-workspace.yaml`.
 - `apps/api`'s `tsconfig` enables `experimentalDecorators` and `emitDecoratorMetadata`, as `AGENTS.md` allows for projects compiling Nest code.
-- GitHub: a `production` Environment on `Shatynska-Labs/basis` with the deploy secrets; a GHCR package `basis-api`.
+- GitHub: an organisation variable `MAIN_PRODUCTION_DEPLOY_HOST` beside the existing organisation Tailscale secrets; a `production` Environment on `Shatynska-Labs/basis` with the deploy key; a GHCR package `basis-api`.
 - The production host runs one more container, reachable at `https://api.basis.shatynska.com`.

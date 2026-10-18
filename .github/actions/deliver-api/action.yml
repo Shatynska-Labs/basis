@@ -1,0 +1,138 @@
+name: Deliver the API
+description: >-
+  Renders .env for one host, checks what Compose resolves from it, delivers
+  docker-compose.yml and .env to that host's forced-command deploy, and waits
+  for the public health report to name the delivered commit
+  (move-api-deploys-to-staging-with-promotion design decision 7). Shared by
+  deploy.yml (staging) and promote.yml (production), so the delivery cannot
+  drift between the two.
+
+# Every input reaches a `run:` body through `env:`, never as `${{ }}` text in
+# one. The tools are resolved from this action's own path, so they come from
+# whichever checkout the action was loaded from: in promote.yml that is main's
+# tooling, not the promoted commit's.
+inputs:
+  target:
+    description: staging or production
+    required: true
+  deploy-host:
+    description: The host's tailnet address
+    required: true
+  deploy-ssh-key:
+    description: The private half of this application's deploy key for that host
+    required: true
+  tailscale-oauth-client-id:
+    description: The tailnet OAuth client
+    required: true
+  tailscale-oauth-secret:
+    description: The tailnet OAuth secret
+    required: true
+  base-domain:
+    description: The organisation's base domain
+    required: true
+  image-digest:
+    description: The image to run, as sha256:<64 hex>
+    required: true
+  commit:
+    description: The commit the image was built from, which /health must report
+    required: true
+  compose-dir:
+    description: The directory holding the docker-compose.yml to deliver
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Refuse without every input
+      shell: bash
+      env:
+        TARGET: ${{ inputs.target }}
+        DEPLOY_HOST: ${{ inputs.deploy-host }}
+        DEPLOY_SSH_KEY: ${{ inputs.deploy-ssh-key }}
+        TAILSCALE_OAUTH_CLIENT_ID: ${{ inputs.tailscale-oauth-client-id }}
+        TAILSCALE_OAUTH_SECRET: ${{ inputs.tailscale-oauth-secret }}
+        BASE_DOMAIN: ${{ inputs.base-domain }}
+        IMAGE_DIGEST: ${{ inputs.image-digest }}
+        COMMIT: ${{ inputs.commit }}
+        COMPOSE_DIR: ${{ inputs.compose-dir }}
+      run: |
+        set -euo pipefail
+        missing=''
+        for name in TARGET DEPLOY_HOST DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET BASE_DOMAIN IMAGE_DIGEST COMMIT COMPOSE_DIR; do
+          if [ -z "${!name:-}" ]; then
+            missing="$missing $name"
+          fi
+        done
+        if [ -n "$missing" ]; then
+          echo "::error::Not available to this job (organisation settings, the Environment, or an earlier step):$missing. Nothing was joined or delivered."
+          exit 1
+        fi
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version-file: ${{ github.action_path }}/../../../.nvmrc
+
+    # SSH to the host is reachable only over the tailnet.
+    - name: Connect to the tailnet
+      uses: tailscale/github-action@v4
+      with:
+        oauth-client-id: ${{ inputs.tailscale-oauth-client-id }}
+        oauth-secret: ${{ inputs.tailscale-oauth-secret }}
+        tags: tag:ci
+        ping: ${{ inputs.deploy-host }}
+
+    - name: Render .env
+      id: render
+      shell: bash
+      env:
+        TARGET: ${{ inputs.target }}
+        BASE_DOMAIN: ${{ inputs.base-domain }}
+        IMAGE_DIGEST: ${{ inputs.image-digest }}
+        COMPOSE_DIR: ${{ inputs.compose-dir }}
+      run: |
+        set -euo pipefail
+        ENV_FILE="$COMPOSE_DIR/.env" node "$GITHUB_ACTION_PATH/../../../tools/delivery/src/render-env.ts"
+
+    # Compose inlines the rendered .env into its output, so the output goes to
+    # the check alone and is never printed.
+    - name: Check what Compose resolves
+      shell: bash
+      env:
+        ROUTER_RULE: ${{ steps.render.outputs.router-rule }}
+        IMAGE_DIGEST: ${{ inputs.image-digest }}
+        COMPOSE_DIR: ${{ inputs.compose-dir }}
+      run: |
+        set -euo pipefail
+        docker compose -f "$COMPOSE_DIR/docker-compose.yml" config --format json \
+          | node "$GITHUB_ACTION_PATH/../../../tools/delivery/src/check-compose.ts"
+
+    # The host's forced command reads the archive, then runs
+    # `docker compose pull && docker compose up -d --wait`, so this step fails
+    # unless the service becomes healthy.
+    - name: Deliver and deploy
+      shell: bash
+      env:
+        DEPLOY_HOST: ${{ inputs.deploy-host }}
+        DEPLOY_SSH_KEY: ${{ inputs.deploy-ssh-key }}
+        COMPOSE_DIR: ${{ inputs.compose-dir }}
+      run: |
+        set -euo pipefail
+        key="$RUNNER_TEMP/deploy_key"
+        known_hosts="$RUNNER_TEMP/known_hosts"
+        (umask 077 && printf '%s\n' "$DEPLOY_SSH_KEY" >"$key")
+        ssh-keyscan -T 15 "$DEPLOY_HOST" >"$known_hosts"
+        tar -czf - -C "$COMPOSE_DIR" docker-compose.yml .env \
+          | ssh -i "$key" \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile="$known_hosts" \
+              "deploy@${DEPLOY_HOST}"
+
+    # A failure, not a warning: staging's record of success is what a
+    # promotion trusts (design decision 6).
+    - name: Wait for the public health report to name the commit
+      shell: bash
+      env:
+        URL: https://${{ steps.render.outputs.technical-hostname }}/health
+        EXPECTED_VERSION: ${{ inputs.commit }}
+      run: node "$GITHUB_ACTION_PATH/../../../tools/delivery/src/await-version.ts"

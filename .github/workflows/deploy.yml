@@ -1,12 +1,14 @@
 name: Deploy
 
-# Builds, pushes and deploys the API once CI has succeeded on a push to main,
-# from the commit CI judged (deploy-api-skeleton design decision 8).
+# Builds and pushes the API once CI has succeeded on a push to main, from the
+# commit CI judged, and deploys it to staging, and only there
+# (deploy-api-skeleton design decision 8; move-api-deploys-to-staging-with-
+# promotion design decision 1). Production is reached by promote.yml alone.
 # `workflow_run` runs this file as it is on the default branch, so a pull
-# request cannot alter what deploys. Under this trigger the run's own commit
-# context is the default branch's tip when the run starts, not the commit CI
-# judged, so it is never read here: every ref, tag and version takes
-# `github.event.workflow_run.head_sha`.
+# request cannot alter what deploys. Every ref, tag and version takes
+# `github.event.workflow_run.head_sha`, the commit CI judged; the run's own
+# commit is read once, by the deliver-stage guard, because it is the commit
+# GitHub records the staging deployment under (design decision 4).
 on:
   workflow_run:
     workflows: [CI]
@@ -17,7 +19,7 @@ permissions:
 
 env:
   # Lowercase literal: must match deploy/api/docker-compose.yml and the
-  # `basis-api` entry in the infrastructure repository's deploy_apps.
+  # `basis-api` entries in the infrastructure repository's deploy_apps.
   IMAGE_NAME: ghcr.io/shatynska-labs/basis-api
 
 jobs:
@@ -31,6 +33,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -45,9 +49,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # The commit's tag only: no floating `latest`, a second name for an
-      # image the host already keeps by the tag Compose references.
+      # The commit's tag only, which is how a promotion finds this commit's
+      # image; what deploys is the digest (design decision 2).
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -58,16 +63,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Deploys arrive in the order their CI runs finish, not in commit order.
-  # A commit main has moved past delivers nothing, so production never goes
-  # back to a superseded commit; a re-run is exempt, since re-running an older
-  # run is the rollback. The guard runs twice. Here, before the deploy job asks
-  # for its concurrency group: GitHub keeps one pending job per group and a
-  # newly queued one cancels it, so a superseded commit that queued would
-  # cancel the newer commit's pending deploy and then skip itself, leaving
-  # main's head undeployed. Skipped here, it never queues. And again in the
-  # deploy job, once it holds the group, for a newer commit that delivered
-  # while this one waited.
+  # Deploys arrive in the order their CI runs finish, not in commit order, and
+  # a commit main has moved past delivers nothing (design decision 5). Checked
+  # here first, before the deploy job asks for its concurrency group: GitHub
+  # keeps one pending job per group and a newly queued one cancels it, so a
+  # superseded commit that queued would cancel the newer commit's pending
+  # deploy and then end itself, leaving main's head undeployed. Skipped here,
+  # the deploy job never starts and leaves no staging record.
   supersession:
     name: Skip a superseded commit
     needs: build-and-push
@@ -76,165 +78,72 @@ jobs:
       contents: read
     outputs:
       deliver: ${{ steps.superseded.outputs.deliver }}
+      digest: ${{ needs.build-and-push.outputs.digest }}
     steps:
-      - &superseded-guard
-        name: Skip a superseded commit
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Skip a superseded commit
         id: superseded
         env:
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-          RUN_ATTEMPT: ${{ github.run_attempt }}
+          STAGE: skip
+          COMMIT: ${{ github.event.workflow_run.head_sha }}
           REMOTE: ${{ github.server_url }}/${{ github.repository }}.git
-        run: |
-          set -euo pipefail
-          if [ "$RUN_ATTEMPT" -gt 1 ]; then
-            echo "::notice::Re-run (attempt $RUN_ATTEMPT): deploying $HEAD_SHA whatever main's head is."
-            echo "deliver=true" >>"$GITHUB_OUTPUT"
-            exit 0
-          fi
-          tip=$(git ls-remote "$REMOTE" refs/heads/main | cut -f1)
-          if [ -z "$tip" ]; then
-            echo "::error::Could not read refs/heads/main from $REMOTE."
-            exit 1
-          fi
-          if [ "$tip" != "$HEAD_SHA" ]; then
-            echo "::notice::main is now at $tip, so $HEAD_SHA is superseded and is not deployed; the newer commit's own run deploys it once its CI succeeds."
-            echo "deliver=false" >>"$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "deliver=true" >>"$GITHUB_OUTPUT"
+        run: node tools/delivery/src/supersession.ts
 
   deploy:
-    name: Deploy (production)
+    name: Deploy (staging)
     needs: supersession
     if: needs.supersession.outputs.deliver == 'true'
     runs-on: ubuntu-latest
-    environment: production
-    # No two deploys overlap, and none in progress is cancelled. Only the
-    # supersession job above keeps a superseded commit from queueing here.
+    environment: staging
+    # No two staging deploys overlap, and none in progress is cancelled. Only
+    # the supersession job above keeps a superseded commit from queueing here.
     concurrency:
-      group: deploy-production
+      group: deploy-staging
       cancel-in-progress: false
     permissions:
       contents: read
     steps:
-      - *superseded-guard
-
-      # The host's tailnet address and the tailnet client are organisation
-      # settings, shared by every application deploying to main-production;
-      # the deploy key is this application's own, a secret of the production
-      # Environment. An organisation variable has one value everywhere, so the
-      # host is chosen by the variable's name.
-      - name: Refuse without the production settings
-        if: steps.superseded.outputs.deliver == 'true'
-        env:
-          MAIN_PRODUCTION_DEPLOY_HOST: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
-          BASIS_API_DEPLOY_SSH_KEY: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
-          TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
-          TAILSCALE_OAUTH_SECRET: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
-        run: |
-          set -euo pipefail
-          missing=''
-          for name in MAIN_PRODUCTION_DEPLOY_HOST BASIS_API_DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET; do
-            if [ -z "${!name:-}" ]; then
-              missing="$missing $name"
-            fi
-          done
-          if [ -n "$missing" ]; then
-            echo "::error::Not available to this job (organisation settings, or the production Environment):$missing. Nothing was joined or delivered."
-            exit 1
-          fi
-
-      - if: steps.superseded.outputs.deliver == 'true'
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-      # SSH to the host is reachable only over the tailnet.
-      - name: Connect to the tailnet
-        if: steps.superseded.outputs.deliver == 'true'
-        uses: tailscale/github-action@v4
+      - uses: actions/setup-node@v7
         with:
-          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
-          tags: tag:ci
-          ping: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
+          node-version-file: .nvmrc
 
-      # The escaping rule is the infrastructure repository's, copied from its
-      # platform-deploy.yml: each value double-quoted with `\` -> `\\`,
-      # `"` -> `\"` and `$` -> `$$`, in that order. Every value written into
-      # the file goes through render(), so one added later is escaped by
-      # construction. Values arrive through `env:`, never as `${{ }}` text in
-      # this body, and the escaped form is never printed.
-      - name: Render .env
-        if: steps.superseded.outputs.deliver == 'true'
+      # Again, once this job holds the group, for a newer commit that
+      # delivered while this one waited. This one fails rather than skips: a
+      # job ending successfully here would record a staging success for a
+      # commit staging never ran, which the promotion's gate would admit. It
+      # also fails when the run's own commit, the one GitHub records this
+      # deployment under, is not the commit about to be delivered.
+      - name: Refuse a superseded commit
         env:
-          IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          set -euo pipefail
-          umask 077
-          render() {
-            local name="$1"
-            local value="$2"
-            local escaped="$value"
-            escaped="${escaped//\\/\\\\}"
-            escaped="${escaped//\"/\\\"}"
-            escaped="${escaped//\$/\$\$}"
-            printf '%s="%s"\n' "$name" "$escaped"
-          }
-          {
-            render IMAGE_TAG "$IMAGE_TAG"
-          } >deploy/api/.env
+          STAGE: deliver
+          COMMIT: ${{ github.event.workflow_run.head_sha }}
+          RUN_COMMIT: ${{ github.sha }}
+          REMOTE: ${{ github.server_url }}/${{ github.repository }}.git
+        run: node tools/delivery/src/supersession.ts
 
-      # The host's forced command reads the archive, then runs
-      # `docker compose pull && docker compose up -d --wait`, so this step
-      # fails unless the service becomes healthy.
-      - name: Deliver and deploy
-        if: steps.superseded.outputs.deliver == 'true'
-        env:
-          DEPLOY_HOST: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
-          DEPLOY_SSH_KEY: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
-        run: |
-          set -euo pipefail
-          key="$RUNNER_TEMP/deploy_key"
-          known_hosts="$RUNNER_TEMP/known_hosts"
-          (umask 077 && printf '%s\n' "$DEPLOY_SSH_KEY" >"$key")
-          ssh-keyscan -T 15 "$DEPLOY_HOST" >"$known_hosts"
-          tar -czf - -C deploy/api docker-compose.yml .env \
-            | ssh -i "$key" \
-                -o IdentitiesOnly=yes \
-                -o StrictHostKeyChecking=yes \
-                -o UserKnownHostsFile="$known_hosts" \
-                "deploy@${DEPLOY_HOST}"
-
-      # A warning, never a failure: before DNS and the certificate exist the
-      # public URL cannot answer, and the host-side `--wait` has already
-      # judged health.
-      - name: Check the public health report
-        if: steps.superseded.outputs.deliver == 'true'
-        env:
-          URL: https://api.basis.shatynska.com/health
-          EXPECTED_VERSION: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          set -uo pipefail
-          attempts="${POLL_ATTEMPTS:-8}"
-          interval="${POLL_INTERVAL:-10}"
-          version=''
-          # Eight attempts of at most 5 s, 10 s apart: under two minutes.
-          for attempt in $(seq 1 "$attempts"); do
-            if body=$(curl -fsS --max-time 5 "$URL"); then
-              version=$(printf '%s' "$body" | jq -r '.version // empty' 2>/dev/null || true)
-              if [ "$version" = "$EXPECTED_VERSION" ]; then
-                echo "$URL reports version $version."
-                exit 0
-              fi
-            fi
-            if [ "$attempt" -lt "$attempts" ]; then
-              sleep "$interval"
-            fi
-          done
-          if [ -n "$version" ]; then
-            echo "::warning::$URL reports version '$version', not $EXPECTED_VERSION."
-          else
-            echo "::warning::$URL did not answer (DNS or the certificate may still be pending)."
-          fi
-          exit 0
+      # The host's tailnet address and the tailnet client are organisation
+      # settings, shared by every application deploying to that host; the
+      # deploy key is this application's own, a secret of the staging
+      # Environment.
+      - uses: ./.github/actions/deliver-api
+        with:
+          target: staging
+          deploy-host: ${{ vars.MAIN_STAGING_DEPLOY_HOST }}
+          deploy-ssh-key: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
+          tailscale-oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          tailscale-oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          base-domain: ${{ vars.BASE_DOMAIN }}
+          image-digest: ${{ needs.supersession.outputs.digest }}
+          commit: ${{ github.event.workflow_run.head_sha }}
+          compose-dir: deploy/api

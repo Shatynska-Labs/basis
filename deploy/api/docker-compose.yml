@@ -1,9 +1,13 @@
-# What the production host runs from /opt/basis-api, delivered with a
-# rendered .env by .github/workflows/deploy.yml (deploy-api-skeleton design
-# decision 6). Nothing is persisted: the service has no volume.
+# What each host runs from /opt/basis-api, delivered with a rendered .env by
+# the deliver-api action: on a merge to staging, by a promotion to production
+# (deploy-api-skeleton design decision 6, move-api-deploys-to-staging-with-
+# promotion design decisions 2 and 3). The image is pinned by digest and the
+# router rule is built from the host's server name and the base domain, so one
+# file serves both hosts and names neither. Nothing is persisted: the service
+# has no volume.
 services:
   api:
-    image: ghcr.io/shatynska-labs/basis-api:${IMAGE_TAG}
+    image: ghcr.io/shatynska-labs/basis-api@${IMAGE_DIGEST:?IMAGE_DIGEST is not rendered}
     restart: unless-stopped
     init: true
     env_file: .env
@@ -26,7 +30,7 @@ services:
     networks: [platform_edge]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.basis-api.rule=Host(`api.basis.shatynska.com`)
+      - traefik.http.routers.basis-api.rule=${ROUTER_RULE:?ROUTER_RULE is not rendered}
       - traefik.http.services.basis-api.loadbalancer.server.port=3000
 
 networks:

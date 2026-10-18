@@ -10,6 +10,16 @@ ADR-0007 states that LLM suggestions "always require human confirmation". The PR
 
 **Depends on**: nothing. Best done before the `nutrition` change (roadmap Phase 3).
 
+## `choose-durable-data-storage`
+
+ADR-0006 puts PostgreSQL, Redis/BullMQ and Object Storage "within the existing Hetzner infrastructure". The infrastructure repository forbids that for durable data: its shared PostgreSQL instance holds only data whose loss is tolerable, and any other store on the host needs a stated reason it needs no backup, or a logical backup written off the host and a rehearsed restore before it holds anything (`Shatynska-Labs/infrastructure`: `openspec/specs/iac-safety-hardening/spec.md`, _No Store on This Host Holds Data Requiring Backup_; `docs/onboard-an-application.md` §3.1, §4.3). Basis's metrics, daily statuses, goals and photos are durable. Decide where they live — an external managed service, or a dedicated store on the host with off-host backups and a rehearsed restore — and record it in an ADR superseding ADR-0006 in part. Redis and Object Storage are decided in the same ADR.
+
+**Interim decision** (operator, 2026-10-17): until this is decided, Basis uses its own database in the production host's shared PostgreSQL instance, and everything it holds there is treated as data whose loss is tolerable. The infrastructure-side change that provisions that database records this classification, as `docs/onboard-an-application.md` §3.1 requires.
+
+**Argued in**: the session that opened `deploy-api-skeleton`.
+
+**Depends on**: nothing. Must be done before Basis stores data its user would not accept losing — at the latest, before the calibration period starts (roadmap Phase 1 outcome).
+
 ## `move-portfolio-to-main-production-deploy-host`
 
 `Shatynska-Labs` now holds main-production's tailnet address twice: the organisation variable `DEPLOY_HOST`, which `portfolio`'s deploy reads as `vars.DEPLOY_HOST`, and `MAIN_PRODUCTION_DEPLOY_HOST`, named for its host so that more hosts can follow, which Basis reads (`deploy-api-skeleton` design decision 8). Move `portfolio`'s deploy to `vars.MAIN_PRODUCTION_DEPLOY_HOST`, confirm a deploy through it, then delete `DEPLOY_HOST` from the organisation after checking nothing else reads it. The change belongs to the `portfolio` repository, not this one; it is recorded here because Basis's change surfaced it.

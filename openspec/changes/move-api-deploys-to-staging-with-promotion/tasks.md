@@ -23,7 +23,7 @@ The plan is committed, then tests are derived from `specs/api-delivery/spec.md` 
 
 - [x] 4.1 Change `deploy.yml` (design decisions 1, 4, 5): `build-and-push` outputs the digest; `supersession` and `Deploy (staging)` each check out `head_sha` and set up Node from `.nvmrc` before the guard; `supersession` runs `supersession.ts` at stage `skip` and passes the digest on, `Deploy (staging)` declares `environment: staging` and group `deploy-staging`, runs `supersession.ts` at stage `deliver` with `RUN_COMMIT: ${{ github.sha }}` first, and delivers through the action with `vars.MAIN_STAGING_DEPLOY_HOST`; the re-run exemption is gone. Verify `actionlint` reports nothing, the derived file checks pass, and `github.sha` appears in it only as `RUN_COMMIT`.
 - [x] 4.2 Write `promote.yml` (design decision 1), its first step refusing any `github.ref` but `refs/heads/main` and a malformed `commit` before any checkout; verify `actionlint` reports nothing, the derived file checks pass, and the ref refusal's script, run locally with `GITHUB_REF=refs/heads/other`, exits non-zero naming the ref.
-- [ ] 4.3 Verify the image job in `ci.yml` and the `check` job still pass on this change's pull request, with `delivery` among the affected projects.
+- [x] 4.3 Verify the image job in `ci.yml` and the `check` job still pass on this change's pull request, with `delivery` among the affected projects.
 
 ## 5. `AGENTS.md`
 

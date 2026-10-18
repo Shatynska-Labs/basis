@@ -45,7 +45,7 @@ The plan is committed, then tests are derived from `specs/api-health/spec.md` in
 
 ## 7. Verification
 
-- [ ] 7.1 Run `pnpm nx run-many -t lint typecheck test build e2e`, `pnpm format:check`, `pnpm audit --audit-level high` and `pnpm exec openspec validate --all --strict`; all pass.
+- [x] 7.1 Run `pnpm nx run-many -t lint typecheck test build e2e`, `pnpm format:check`, `pnpm audit --audit-level high` and `pnpm exec openspec validate --all --strict`; all pass.
 
 ## Workflow follow-up
 

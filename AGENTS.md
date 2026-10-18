@@ -186,6 +186,19 @@ A new working tree is provisioned when every step below is reached; until then, 
 
 <!-- /ai-toolkit:project-foundation -->
 
+## Deployment
+
+Two hosts: `main-staging` and `main-production`. A merge to `main` builds the API's image once and deploys it to **staging** (`.github/workflows/deploy.yml`); production is reached only when the operator **promotes** a commit staging has already run, as the same image by digest (`.github/workflows/promote.yml`). Rollback is a promotion naming an earlier commit (`move-api-deploys-to-staging-with-promotion` design decision 1).
+
+**This refines the development workflow's `ship` stage, and where the two differ this section holds.** The workflow block above is generated and assumes one deploy triggered by merging; read "the deploy" there as staging's, and "a change reaches production by merging" as "a change reaches staging by merging, and production by a promotion the operator triggers". The `ship` transitions here are `open pr · merge · deploy staging · confirm · promote · deploy production · smoke · archive`, and `ship:staging-deployed` and `ship:production-deployed` reorder as `ship:pr-open` does.
+
+- **Never trigger a promotion.** Triggering a workflow is not deploying, but a promotion is the operator's act: propose it — the commit, and `gh workflow run promote.yml -f commit=<full sha>` — and wait. Never run the deploy command against either host.
+- **deploy staging** — wait for the operator's word that the merge's staging deploy is healthy; its job fails unless staging's `/health` names the merged commit.
+- **confirm** happens **on staging**: propose how the effect can be observed there, where it can be provoked safely, and wait for the operator's confirmation. Do not infer from a confirmed staging effect that production has received it.
+- **promote → deploy production → smoke** — the smoke check is the promotion's own wait for production's `/health` to name the promoted commit; there is no other. Wait for the operator's word that the promotion completed and its wait passed. A promotion whose wait fails leaves production on the promoted image: the change is not delivered and re-enters at `build`'s review gate, and the immediate remedy, promoting the previous commit, is the operator's.
+- **archive** waits until the change is confirmed on staging, or its gate waived, **and is in production**. A change confirmed on staging and never promoted is not archived. A change deliberately not going to production — a documentation-only merge is the ordinary case — is archived on the operator's word, recorded in its artifacts as a waiver of **promote** rather than of **confirm**.
+- A promotion runs from `main` only, and is refused unless GitHub's `staging` deployment records hold a success for the commit with no later failure.
+
 ## Conventions
 
 Product principles are in [`docs/product/01-vision.md`](docs/product/01-vision.md#principles); read them before any change touching product behaviour. The `excused` cap is in `docs/product/04-domain-model.md` §3.

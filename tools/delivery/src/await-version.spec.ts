@@ -26,7 +26,7 @@ const health = ({ status, version }: { status: number; version?: string }) =>
 const fakeFetch = (answers: Answer[]) => {
   let call = 0;
   return vi.fn(async (_input: unknown, _init?: unknown) => {
-    const answer = answers[Math.min(call, answers.length - 1)];
+    const answer = answers[Math.min(call, answers.length - 1)] as Answer;
     call += 1;
     if (answer === 'no answer') throw new TypeError('fetch failed');
     return health(answer);

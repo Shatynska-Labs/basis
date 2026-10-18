@@ -1,0 +1,125 @@
+name: Promote to production
+
+# Production is reached by this workflow and by nothing else
+# (move-api-deploys-to-staging-with-promotion design decision 1). A merge to
+# main deploys staging; the operator then promotes a commit staging has
+# already run, as the same image by digest, with
+# `gh workflow run promote.yml -f commit=<full sha>` or "Run workflow" here.
+# Rollback is the same act, naming an earlier commit staging ran.
+#
+# No push, tag, schedule or `workflow_run` trigger, and no approval rule:
+# triggering needs write access to the repository, and that is the access
+# control. Only main promotes (the first step), and both Environments accept
+# deployments from main alone.
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: The full 40-character commit SHA to promote
+        required: true
+        type: string
+
+env:
+  # Lowercase literal: must match deploy/api/docker-compose.yml.
+  IMAGE_NAME: ghcr.io/shatynska-labs/basis-api
+
+jobs:
+  promote:
+    name: Promote to production
+    runs-on: ubuntu-latest
+    environment: production
+    # No two promotions overlap, and none in progress is cancelled.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    # `contents` for the checkouts, `deployments` to read staging's records,
+    # `packages` to resolve the digest. Anything unlisted is denied.
+    permissions:
+      contents: read
+      deployments: read
+      packages: read
+    steps:
+      # Before anything is checked out. GitHub runs a dispatch from whichever
+      # ref the dispatcher selects, so without this an unreviewed branch's
+      # copy of this file and its tools would run under production's secrets.
+      # A literal SHA rather than a ref: a branch's head can move between the
+      # choice and the run, so what got promoted would not be what was chosen.
+      - name: Refuse another branch or a malformed commit
+        env:
+          REF: ${{ github.ref }}
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          set -euo pipefail
+          if [ "$REF" != refs/heads/main ]; then
+            echo "::error::Only refs/heads/main promotes; this run is from $REF. Nothing was checked out or delivered."
+            exit 1
+          fi
+          if ! [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::The commit input is not a full commit SHA (40 lowercase hexadecimal characters). Nothing was checked out or delivered."
+            exit 1
+          fi
+
+      # The promotion's own tooling, from main (by the step above), not from
+      # the promoted commit: a fix to a gate applies to the next promotion,
+      # and promoting a commit older than a tool still finds the tool.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # "It passed staging" as GitHub's own record, not a claim (design
+      # decision 4).
+      - name: Require a successful staging deployment
+        env:
+          COMMIT: ${{ inputs.commit }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node tools/delivery/src/staging-gate.ts
+
+      # The Compose file is the promoted commit's: an old image under a newer
+      # Compose file is a combination nothing tested.
+      - name: Check out the promoted commit's Compose file
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.commit }}
+          path: .promoted
+          sparse-checkout: deploy/api
+          sparse-checkout-cone-mode: false
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Nothing is built: the digest the commit's tag points at is what
+      # staging ran (design decision 2).
+      - name: Resolve the image digest
+        id: digest
+        env:
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          set -uo pipefail
+          if ! digest="$(docker buildx imagetools inspect "$IMAGE_NAME:$COMMIT" --format '{{.Manifest.Digest}}')" || [ -z "$digest" ]; then
+            echo "::error::No image was published for commit $COMMIT."
+            exit 1
+          fi
+          echo "digest=$digest" >>"$GITHUB_OUTPUT"
+          echo "Promoting $COMMIT as $IMAGE_NAME@$digest."
+
+      # A failed health wait leaves production on the promoted image; the
+      # remedy is promoting the previous commit (design decision 6).
+      - uses: ./.github/actions/deliver-api
+        with:
+          target: production
+          deploy-host: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
+          deploy-ssh-key: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
+          tailscale-oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          tailscale-oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
+          base-domain: ${{ vars.BASE_DOMAIN }}
+          image-digest: ${{ steps.digest.outputs.digest }}
+          commit: ${{ inputs.commit }}
+          compose-dir: .promoted/deploy/api

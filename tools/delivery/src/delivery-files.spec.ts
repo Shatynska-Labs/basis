@@ -124,7 +124,7 @@ const onlyJobOf = (wf: Workflow) => {
   const jobs = Object.values(wf.jobs ?? {});
   if (jobs.length !== 1)
     throw new Error(`expected one job, found ${jobs.length}`);
-  return jobs[0];
+  return jobs[0] as NonNullable<(typeof jobs)[number]>;
 };
 
 const refRefusalProblems = (text: string): string[] => {
@@ -379,7 +379,7 @@ jobs:
   });
   it('the execution reports success for a refusal that refuses nothing', () => {
     const permissive = goodPromote.replace(
-      /run: \|[\s\S]*?(?=      - uses)/,
+      /run: \|[\s\S]*?(?= {6}- uses)/,
       'run: echo ok\n',
     );
     expect(

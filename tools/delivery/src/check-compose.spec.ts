@@ -25,7 +25,8 @@ const RULE_LABEL = 'traefik.http.routers.basis-api.rule';
 // name, labels as a map.
 const resolved = ({
   image = IMAGE,
-  rule = RENDERED_RULE as string | undefined,
+  // `null` leaves the rule label out; `undefined` takes the default.
+  rule = RENDERED_RULE as string | null,
 } = {}) => ({
   name: 'basis-api',
   services: {
@@ -33,7 +34,7 @@ const resolved = ({
       image,
       labels: {
         'traefik.enable': 'true',
-        ...(rule === undefined ? {} : { [RULE_LABEL]: rule }),
+        ...(rule === null ? {} : { [RULE_LABEL]: rule }),
         'traefik.http.services.basis-api.loadbalancer.server.port': '3000',
       },
     },
@@ -58,7 +59,7 @@ describe('the resolved configuration matches', () => {
 describe('the resolved rule differs', () => {
   it.each([
     ['differs', RESOLVED_RULE],
-    ['is absent', undefined],
+    ['is absent', null],
   ])(
     'fails naming the router rule when the rule %s, printing neither rule',
     (_name, rule) => {

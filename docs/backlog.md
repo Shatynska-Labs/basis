@@ -27,3 +27,18 @@ ADR-0006 puts PostgreSQL, Redis/BullMQ and Object Storage "within the existing H
 **Argued in**: the session that opened `deploy-api-skeleton`, when the operator chose organisation-level deploy settings.
 
 **Depends on**: `MAIN_PRODUCTION_DEPLOY_HOST` existing in the organisation (`deploy-api-skeleton` task 6.2). Until then, deleting `DEPLOY_HOST` breaks `portfolio`'s deploy.
+
+## `move-api-deploys-to-staging-with-promotion`
+
+The operator has switched `main-staging` back on (2026-10-18) and wants a merge to `main` to deploy staging, with production reached only when the operator promotes a commit staging has already run. Today `deploy.yml` deploys every merge to production (`deploy-api-skeleton` design decision 8). Follow `Fuperia-IT/commerce-ops` (`docs/environments.md` decisions 1, 2, 9 and 12; `.github/workflows/promote.yml`), simplified for an API with no database:
+
+- `deploy.yml` builds once and deploys staging alone (`environment: staging`, `vars.MAIN_STAGING_DEPLOY_HOST`), keeping the superseded-commit guard.
+- A `promote.yml` on `workflow_dispatch` takes a full commit SHA, refuses unless GitHub's `staging` Deployment records hold a `success` for it with no later `failure`, resolves the image's digest and deploys that to production, and fails when `/health` does not report the promoted SHA. Rollback is a promotion naming an earlier commit.
+- One Compose file for both hosts, the Traefik rule rendered from `.env`: `basis-api.<server>.<BASE_DOMAIN>` (both per-server wildcards already resolve), with `api.basis.shatynska.com` kept as production's alias.
+- `AGENTS.md`'s `ship` stage gains staging deploy, confirm on staging, promote, production deploy and smoke, as commerce-ops' does; the operator triggers the promotion, never the agent.
+
+Needs on the infrastructure side a `basis-api` entry in `main-staging.yml` with its own key (`basis-api-deploy-main-staging`), and on `basis` a `staging` Environment holding that key.
+
+**Argued in**: the session that shipped `deploy-api-skeleton`.
+
+**Depends on**: nothing in this repository; its first staging deploy waits on the infrastructure entry.

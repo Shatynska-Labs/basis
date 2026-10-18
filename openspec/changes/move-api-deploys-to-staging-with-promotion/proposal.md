@@ -31,7 +31,7 @@ None. `api-health` is read, not changed.
 
 ## Impact
 
-- Changed: `.github/workflows/deploy.yml`, `deploy/api/docker-compose.yml`, `AGENTS.md` (`ship`, and the sentence saying a change reaches production by merging).
+- Changed: `.github/workflows/deploy.yml`, `deploy/api/docker-compose.yml`, `AGENTS.md` (a `## Deployment` section refining `ship`; the generated workflow block is left unchanged).
 - New: `.github/workflows/promote.yml`, `.github/actions/deliver-api/action.yml`, `tools/delivery` (Nx project `delivery`, tags `scope:tooling`, `type:tooling`).
 - New development dependency: `yaml`, for the tests that read the workflow files.
 - GitHub: a `staging` Environment; the `production` Environment keeps its deploy key and is now read only by `promote.yml`.

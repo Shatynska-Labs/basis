@@ -93,7 +93,6 @@ jobs:
         env:
           STAGE: skip
           COMMIT: ${{ github.event.workflow_run.head_sha }}
-          RUN_COMMIT: ${{ github.sha }}
           REMOTE: ${{ github.server_url }}/${{ github.repository }}.git
         run: node tools/delivery/src/supersession.ts
 

@@ -16,16 +16,16 @@ The plan is committed, then tests are derived from `specs/api-health/spec.md` in
 
 ## 3. Image
 
-- [ ] 3.1 Write `apps/api/Dockerfile` and the root `.dockerignore` as design decision 5 describes, with the base image at an exact Node 24 version; verify `docker build -f apps/api/Dockerfile --build-arg APP_VERSION=local -t basis-api:local .` succeeds, `docker run --rm basis-api:local id -u` is not `0`, and `docker image inspect` shows the `HEALTHCHECK`.
-- [ ] 3.2 Verify the image runs as specified: `docker run -d -p 3000:3000 basis-api:local` becomes `(healthy)` in `docker ps`, `curl -s localhost:3000/health` answers `{"status":"ok","version":"local"}`, and `docker stop` completes without hitting its 10-second kill timeout.
-- [ ] 3.3 Verify the build context: with a file `.env.probe` at the repository root and a working tree under `.worktrees/`, `docker build` with a `RUN ls -a` probe stage shows neither; remove the probe.
-- [ ] 3.4 Add the `docker` ecosystem for `/apps/api` to `.github/dependabot.yml`, monthly, prefix `chore(deps)`; verify the file parses (`python3 -c 'import yaml,sys;yaml.safe_load(open(sys.argv[1]))' .github/dependabot.yml`).
+- [x] 3.1 Write `apps/api/Dockerfile` and the root `.dockerignore` as design decision 5 describes, with the base image at an exact Node 24 version; verify `docker build -f apps/api/Dockerfile --build-arg APP_VERSION=local -t basis-api:local .` succeeds, `docker run --rm basis-api:local id -u` is not `0`, and `docker image inspect` shows the `HEALTHCHECK`.
+- [x] 3.2 Verify the image runs as specified: `docker run -d -p 3000:3000 basis-api:local` becomes `(healthy)` in `docker ps`, `curl -s localhost:3000/health` answers `{"status":"ok","version":"local"}`, and `docker stop` completes without hitting its 10-second kill timeout.
+- [x] 3.3 Verify the build context: with a file `.env.probe` at the repository root and a working tree under `.worktrees/`, `docker build` with a `RUN ls -a` probe stage shows neither; remove the probe.
+- [x] 3.4 Add the `docker` ecosystem for `/apps/api` to `.github/dependabot.yml`, monthly, prefix `chore(deps)`; verify the file parses (`python3 -c 'import yaml,sys;yaml.safe_load(open(sys.argv[1]))' .github/dependabot.yml`).
 
 ## 4. Compose file
 
-- [ ] 4.1 Write `deploy/api/docker-compose.yml` as design decision 6 describes; verify `IMAGE_TAG=local docker compose -f deploy/api/docker-compose.yml config` succeeds and lists no volume.
-- [ ] 4.2 Verify the service runs under its restrictions: with a local `platform_edge` network (`docker network create platform_edge`) and `basis-api:local` tagged as `ghcr.io/shatynska-labs/basis-api:local`, `IMAGE_TAG=local docker compose -f deploy/api/docker-compose.yml up -d --wait` (with an empty `deploy/api/.env`) returns success; then remove the containers, the network and the `.env`.
-- [ ] 4.3 Verify `--wait` fails on an unhealthy service: with the healthcheck's URL changed to a path answering `404`, the same `up -d --wait` exits non-zero; revert it.
+- [x] 4.1 Write `deploy/api/docker-compose.yml` as design decision 6 describes; verify `IMAGE_TAG=local docker compose -f deploy/api/docker-compose.yml config` succeeds and lists no volume.
+- [x] 4.2 Verify the service runs under its restrictions: with a local `platform_edge` network (`docker network create platform_edge`) and `basis-api:local` tagged as `ghcr.io/shatynska-labs/basis-api:local`, `IMAGE_TAG=local docker compose -f deploy/api/docker-compose.yml up -d --wait` (with an empty `deploy/api/.env`) returns success; then remove the containers, the network and the `.env`.
+- [x] 4.3 Verify `--wait` fails on an unhealthy service: with the healthcheck's URL changed to a path answering `404`, the same `up -d --wait` exits non-zero; revert it.
 
 ## 5. Workflows
 

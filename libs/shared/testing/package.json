@@ -18,7 +18,12 @@
     "tags": [
       "scope:shared",
       "type:testing"
-    ]
+    ],
+    "targets": {
+      "test": {
+        "cache": false
+      }
+    }
   },
   "dependencies": {}
 }

@@ -235,13 +235,11 @@ const COMPOSE_IMAGE =
   /^ghcr\.io\/shatynska-labs\/basis-api@\$\{IMAGE_DIGEST:\?[^}]*\}$/;
 const COMPOSE_RULE = /^\$\{ROUTER_RULE:\?[^}]*\}$/;
 
+// The count of image references is delivery-files-migrate.spec.ts's, since
+// add-persistence-skeleton added the `migrate` service.
 const composeImageProblems = (text: string): string[] => {
   const services = servicesOf(text);
-  const images = Object.entries(services).filter(
-    ([, s]) => s.image !== undefined,
-  );
   const problems: string[] = [];
-  if (images.length !== 1) problems.push(`${images.length} image references`);
   const image = services.api?.image;
   if (image === undefined || !COMPOSE_IMAGE.test(image))
     problems.push(`service api's image is ${JSON.stringify(image)}`);

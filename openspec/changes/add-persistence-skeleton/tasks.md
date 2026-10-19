@@ -32,7 +32,7 @@
 
 ## 6. Ship
 
-- [ ] 6.1 Operator: provision `basis-api`'s database on `main-staging` and store `BASIS_API_DATABASE_PASSWORD` in `staging` (infrastructure `docs/onboard-an-application.md` §3.2), before the merge
+- [x] 6.1 Operator: provision `basis-api`'s database on `main-staging` and store `BASIS_API_DATABASE_PASSWORD` in `staging` (infrastructure `docs/onboard-an-application.md` §3.2), before the merge — done 2026-10-19 on the operator's instruction, by the recipe verbatim through `ops-claude`; checks: database owned by `basis-api`, `pgexporter` has no `CONNECT`, no role statement in `docker logs`
 - [ ] 6.2 Merge the implementation; staging's Deploy run succeeds
 - [ ] 6.3 Confirm on staging: the `migrate` container exited `0` and `drizzle.__drizzle_migrations` in `basis-api` holds the baseline
 - [ ] 6.4 Operator: provision `basis-api`'s database on `main-production` and store `BASIS_API_DATABASE_PASSWORD` in `production`; promote; the promotion's wait passes

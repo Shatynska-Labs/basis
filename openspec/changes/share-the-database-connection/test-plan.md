@@ -144,31 +144,37 @@ The dispatch named `libs/shared/testing` (`@basis/shared-testing`) and `apps/api
    - Used by: `project.spec.ts` › both tests.
    - Near-miss: none. A similar spawn appears in `apps/api/src/test-targets.spec.ts` (a test module), whose name and behaviour were not read.
    - Proposed home: `@basis/shared-testing` (generic helper), if promoted.
+   - Disposition: **Kept** local: only `project.spec.ts` uses it, and arrangement enters `@basis/shared-testing` when a second spec needs it (AGENTS.md, Testing Strategy).
 2. **`listFiles`, `nonSpecSources`, `misplaced`** in `libs/shared/infrastructure/src/layout.spec.ts`.
    - Stands in for: the layout check.
    - Used by: `layout.spec.ts` › S6 tests and its discriminators.
    - Near-miss: none.
    - Proposed home: none. It is specific to this library's layout, but could become generic in `@basis/shared-testing` once context `infrastructure` libraries need the same check.
+   - Disposition: **Kept** local: it checks this library's own layout, and only `layout.spec.ts` uses it.
 3. **`exportTargets`, `nonCompiledExports`** in `libs/shared/infrastructure/src/package.spec.ts`.
    - Stands in for: the package-exports check.
    - Used by: `package.spec.ts` › S9 tests and its discriminators.
    - Near-miss: none.
    - Proposed home: `@basis/shared-testing`, if another library gains a build.
+   - Disposition: **Kept** local: only `package.spec.ts` uses it. No other library has a build yet.
 4. **`lintBoundaries`** in `libs/shared/infrastructure/src/boundaries.spec.ts`.
    - Stands in for: linting a virtual file through ESLint's Node API.
    - Used by: the S4 lint test and the S5 type:core lint test.
    - Near-miss: found in test module `libs/shared/testing/src/boundaries.spec.ts` (its local `lint`, which also filters `no-restricted-imports`/`no-restricted-syntax`). Not imported from there, per the rule that test modules do not import from one another.
    - Proposed home: `@basis/shared-testing`. A second spec now needs it.
+   - Disposition: **Kept** local: the near-miss in `libs/shared/testing/src/boundaries.spec.ts` filters different rules (it also filters `no-restricted-imports` and `no-restricted-syntax`). Promoting either one means exporting an ESLint-backed helper from `@basis/shared-testing`'s entry, which would load ESLint in every spec that imports the library, the integration specs among them. A subpath export would avoid that, but it is a decision about the shared arrangement's shape and does not fit this change.
 5. **`DepConstraint`, `hasTag`, `allows`, `constraintTable`** in `libs/shared/infrastructure/src/boundaries.spec.ts`.
    - Stands in for: reading and evaluating `@nx/enforce-module-boundaries`' constraint table.
    - Used by: the S3 test, the S4 derived test, the S5 constraint cases and the evaluator discriminators.
    - Near-miss: test module `libs/shared/testing/src/boundaries.spec.ts` reads the table inline and checks only `onlyDependOnLibsWithTags` membership. That would not do, because it ignores wildcard, combo and `notDependOnLibsWithTags` semantics.
    - Proposed home: `@basis/shared-testing`, beside item 4.
+   - Disposition: **Kept** local: only `boundaries.spec.ts` uses it.
 6. **`resolveFrom(dir, specifier)`** in `apps/api-e2e/src/shared-infrastructure.spec.ts`.
    - Stands in for: Node ESM resolution from a directory, in a child process.
    - Used by: the S7 resolution test and the S8 test.
    - Near-miss: none in `api-process.ts`.
    - Proposed home: `apps/api-e2e/src/support/` (not `@basis/shared-testing`; it serves the e2e harness).
+   - Disposition: **Kept** local: only `shared-infrastructure.spec.ts` uses it. It serves the e2e harness, not the shared arrangement.
 
 ## Baseline
 

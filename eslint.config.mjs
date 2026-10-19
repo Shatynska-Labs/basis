@@ -184,6 +184,10 @@ const depConstraints = ({ withExternalImports }) => {
   ];
 };
 
+const sharedTestingMessage =
+  'Shared test arrangement is for specs, tests/ and test configuration only.';
+const sharedTestingSpecifier = String.raw`/^@basis\/shared-testing(\/|$)/`;
+
 const boundaries = (withExternalImports) => [
   'error',
   {
@@ -249,13 +253,24 @@ export default [
       'no-restricted-imports': [
         'error',
         {
-          paths: [
+          patterns: [
             {
-              name: '@basis/shared-testing',
-              message:
-                'Shared test arrangement is for specs, tests/ and test configuration only.',
+              group: ['@basis/shared-testing', '@basis/shared-testing/*'],
+              message: sharedTestingMessage,
             },
           ],
+        },
+      ],
+      // `no-restricted-imports` sees only static imports and re-exports.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: `ImportExpression[source.value=${sharedTestingSpecifier}]`,
+          message: sharedTestingMessage,
+        },
+        {
+          selector: `CallExpression[callee.name='require'][arguments.0.value=${sharedTestingSpecifier}]`,
+          message: sharedTestingMessage,
         },
       ],
     },

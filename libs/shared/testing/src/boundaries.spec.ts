@@ -19,7 +19,8 @@ const eslint = new ESLint({
 
 const boundaryRule = '@nx/enforce-module-boundaries';
 const restrictionRule = 'no-restricted-imports';
-const relevantRules = [boundaryRule, restrictionRule];
+const syntaxRule = 'no-restricted-syntax';
+const relevantRules = [boundaryRule, restrictionRule, syntaxRule];
 
 // Declared locally: the project has no shared test arrangement (see
 // "Missing shared arrangement" in test-plan.md).
@@ -120,6 +121,40 @@ describe('Shared test arrangement: production code cannot import it', () => {
     );
 
     expect(errors.map((error) => error.ruleId)).toContain(restrictionRule);
+  });
+
+  it.each([
+    [
+      'a dynamic import',
+      'libs/shared/core/src/lib/sample.ts',
+      `export const load = () => import('@basis/shared-testing');\n`,
+    ],
+    [
+      'a require call',
+      'apps/api/src/sample.cjs',
+      `module.exports = require('@basis/shared-testing');\n`,
+    ],
+    [
+      'a subpath import',
+      'libs/shared/core/src/lib/sample.ts',
+      `import pkg from '@basis/shared-testing/package.json';\nexport const x = pkg;\n`,
+    ],
+  ])(
+    '%s of it in a non-spec source file is an error (folded in after code review)',
+    async (_name, path, source) => {
+      const errors = await lint(path, source);
+
+      expect(errors.length).toBeGreaterThan(0);
+    },
+  );
+
+  it('a dynamic import of it in a spec is not reported (folded in after code review)', async () => {
+    const errors = await lint(
+      'libs/shared/core/src/lib/sample.spec.ts',
+      `export const load = () => import('@basis/shared-testing');\n`,
+    );
+
+    expect(errors).toEqual([]);
   });
 
   it('a file under a tests directory is test code', async () => {

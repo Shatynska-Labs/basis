@@ -71,17 +71,3 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 **Recorded by**: the session that opened `deploy-api-skeleton`, when the operator chose organisation-level deploy settings; it is another repository's work.
 
 **Re-checked**: 2026-10-19.
-
-## `share-the-test-arrangement`
-
-The project has no shared test arrangement: no library holds the builders, fixtures and in-memory port fakes that specs need, so each spec declares its own, and copies drift from the interface they stand in for. Decide where shared arrangement lives (for example an Nx library under `libs/shared/` tagged for test use only, so `@nx/enforce-module-boundaries` keeps production code from importing it), move the fakes the specs already repeat into it, and record its location under _Testing Strategy_ in `AGENTS.md` as the shared test arrangement.
-
-**Kind**: `change`. It decides the project's testing strategy, which is the operator's decision.
-
-**Waits on**: `nothing`. Cheapest while the suite is small.
-
-**Design with**: `nothing`.
-
-**Recorded by**: `sync-ai-toolkit-workflow-v10`, which recorded the shared test arrangement as none when taking ai-toolkit's development-workflow v10; creating one is not a sync.
-
-**Re-checked**: 2026-10-19.

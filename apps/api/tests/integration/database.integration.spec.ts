@@ -4,8 +4,9 @@
 // (design decision 8 provides it from the global setup; the key name is an
 // unresolved project question in the change's test-plan.md), and each test
 // takes its own database through `freshDatabase` from @basis/shared-testing.
-// The Drizzle database is taken from the token assumed to be exported as
-// `DATABASE` from `src/database/database.module.ts`.
+// The Drizzle database is taken from the token `DATABASE`, exported by
+// @basis/shared-infrastructure (share-the-database-connection design
+// decision 3).
 import { NestFactory } from '@nestjs/core';
 import type { INestApplicationContext } from '@nestjs/common';
 import { DATABASE } from '@basis/shared-infrastructure';

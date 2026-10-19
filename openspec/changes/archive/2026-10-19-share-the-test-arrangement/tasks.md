@@ -13,3 +13,10 @@
 - [x] 3.1 Make the derived lint spec in `libs/shared/testing` pass with `pnpm nx test shared-testing`, with no `eslint-disable` added anywhere
 - [x] 3.2 Update `AGENTS.md` _Testing Strategy_ (shared test arrangement: `libs/shared/testing`) and ADR-0012's library and tag tables; verify `pnpm format:check` passes
 - [x] 3.3 Dispose of the `test-plan.md` _Missing shared arrangement_ entries (expected none) and run `pnpm nx affected -t lint typecheck test build` and `openspec validate --all --strict`
+
+## 4. Ship
+
+- [x] 4.1 Merge the implementation: pull request #24, merged 2026-10-19 as `3c1435e`; staging's Deploy run for `3c1435e` succeeded
+- [x] 4.2 Confirm — **waived** by the operator on 2026-10-19, class: _no observation can actually be made_. The change adds lint rules, an empty test library and documentation; the API's runtime behaviour is unchanged, so there is no effect to observe on staging. Its effect is the lint rules, which the lint spec (26 tests) and CI exercise. No successor is intended.
+- [x] 4.3 Promote — **waived** by the operator on 2026-10-19: the change is not going to production, since nothing it changes runs there.
+- [x] 4.4 Delete `share-the-test-arrangement` from `docs/backlog.md` in the archive pull request

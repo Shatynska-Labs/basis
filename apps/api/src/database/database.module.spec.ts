@@ -7,11 +7,11 @@
 // token: an unresolved project question in the change's test-plan.md). No
 // database is reachable here: the pool opens no connection until a query
 // (design decision 1), so creating and closing the context needs none.
+import { DATABASE } from '@basis/shared-infrastructure';
 import { NestFactory } from '@nestjs/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../app.module.js';
-import { DATABASE } from './database.module.js';
 
 // The Drizzle node-postgres database exposes its pg.Pool as `$client`, and a
 // pg.Pool keeps the options it was created with as `options`.

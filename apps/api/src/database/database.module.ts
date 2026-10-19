@@ -1,3 +1,4 @@
+import { DATABASE, type Database } from '@basis/shared-infrastructure';
 import {
   Global,
   Inject,
@@ -5,18 +6,13 @@ import {
   Module,
   type OnApplicationShutdown,
 } from '@nestjs/common';
-import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 
 import { APPLICATION_NAME, readDatabaseUrl } from './database-url.js';
-import * as schema from './schema.js';
 
 /** The `pg` pool behind {@link DATABASE}. */
 export const DATABASE_POOL = Symbol('DATABASE_POOL');
-/** The Drizzle database over every context's schema. */
-export const DATABASE = Symbol('DATABASE');
-
-export type Database = NodePgDatabase<typeof schema>;
 
 // A pool opens no connection until its first query, so starting the API does
 // not depend on the database (add-persistence-skeleton design decision 1).
@@ -36,6 +32,9 @@ const createPool = (): pg.Pool => {
   return pool;
 };
 
+// The database is provided under the shared token, so a context's
+// infrastructure takes it from @basis/shared-infrastructure
+// (share-the-database-connection design decision 3).
 @Global()
 @Module({
   providers: [
@@ -43,7 +42,7 @@ const createPool = (): pg.Pool => {
     {
       provide: DATABASE,
       inject: [DATABASE_POOL],
-      useFactory: (pool: pg.Pool): Database => drizzle(pool, { schema }),
+      useFactory: (pool: pg.Pool): Database => drizzle(pool),
     },
   ],
   exports: [DATABASE],

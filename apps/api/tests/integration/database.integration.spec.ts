@@ -8,13 +8,13 @@
 // `DATABASE` from `src/database/database.module.ts`.
 import { NestFactory } from '@nestjs/core';
 import type { INestApplicationContext } from '@nestjs/common';
+import { DATABASE } from '@basis/shared-infrastructure';
 import { freshDatabase, withClient } from '@basis/shared-testing';
 import { sql } from 'drizzle-orm';
 import type { Client } from 'pg';
 import { afterEach, beforeEach, describe, expect, inject, it } from 'vitest';
 
 import { AppModule } from '../../src/app.module.js';
-import { DATABASE } from '../../src/database/database.module.js';
 
 interface Executes {
   execute(

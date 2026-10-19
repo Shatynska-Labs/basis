@@ -109,9 +109,12 @@ const depConstraints = ({ withExternalImports }) => {
         allowedExternalImports: ['@nestjs/common', '@nestjs/cqrs'],
       }),
     },
+    // With the scope rows, a context's infrastructure reaches only the shared
+    // infrastructure (share-the-database-connection design decision 7).
     {
       sourceTag: 'type:infrastructure',
       onlyDependOnLibsWithTags: [
+        'type:infrastructure',
         'type:application',
         'type:domain',
         'type:contracts',

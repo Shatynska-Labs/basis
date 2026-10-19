@@ -54,6 +54,7 @@ const serverLibraries = [
   'type:application',
   'type:infrastructure',
   'type:data-access',
+  'type:testing',
 ];
 
 // The tag table of ADR-0012 §7, extended with `type:tooling` and
@@ -66,22 +67,32 @@ const depConstraints = ({ withExternalImports }) => {
   return [
     {
       sourceTag: 'type:core',
-      onlyDependOnLibsWithTags: [],
+      onlyDependOnLibsWithTags: ['type:testing'],
       ...external({ bannedExternalImports: ['*'] }),
     },
     {
       sourceTag: 'type:util',
-      onlyDependOnLibsWithTags: ['type:core', 'type:util'],
+      onlyDependOnLibsWithTags: ['type:core', 'type:util', 'type:testing'],
       ...external({ bannedExternalImports: frameworkAndSdkPackages }),
     },
     {
       sourceTag: 'type:contracts',
-      onlyDependOnLibsWithTags: ['type:contracts', 'type:core', 'type:util'],
+      onlyDependOnLibsWithTags: [
+        'type:contracts',
+        'type:core',
+        'type:util',
+        'type:testing',
+      ],
       ...external({ allowedExternalImports: ['zod'] }),
     },
     {
       sourceTag: 'type:domain',
-      onlyDependOnLibsWithTags: ['type:domain', 'type:core', 'type:util'],
+      onlyDependOnLibsWithTags: [
+        'type:domain',
+        'type:core',
+        'type:util',
+        'type:testing',
+      ],
       ...external({ bannedExternalImports: frameworkAndSdkPackages }),
     },
     {
@@ -91,6 +102,7 @@ const depConstraints = ({ withExternalImports }) => {
         'type:contracts',
         'type:core',
         'type:util',
+        'type:testing',
       ],
       ...external({
         bannedExternalImports: frameworkAndSdkPackages,
@@ -105,12 +117,21 @@ const depConstraints = ({ withExternalImports }) => {
         'type:contracts',
         'type:core',
         'type:util',
+        'type:testing',
       ],
     },
     {
       sourceTag: 'type:data-access',
-      onlyDependOnLibsWithTags: ['type:contracts', 'type:core', 'type:util'],
+      onlyDependOnLibsWithTags: [
+        'type:contracts',
+        'type:core',
+        'type:util',
+        'type:testing',
+      ],
     },
+    // Test arrangement depends on no other workspace library, or a spec in any
+    // library importing it would close a project cycle.
+    { sourceTag: 'type:testing', onlyDependOnLibsWithTags: [] },
     {
       sourceTag: 'type:tooling',
       onlyDependOnLibsWithTags: [],
@@ -151,6 +172,7 @@ const depConstraints = ({ withExternalImports }) => {
           'type:core',
           'type:util',
           'type:domain',
+          'type:testing',
         ],
       },
       // Of the domain libraries, only the shared kernel's.
@@ -161,6 +183,10 @@ const depConstraints = ({ withExternalImports }) => {
     ]),
   ];
 };
+
+const sharedTestingMessage =
+  'Shared test arrangement is for specs, tests/ and test configuration only.';
+const sharedTestingSpecifier = String.raw`/^@basis\/shared-testing(\/|$)/`;
 
 const boundaries = (withExternalImports) => [
   'error',
@@ -200,6 +226,58 @@ export default [
       '**/eslint.config.*',
     ],
     rules: { '@nx/enforce-module-boundaries': boundaries(false) },
+  },
+  // Tags are per project and cannot tell a spec from a source file, so the
+  // shared test arrangement is kept out of production code by file.
+  {
+    files: [
+      '**/*.ts',
+      '**/*.tsx',
+      '**/*.cts',
+      '**/*.mts',
+      '**/*.js',
+      '**/*.jsx',
+      '**/*.cjs',
+      '**/*.mjs',
+    ],
+    ignores: [
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '**/tests/**',
+      '**/vitest.config.*',
+      '**/vite.config.*',
+      '**/jest.config.*',
+      '**/eslint.config.*',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@basis/shared-testing', '@basis/shared-testing/*'],
+              message: sharedTestingMessage,
+            },
+          ],
+        },
+      ],
+      // `no-restricted-imports` sees only static imports and re-exports.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: `ImportExpression[source.value=${sharedTestingSpecifier}]`,
+          message: sharedTestingMessage,
+        },
+        {
+          selector: `ImportExpression[source.type='TemplateLiteral'][source.quasis.0.value.cooked=${sharedTestingSpecifier}]`,
+          message: sharedTestingMessage,
+        },
+        {
+          selector: `CallExpression[callee.name='require'][arguments.0.value=${sharedTestingSpecifier}]`,
+          message: sharedTestingMessage,
+        },
+      ],
+    },
   },
   eslintConfigPrettier,
 ];

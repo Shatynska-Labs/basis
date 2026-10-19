@@ -40,5 +40,11 @@ The plan is committed, then tests are derived from `specs/api-delivery/spec.md` 
 
   **Observed 2026-10-19.** The operator ran promote run 39165632180 for `ac8fce8`, which succeeded. The gate reported "staging deployment 7160589328 succeeded"; the run promoted `ghcr.io/shatynska-labs/basis-api@sha256:2783c53fcc4acc480f93e453bcd16324f7a81b8647549e9a83b8ae9ad9df481e`, the digest staging's Deploy run 39165383089 built and delivered; Compose resolved the rendered image and rule. Both `https://basis-api.main-production.shatynska.com/health` and `https://api.basis.shatynska.com/health` answer `{"status":"ok","version":"ac8fce85ede097af8192a59358c21144cf71b3d3"}`; production deployment 7160622687 records that commit.
 
-- [ ] 6.4 Observe the gate refusing: the operator runs `promote.yml` with a commit `main` holds that staging never ran (the parent of the merge commit, if it has no staging record); the run fails at the gate and production still reports the merge commit.
-- [ ] 6.5 Delete `move-api-deploys-to-staging-with-promotion` from `docs/backlog.md` in the archive pull request.
+- [x] 6.4 Observe the gate refusing: the operator runs `promote.yml` with a commit `main` holds that staging never ran (the parent of the merge commit, if it has no staging record); the run fails at the gate and production still reports the merge commit.
+
+  **Observed 2026-10-19.** The operator ran promote run 39229130778 for `497d03bc977f29d10a337f56e8cab166aa9716a0`, the parent of the merge, which has a production record and no staging one. It failed at "Require a successful staging deployment": `staging has not run commit 497d03bc977f29d10a337f56e8cab166aa9716a0: there is no staging deployment record for it.` No later step ran, and production still reports `ac8fce85ede097af8192a59358c21144cf71b3d3`. The failed job left a production deployment record (7170061410, `failure`) under the run's own commit, `main`'s tip `56db46a`; the gate reads only `staging` records, so it has no effect on a later promotion.
+
+## Confirmation (2026-10-19)
+
+The effect was observed by the operator at each step: a merge deployed staging only (6.2), a promotion delivered staging's digest to production at both names (6.3), and a promotion of a commit staging never ran was refused before anything was delivered (6.4).
+- [x] 6.5 Delete `move-api-deploys-to-staging-with-promotion` from `docs/backlog.md` in the archive pull request.

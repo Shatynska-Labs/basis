@@ -72,20 +72,6 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 **Re-checked**: 2026-10-19.
 
-## `move-api-deploys-to-staging-with-promotion`
-
-A merge to `main` deploys staging, and production is reached only when the operator promotes a commit staging has already run, following `Fuperia-IT/commerce-ops`. Opened as the OpenSpec change of the same name and merged (PR #21): `deploy.yml` deploys staging, `promote.yml` promotes by digest, and `AGENTS.md`'s `## Deployment` section refines `ship`. What remains is its first staging deploy and first promotion; delete this entry when the change is archived.
-
-**Kind**: `change`, in progress as the OpenSpec change of the same name.
-
-**Waits on**: `nothing`. The infrastructure side (`onboard-basis-api-to-staging`) is archived in `Shatynska-Labs/infrastructure`.
-
-**Design with**: `nothing`.
-
-**Recorded by**: the session that shipped `deploy-api-skeleton`.
-
-**Re-checked**: 2026-10-19.
-
 ## `share-the-test-arrangement`
 
 The project has no shared test arrangement: no library holds the builders, fixtures and in-memory port fakes that specs need, so each spec declares its own, and copies drift from the interface they stand in for. Decide where shared arrangement lives (for example an Nx library under `libs/shared/` tagged for test use only, so `@nx/enforce-module-boundaries` keeps production code from importing it), move the fakes the specs already repeat into it, and record its location under _Testing Strategy_ in `AGENTS.md` as the shared test arrangement.

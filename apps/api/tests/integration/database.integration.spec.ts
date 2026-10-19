@@ -8,9 +8,9 @@
 // `DATABASE` from `src/database/database.module.ts`.
 import { NestFactory } from '@nestjs/core';
 import type { INestApplicationContext } from '@nestjs/common';
-import { freshDatabase } from '@basis/shared-testing';
+import { freshDatabase, withClient } from '@basis/shared-testing';
 import { sql } from 'drizzle-orm';
-import { Client } from 'pg';
+import type { Client } from 'pg';
 import { afterEach, beforeEach, describe, expect, inject, it } from 'vitest';
 
 import { AppModule } from '../../src/app.module.js';
@@ -25,24 +25,11 @@ interface Executes {
 const databaseNameOf = (url: string) =>
   decodeURIComponent(new URL(url).pathname.replace(/^\//, ''));
 
-// Declared locally (see "Missing shared arrangement" in test-plan.md): a
-// connection of the test's own, under an application_name other than the
-// API's, used to observe the server.
-const withObserver = async <T>(
-  url: string,
-  use: (client: Client) => Promise<T>,
-) => {
-  const client = new Client({
-    connectionString: url,
-    application_name: 'test-observer',
-  });
-  await client.connect();
-  try {
-    return await use(client);
-  } finally {
-    await client.end();
-  }
-};
+// A connection of the test's own, under an application_name other than the
+// API's, used to observe the server; its client from the shared arrangement
+// (test-plan.md, Missing shared arrangement, entry 1: promoted).
+const withObserver = <T>(url: string, use: (client: Client) => Promise<T>) =>
+  withClient(url, use, { applicationName: 'test-observer' });
 
 const apiConnections = (client: Client, database: string) =>
   client

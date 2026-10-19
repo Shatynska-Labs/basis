@@ -32,18 +32,35 @@ export async function startPostgres(): Promise<StartedPostgres> {
 }
 
 /**
+ * Connects a client of the spec's own to `url`, runs `use` with it, and ends
+ * the client whatever `use` does.
+ */
+export async function withClient<T>(
+  url: string,
+  use: (client: pg.Client) => Promise<T>,
+  options: { applicationName?: string } = {},
+): Promise<T> {
+  const client = new pg.Client({
+    connectionString: url,
+    application_name: options.applicationName,
+  });
+  await client.connect();
+  try {
+    return await use(client);
+  } finally {
+    await client.end();
+  }
+}
+
+/**
  * Creates a new, empty database on the server `serverUrl` reaches, named
  * uniquely, and returns a URL to it with the same credentials.
  */
 export async function freshDatabase(serverUrl: string): Promise<string> {
   const name = `test_${randomUUID().replaceAll('-', '')}`;
-  const client = new pg.Client({ connectionString: serverUrl });
-  await client.connect();
-  try {
-    await client.query(`create database "${name}"`);
-  } finally {
-    await client.end();
-  }
+  await withClient(serverUrl, (client) =>
+    client.query(`create database "${name}"`),
+  );
   const url = new URL(serverUrl);
   url.pathname = `/${name}`;
   return url.toString();

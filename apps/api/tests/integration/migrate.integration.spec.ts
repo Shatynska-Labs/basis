@@ -12,8 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { freshDatabase } from '@basis/shared-testing';
-import { Client } from 'pg';
+import { freshDatabase, withClient } from '@basis/shared-testing';
 import { describe, expect, inject, it } from 'vitest';
 
 const apiRoot = fileURLToPath(new URL('../../', import.meta.url));
@@ -41,19 +40,10 @@ const historyEntries = () =>
   (JSON.parse(readFileSync(journal, 'utf8')) as { entries: { tag: string }[] })
     .entries;
 
-// Declared locally (see "Missing shared arrangement" in test-plan.md).
-const query = async <R extends Record<string, unknown>>(
-  url: string,
-  text: string,
-) => {
-  const client = new Client({ connectionString: url });
-  await client.connect();
-  try {
-    return (await client.query<R>(text)).rows;
-  } finally {
-    await client.end();
-  }
-};
+// Its client from the shared arrangement (test-plan.md, Missing shared
+// arrangement, entry 2: promoted).
+const query = <R extends Record<string, unknown>>(url: string, text: string) =>
+  withClient(url, async (client) => (await client.query<R>(text)).rows);
 
 const migrationRecord = (url: string) =>
   query<{ id: number; hash: string; created_at: string }>(

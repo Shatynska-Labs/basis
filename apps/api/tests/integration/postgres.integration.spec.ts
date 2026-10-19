@@ -4,23 +4,16 @@
 // `inject('postgresUrl')` (the key name is an unresolved project question in
 // the change's test-plan.md); `freshDatabase(url)` is the helper design
 // decision 8 names in @basis/shared-testing.
-import { freshDatabase } from '@basis/shared-testing';
-import { Client } from 'pg';
+import { freshDatabase, withClient } from '@basis/shared-testing';
 import { describe, expect, inject, it } from 'vitest';
 
-// Declared locally (see "Missing shared arrangement" in test-plan.md).
-const queryOne = async <R extends Record<string, unknown>>(
+// Its client from the shared arrangement (test-plan.md, Missing shared
+// arrangement, entry 3: promoted).
+const queryOne = <R extends Record<string, unknown>>(
   url: string,
   text: string,
-) => {
-  const client = new Client({ connectionString: url });
-  await client.connect();
-  try {
-    return (await client.query<R>(text)).rows[0] as R;
-  } finally {
-    await client.end();
-  }
-};
+) =>
+  withClient(url, async (client) => (await client.query<R>(text)).rows[0] as R);
 
 describe('integration-testing: each integration run gets a throwaway PostgreSQL', () => {
   it("the run's server answers, and its major version is 18", async () => {

@@ -4,4 +4,5 @@ export {
   POSTGRES_IMAGE,
   startPostgres,
   type StartedPostgres,
+  withClient,
 } from './lib/postgres.js';

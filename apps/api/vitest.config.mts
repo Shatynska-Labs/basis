@@ -19,6 +19,9 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'node',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    // Integration specs run only through `integration`
+    // (add-persistence-skeleton design decision 9).
+    exclude: ['tests/integration/**', '**/*.integration.spec.ts'],
     passWithNoTests: true,
     reporters: ['default'],
   },

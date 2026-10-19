@@ -1,0 +1,3 @@
+-- Baseline (add-persistence-skeleton design decision 5): the API's migration
+-- history starts here and creates nothing. Each context adds its own schema in
+-- later migrations, generated with `pnpm nx run api:db-generate`.

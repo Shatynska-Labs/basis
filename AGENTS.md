@@ -175,7 +175,7 @@ Tests are written at the lowest level that can show the behaviour; the `domain` 
 
 **Test-path glob:** `{apps,libs,tools}/**/*.spec.{ts,tsx}`, excluding `**/*.integration.spec.ts` and `apps/api-e2e/**` (the `test` target); end-to-end: `apps/api-e2e/**/*.spec.ts` (the `e2e` target); integration: `{apps,libs}/**/tests/integration/**/*.integration.spec.ts` (the `integration` target).
 
-**Shared test arrangement:** none yet. No library holds builders, fixtures or in-memory fakes that specs import, so the test author declares every piece of arrangement in the spec it writes and lists it under **Missing shared arrangement** in `test-plan.md`, and `apply` keeps each with that reason. `docs/backlog.md`'s `share-the-test-arrangement` is the change that would give the project one.
+**Shared test arrangement:** `libs/shared/testing` (`@basis/shared-testing`, `scope:shared`, `type:testing`). Only specs, `tests/` and test or lint configuration may import it (ESLint reports any other import), and it depends on no other workspace library, so it holds generic helpers only. It starts empty: arrangement enters when a second spec needs it, and a fake of a port stays declared in the spec that uses it, listed in `test-plan.md`, until a change decides where such fakes live.
 
 ## Development Tooling
 

@@ -39,7 +39,10 @@ const importSharedTesting = `import { } from '@basis/shared-testing';\nexport co
 
 describe('Shared test arrangement: a spec may use it', () => {
   it.each([
-    ['a spec in a type:core library', 'libs/shared/core/src/lib/sample.spec.ts'],
+    [
+      'a spec in a type:core library',
+      'libs/shared/core/src/lib/sample.spec.ts',
+    ],
     ['a spec in an app', 'apps/api/src/sample.spec.ts'],
   ])('%s importing it is not reported', async (_name, path) => {
     const errors = await lint(path, importSharedTesting);
@@ -89,7 +92,9 @@ describe('Shared test arrangement: a spec may use it', () => {
 
       expect(rows.length).toBeGreaterThan(0);
       expect(
-        rows.some((row) => row.onlyDependOnLibsWithTags.includes('type:testing')),
+        rows.some((row) =>
+          row.onlyDependOnLibsWithTags.includes('type:testing'),
+        ),
       ).toBe(true);
     },
   );
@@ -97,7 +102,10 @@ describe('Shared test arrangement: a spec may use it', () => {
 
 describe('Shared test arrangement: production code cannot import it', () => {
   it.each([
-    ['a non-spec source file in a library', 'libs/shared/core/src/lib/sample.ts'],
+    [
+      'a non-spec source file in a library',
+      'libs/shared/core/src/lib/sample.ts',
+    ],
     ['a non-spec source file in an app', 'apps/api/src/sample.ts'],
   ])('%s importing it is an error', async (_name, path) => {
     const errors = await lint(path, importSharedTesting);

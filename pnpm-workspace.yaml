@@ -6,6 +6,15 @@ packages:
 allowBuilds:
   '@swc/core': true
   nx: true
+  # Declined (add-persistence-skeleton design decision 8). Testcontainers
+  # reaches Docker over its socket, needing neither ssh2's optional native
+  # crypto (cpu-features, ssh2) nor protobufjs's postinstall notice; esbuild,
+  # reached through drizzle-kit, runs from its platform package without its
+  # postinstall check.
+  cpu-features: false
+  esbuild: false
+  protobufjs: false
+  ssh2: false
 engineStrict: true
 saveExact: true
 

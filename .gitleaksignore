@@ -5,3 +5,7 @@
 # A made-up 40-character commit SHA in an image tag, the fixture for
 # "the resolved image differs" (move-api-deploys-to-staging-with-promotion).
 d097c93b7b2af1cfd3205629d273f18852ee4e67:tools/delivery/src/check-compose.spec.ts:generic-api-key:83
+
+# The same made-up commit SHA in an image tag, the fixture for "the resolved
+# image differs" in the derived tests of add-persistence-skeleton.
+2c7d35ba37bfa314c947fdcfcd19e4061d63591e:tools/delivery/src/check-compose-migrate.spec.ts:generic-api-key:27

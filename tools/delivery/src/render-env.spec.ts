@@ -24,6 +24,9 @@ const script = fileURLToPath(new URL('./render-env.ts', import.meta.url));
 
 const DIGEST = `sha256:${'0123456789abcdef'.repeat(4)}`;
 const BASE_DOMAIN = 'example.org';
+// Rendering requires a database password since add-persistence-skeleton; these
+// tests pass one and assert nothing about it (see that change's test-plan.md).
+const DATABASE_PASSWORD = '3f9a0c';
 
 const STAGING_RULE = 'Host(`basis-api.main-staging.example.org`)';
 const PRODUCTION_RULE =
@@ -48,6 +51,7 @@ const runCommand = (env: Record<string, string>) => {
         PATH: process.env.PATH,
         ENV_FILE: envFile,
         GITHUB_OUTPUT: output,
+        DATABASE_PASSWORD,
         ...env,
       },
     });
@@ -70,6 +74,7 @@ describe('the rendered environment names a digest', () => {
       target: 'staging',
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
+      databasePassword: DATABASE_PASSWORD,
     });
     expect(lineOf(content, 'IMAGE_DIGEST')).toEqual([
       `IMAGE_DIGEST="${DIGEST}"`,
@@ -84,7 +89,12 @@ describe('a malformed digest is refused', () => {
     'renderEnv throws naming IMAGE_DIGEST for "%s"',
     (imageDigest) => {
       expect(() =>
-        renderEnv({ target: 'staging', baseDomain: BASE_DOMAIN, imageDigest }),
+        renderEnv({
+          target: 'staging',
+          baseDomain: BASE_DOMAIN,
+          imageDigest,
+          databasePassword: DATABASE_PASSWORD,
+        }),
       ).toThrow(/IMAGE_DIGEST/);
     },
   );
@@ -109,6 +119,7 @@ describe("staging's rule", () => {
       target: 'staging',
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
+      databasePassword: DATABASE_PASSWORD,
     });
     expect(lineOf(content, 'ROUTER_RULE')).toEqual([
       `ROUTER_RULE="${STAGING_RULE}"`,
@@ -123,6 +134,7 @@ describe("production's rule", () => {
       target: 'production',
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
+      databasePassword: DATABASE_PASSWORD,
     });
     expect(lineOf(content, 'ROUTER_RULE')).toEqual([
       `ROUTER_RULE="${PRODUCTION_RULE}"`,
@@ -138,7 +150,12 @@ describe('a missing or malformed base domain', () => {
     'renderEnv throws naming BASE_DOMAIN for "%s"',
     (baseDomain) => {
       expect(() =>
-        renderEnv({ target: 'production', baseDomain, imageDigest: DIGEST }),
+        renderEnv({
+          target: 'production',
+          baseDomain,
+          imageDigest: DIGEST,
+          databasePassword: DATABASE_PASSWORD,
+        }),
       ).toThrow(/BASE_DOMAIN/);
     },
   );
@@ -162,6 +179,7 @@ describe('an unknown target', () => {
         target: 'preview',
         baseDomain: BASE_DOMAIN,
         imageDigest: DIGEST,
+        databasePassword: DATABASE_PASSWORD,
       }),
     ).toThrow(/target|preview/i);
   });
@@ -194,6 +212,7 @@ describe('the command, on success', () => {
         target: 'production',
         baseDomain: BASE_DOMAIN,
         imageDigest: DIGEST,
+        databasePassword: DATABASE_PASSWORD,
       }).content,
     );
     expect(run.content.endsWith('\n')).toBe(true);

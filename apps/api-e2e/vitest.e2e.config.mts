@@ -11,6 +11,10 @@ export default defineConfig(() => ({
     watch: false,
     environment: 'node',
     include: ['src/**/*.spec.ts'],
+    // The API refuses to start without a database URL; this one names an
+    // address where nothing listens, so no database is reachable
+    // (add-persistence-skeleton design decision 2).
+    env: { DATABASE_URL: 'postgres://basis:unused@127.0.0.1:9/basis' },
     reporters: ['default'],
   },
 }));

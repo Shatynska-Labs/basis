@@ -134,13 +134,14 @@ jobs:
 
       # The host's tailnet address and the tailnet client are organisation
       # settings, shared by every application deploying to that host; the
-      # deploy key is this application's own, a secret of the staging
-      # Environment.
+      # deploy key and the database password are this application's own,
+      # secrets of the staging Environment.
       - uses: ./.github/actions/deliver-api
         with:
           target: staging
           deploy-host: ${{ vars.MAIN_STAGING_DEPLOY_HOST }}
           deploy-ssh-key: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
+          database-password: ${{ secrets.BASIS_API_DATABASE_PASSWORD }}
           tailscale-oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
           tailscale-oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
           base-domain: ${{ vars.BASE_DOMAIN }}

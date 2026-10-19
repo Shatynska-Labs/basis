@@ -3,9 +3,28 @@
 # (deploy-api-skeleton design decision 6, move-api-deploys-to-staging-with-
 # promotion design decisions 2 and 3). The image is pinned by digest and the
 # router rule is built from the host's server name and the base domain, so one
-# file serves both hosts and names neither. Nothing is persisted: the service
-# has no volume.
+# file serves both hosts and names neither. Before the API starts, `migrate`
+# applies the API's migrations to its database in the host's shared PostgreSQL
+# instance, once, from the same image; a failed migration fails the host's
+# `docker compose up -d --wait`, so the delivery fails (add-persistence-
+# skeleton design decision 3). Nothing is persisted on the host: neither
+# service has a volume.
 services:
+  migrate:
+    image: ghcr.io/shatynska-labs/basis-api@${IMAGE_DIGEST:?IMAGE_DIGEST is not rendered}
+    command: [node, dist/migrate.js]
+    restart: 'no'
+    init: true
+    env_file: .env
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    # The image's HEALTHCHECK is the API's, and means nothing for a one-shot.
+    healthcheck:
+      disable: true
+    networks: [platform_edge]
+
   api:
     image: ghcr.io/shatynska-labs/basis-api@${IMAGE_DIGEST:?IMAGE_DIGEST is not rendered}
     restart: unless-stopped
@@ -15,6 +34,9 @@ services:
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     mem_limit: 512m
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
       test:
         [

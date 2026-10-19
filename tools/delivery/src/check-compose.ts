@@ -1,8 +1,11 @@
 // Checks what Compose resolves from deploy/api/docker-compose.yml and the
 // rendered `.env` before anything is delivered (move-api-deploys-to-staging-
-// with-promotion design decision 7): the service `api` must run the rendered
-// digest and carry the rendered router rule, so a rule or image corrupted
-// between rendering and Compose never reaches the host. A refusal names the
+// with-promotion design decision 7): the service `api`, and every other
+// service declared, must run the rendered digest, and `api` must carry the
+// rendered router rule, so a rule or image corrupted between rendering and
+// Compose never reaches the host. A configuration without `migrate`, as every
+// commit before migrations were delivered has, passes, so that such a commit
+// stays promotable (add-persistence-skeleton design decision 7). A refusal names the
 // field and never a value: Compose inlines the rendered `.env` into its output.
 //
 // It runs as `node tools/delivery/src/check-compose.ts`, so it imports Node
@@ -29,12 +32,22 @@ export const checkCompose = ({
   routerRule: string;
   imageDigest: string;
 }): CheckResult => {
-  const service = field(field(config, 'services'), 'api');
-  if (field(service, 'image') !== `${IMAGE_NAME}@${imageDigest}`) {
-    return {
-      ok: false,
-      reason: `the service api's resolved image is not ${IMAGE_NAME} at the rendered IMAGE_DIGEST.`,
-    };
+  const services = field(config, 'services');
+  const service = field(services, 'api');
+  const others =
+    typeof services === 'object' && services !== null
+      ? Object.keys(services).filter((name) => name !== 'api')
+      : [];
+  // `api` first, so its failure is the one named when both differ.
+  for (const name of ['api', ...others]) {
+    if (
+      field(field(services, name), 'image') !== `${IMAGE_NAME}@${imageDigest}`
+    ) {
+      return {
+        ok: false,
+        reason: `the service ${name}'s resolved image is not ${IMAGE_NAME} at the rendered IMAGE_DIGEST.`,
+      };
+    }
   }
   if (field(field(service, 'labels'), RULE_LABEL) !== routerRule) {
     return {

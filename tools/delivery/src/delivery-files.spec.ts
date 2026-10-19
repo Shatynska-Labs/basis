@@ -235,13 +235,11 @@ const COMPOSE_IMAGE =
   /^ghcr\.io\/shatynska-labs\/basis-api@\$\{IMAGE_DIGEST:\?[^}]*\}$/;
 const COMPOSE_RULE = /^\$\{ROUTER_RULE:\?[^}]*\}$/;
 
+// The count of image references is delivery-files-migrate.spec.ts's, since
+// add-persistence-skeleton added the `migrate` service.
 const composeImageProblems = (text: string): string[] => {
   const services = servicesOf(text);
-  const images = Object.entries(services).filter(
-    ([, s]) => s.image !== undefined,
-  );
   const problems: string[] = [];
-  if (images.length !== 1) problems.push(`${images.length} image references`);
   const image = services.api?.image;
   if (image === undefined || !COMPOSE_IMAGE.test(image))
     problems.push(`service api's image is ${JSON.stringify(image)}`);
@@ -406,7 +404,6 @@ services:
       'a default instead of a refusal',
       goodCompose.replace('IMAGE_DIGEST:?', 'IMAGE_DIGEST:-'),
     ],
-    ['a second image', `${goodCompose}  sidecar:\n    image: busybox\n`],
   ])('the image check fails a fixture with %s', (_name, text) => {
     expect(composeImageProblems(text)).not.toEqual([]);
   });
@@ -500,12 +497,6 @@ describe('a promotion does not build', () => {
       ),
     ).toEqual([]);
     expect(read(PROMOTE)).not.toMatch(/docker (buildx )?build\b/);
-  });
-});
-
-describe('the Compose file has no tag', () => {
-  it(`${COMPOSE}'s only image reference is the digest, failing when unset`, () => {
-    expect(composeImageProblems(read(COMPOSE))).toEqual([]);
   });
 });
 

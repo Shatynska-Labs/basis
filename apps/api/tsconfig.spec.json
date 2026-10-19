@@ -14,11 +14,14 @@
     "emitDecoratorMetadata": true
   },
   "include": [
+    "drizzle.config.ts",
     "vitest.config.ts",
     "vitest.config.mts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "vitest.integration.config.mts",
+    "tests/**/*.ts"
   ],
   "references": [
     {

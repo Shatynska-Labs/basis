@@ -45,6 +45,15 @@
   "targetDefaults": {
     "test": {
       "dependsOn": ["^build"]
+    },
+    "integration": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "cache": false,
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "vitest run --config vitest.integration.config.mts"
+      }
     }
   }
 }

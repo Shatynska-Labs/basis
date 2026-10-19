@@ -130,6 +130,11 @@ describe('Shared test arrangement: production code cannot import it', () => {
       `export const load = () => import('@basis/shared-testing');\n`,
     ],
     [
+      'a template-literal dynamic import',
+      'libs/shared/core/src/lib/sample.ts',
+      'export const load = () => import(`@basis/shared-testing`);\n',
+    ],
+    [
       'a require call',
       'apps/api/src/sample.cjs',
       `module.exports = require('@basis/shared-testing');\n`,

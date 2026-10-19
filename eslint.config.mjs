@@ -269,6 +269,10 @@ export default [
           message: sharedTestingMessage,
         },
         {
+          selector: `ImportExpression[source.type='TemplateLiteral'][source.quasis.0.value.cooked=${sharedTestingSpecifier}]`,
+          message: sharedTestingMessage,
+        },
+        {
           selector: `CallExpression[callee.name='require'][arguments.0.value=${sharedTestingSpecifier}]`,
           message: sharedTestingMessage,
         },

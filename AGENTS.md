@@ -1,5 +1,5 @@
 <!-- prettier-ignore-start -->
-<!-- ai-toolkit:development-workflow v4 -->
+<!-- ai-toolkit:development-workflow v10 -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong below the closing marker. -->
 
@@ -65,7 +65,7 @@ _Claude Code binding:_ dispatch `ai-toolkit:change-plan-reviewer` once every art
 
 **commit** — commit the approved plan before tests are derived from it; the tests map to that baseline.
 
-**derive tests** — have an author other than whoever writes the implementation derive tests from the approved specification deltas, not from implementation code. That author needs this project's test command and test-path glob; both are in this project's own conventions.
+**derive tests** — have an author other than whoever writes the implementation derive tests from the approved specification deltas, not from implementation code. That author needs this project's test command and test-path glob, and the location of its shared test arrangement where it has one — the test code its tests take builders, fixtures, fakes and stubs from; all are in this project's own conventions.
 
 A stated exemption applies where this project's rules name one for a class of change, and the reason is given when it is used. A change declaring no specification deltas owes no new tests, only that the suite stays green.
 
@@ -73,7 +73,9 @@ _Claude Code binding:_ dispatch `ai-toolkit:change-test-writer` after the verdic
 
 ### build
 
-**apply** — implement only once two things hold: a commit holding the approved plan, which follows the verdict that permitted proceeding, and the derived tests — or the stated exemption that excused them. Where either is absent, take the missing step rather than starting and noting the gap. Work too small to be a change skipped `plan` and has neither to hold.
+**apply** — implement only once two things hold: a commit holding the approved plan, which follows the verdict that permitted proceeding, and the derived tests — or the stated exemption that excused them. Where either is absent, take the missing step rather than starting and noting the gap. Work too small to be a change skipped `plan` and has neither to hold. Before implementing, read `docs/backlog.md` for entries the scope rule would let this change fold in, and take each as folded-in work whose commit names the entry; leave the entry itself to the archive step.
+
+Where the test author declared arrangement locally because the shared test arrangement lacked it, the change's test plan lists each such entry. Deal with every entry in this change, before `build`'s review, and record its disposition against the entry: **promote** it — add it to the shared test arrangement, or extend the near-miss the entry names, and move the derived tests that declared it onto it — or **keep** it local and record the reason. A local copy drifts from the interface it stands in for, and later tests import it from the test file that declared it. Moving derived tests onto promoted arrangement is permitted: change only where a test takes its arrangement from — remove the local declaration, import from the shared arrangement, adapt to its constructor — and never what the test asserts. Where this project's conventions record no shared arrangement's location, whether they state it has none or are silent, keep every entry with that reason; creating a shared arrangement, or recording where one lives, is a decision about the project's testing strategy, not a step of this change.
 
 **verify** — run the verification relevant to the change: tests, type checking, linting, formatting, a build, whatever this project's conventions require. Do not report a change as complete without having run it.
 
@@ -83,13 +85,13 @@ _Claude Code binding:_ dispatch `ai-toolkit:change-test-writer` after the verdic
 
 Dispatch against a diff that already passes verification. Re-review only where the fixes were substantial enough to warrant it, bounded at three rounds; past three, report where the loop stands and ask rather than dispatching a fourth. A review judging the implemented change unsound rather than defective exits immediately and is raised.
 
-_Claude Code binding:_ run `ai-toolkit:change-code-reviewer` over the change's committed diff.
+_Claude Code binding:_ run `ai-toolkit:change-code-reviewer` over the change's committed diff. On `FIX REQUIRED` fix, and re-dispatch where the fixes were substantial, within three rounds, or otherwise continue; on `CONDITIONALLY APPROVED` apply the `[MINOR]` fixes and continue; on `APPROVED` continue; on `REJECTED` stop and raise it.
 
 ### ship
 
 Nothing ships from a local machine. Never run the deploy command against production — a change reaches production by merging and by nothing else. Local credentials for production, where they exist at all, are for reading — a plan, a status, a log — and not for applying.
 
-Every change reaches the trunk through pull requests, and takes at least two. Begin once verification passes on the branch head and `build`'s review has cleared.
+Every change reaches the trunk through pull requests, and takes at least two. A repository's first commit reaches the trunk directly, because there is no commit before it for a pull request to merge into, and no other commit does. Begin once verification passes on the branch head and `build`'s review has cleared.
 
 **open pr → merge → deploy** — open the pull request, let continuous integration run, and wait for the operator's confirmation that it merged and that the deploy is healthy. Do not infer a merge, a deploy or a confirmed effect from a green pull request, an approval, or silence.
 
@@ -102,7 +104,7 @@ Two classes cannot answer that gate and are waivable. Say so plainly, name the c
 
 A recorded waiver completes **confirm**: `ship:confirmed` is true of a waived change.
 
-**archive** — once the effect is confirmed or the gate waived, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing.
+**archive** — once the effect is confirmed or the gate waived, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog.md` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as the file directs, in the commit that carries the record.
 
 Two is a floor. Where the deploy is unhealthy, or the effect is absent through a defect, the change is not delivered and its record is not written: fix it and re-enter at `build`'s review gate; the fix takes a pull request of its own.
 
@@ -118,22 +120,18 @@ Remove the branch locally and on the remote, and the working tree from the repos
 
 While applying, the derived tests fail by design until the implementation is complete, so the verification above cannot pass and a hook running it blocks the commit. Commit with `--no-verify`, and read that failure as expected rather than as a defect. It suspends the pre-commit check, not the gate: `verify` still runs before any completion claim.
 
-**Scope.** Prefer changes small enough to review in one sitting; where one grows to cover multiple independent concerns, consider splitting it. Implement only what belongs to the change in progress — an improvement noticed along the way becomes a separate proposed change rather than being folded in.
+**Scope.** Prefer changes small enough to review in one sitting; where one grows to cover multiple independent concerns, consider splitting it. Implement only what belongs to the change in progress, with one exception. **Fold in** work noticed along the way where it touches only files the change edits for its own work, or their direct tests; owes no specification delta and no decision from the operator; and is small — a defect, a test correction, a documentation or naming fix, about a screen of diff. Give it a commit of its own whose message says it is folded in, and name it in the pull request's description. Anything else noticed along the way becomes a separate proposed change.
 
-**A second change surfacing.** You work on one change at a time. Record the second before doing anything else about it.
+**A second change surfacing.** You work on one change at a time. Work you identify that the scope rule does not fold in is a second change: record it before doing anything else about it.
 
 - Where the change in progress **depends** on it: record the dependency and the wait in the current change's own artifacts, then at most open the identified change and recommend it be continued in a separate session.
-- Where it **does not**: record it in `docs/backlog.md`, creating that file if absent, or open the identified change.
+- Where it **does not**: record it in `docs/backlog.md`. That is what is owed; opening the identified change instead is the option.
 
 *Opening* one means a branch of its own and a `handoff.md`, with no proposal — why the change was identified, what bears on it, and what it must not undo. Place it in the new change's own directory in this project's change-record layout — for OpenSpec, `openspec/changes/<name>/handoff.md`. The session that takes it up writes the proposal. Commit that branch at once: the session that opened it is not returning to it, so no later commit of its own will carry the handoff.
 
 Such a branch is created and left: it takes no working tree and does not become the branch this session works on.
 
-`docs/backlog.md` holds identified changes, deleted when archived; an entry there is the separate proposed change the scope rule calls for, recorded rather than opened.
-
-It sits outside the change that recorded it, because a note kept inside one is archived with it: it is the change succeeding, not the session ending, that would lose it.
-
-**A `docs/backlog.md` entry's number is an identifier, not a priority, and it is not stable.** The names are stable; cite an entry by name, never by number.
+`docs/backlog.md` holds identified changes, each the separate proposed change the scope rule calls for, recorded rather than opened. It sits outside any change, because a note kept inside one is archived with it: it is the change succeeding, not the session ending, that would lose it. The file itself states how an entry is written and when it is deleted.
 
 **Assumptions.** Do not silently invent a requirement that was not stated and cannot reasonably be inferred; where an important decision cannot be inferred, ask rather than guess. Record significant decisions in this project's own artifacts rather than in conversation history alone.
 
@@ -141,6 +139,23 @@ It sits outside the change that recorded it, because a note kept inside one is a
 
 **Markdown prose.** Do not hard-wrap prose. Keep each paragraph on a single line whatever its length. Use a line break only where Markdown's own structure requires one.
 <!-- /ai-toolkit:development-workflow -->
+<!-- prettier-ignore-end -->
+
+<!-- prettier-ignore-start -->
+<!-- ai-toolkit:test-plan v3 -->
+<!-- Copied from ai-toolkit's rules/test-plan.md. Do not edit inside this block — it is replaced on update.
+     Project-specific conventions belong below the closing marker. -->
+
+## Read the test plan before implementing
+
+If an OpenSpec change has been passed to `change-test-writer`, its change root carries a `test-plan.md` alongside `proposal.md`, `design.md`, and `tasks.md`. Read it before implementing.
+
+`test-plan.md` is not an artifact the OpenSpec schema defines, so it is not among the files `openspec instructions apply` surfaces automatically — finding it takes a deliberate look at the change root, not a step the tooling takes for you.
+
+It names, per task, which tests must go from failing to passing, which existing tests are now obsolete and why (never edited or deleted — that judgment is yours), and any project questions the agent couldn't resolve on its own.
+
+Its **Missing shared arrangement** section lists the builders, fixtures, fakes and stubs the agent declared inside its own test files because the project's shared test arrangement lacked them. Deal with each entry in the same change: promote it into the shared test arrangement and move the derived tests onto it, or keep it local with a recorded reason. Write the disposition — promoted, or kept and why — against the entry in that section; it is where review looks for it. Moving derived tests onto promoted arrangement changes only where they take their arrangement from, never what they assert.
+<!-- /ai-toolkit:test-plan -->
 <!-- prettier-ignore-end -->
 
 <!-- ai-toolkit:project-foundation -->
@@ -159,6 +174,8 @@ Tests are written at the lowest level that can show the behaviour; the `domain` 
 **Test command:** `pnpm nx affected -t test` (CI), `pnpm nx run-many -t test` (whole suite); integration: `pnpm nx affected -t integration` (needs Docker); API end-to-end: `pnpm nx e2e api-e2e`.
 
 **Test-path glob:** `{apps,libs,tools}/**/*.spec.{ts,tsx}`, excluding `**/*.integration.spec.ts` and `apps/api-e2e/**` (the `test` target); end-to-end: `apps/api-e2e/**/*.spec.ts` (the `e2e` target); integration: `{apps,libs}/**/tests/integration/**/*.integration.spec.ts` (the `integration` target).
+
+**Shared test arrangement:** none yet. No library holds builders, fixtures or in-memory fakes that specs import, so the test author declares every piece of arrangement in the spec it writes and lists it under **Missing shared arrangement** in `test-plan.md`, and `apply` keeps each with that reason. `docs/backlog.md`'s `share-the-test-arrangement` is the change that would give the project one.
 
 ## Development Tooling
 

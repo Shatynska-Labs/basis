@@ -39,6 +39,11 @@ inputs:
   compose-dir:
     description: The directory holding the docker-compose.yml to deliver
     required: true
+  database-password:
+    description: >-
+      The host's database password, from which .env's DATABASE_URL is
+      rendered (add-persistence-skeleton design decision 6)
+    required: true
 
 runs:
   using: composite
@@ -55,10 +60,11 @@ runs:
         IMAGE_DIGEST: ${{ inputs.image-digest }}
         COMMIT: ${{ inputs.commit }}
         COMPOSE_DIR: ${{ inputs.compose-dir }}
+        DATABASE_PASSWORD: ${{ inputs.database-password }}
       run: |
         set -euo pipefail
         missing=''
-        for name in TARGET DEPLOY_HOST DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET BASE_DOMAIN IMAGE_DIGEST COMMIT COMPOSE_DIR; do
+        for name in TARGET DEPLOY_HOST DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET BASE_DOMAIN IMAGE_DIGEST COMMIT COMPOSE_DIR DATABASE_PASSWORD; do
           if [ -z "${!name:-}" ]; then
             missing="$missing $name"
           fi
@@ -89,6 +95,7 @@ runs:
         BASE_DOMAIN: ${{ inputs.base-domain }}
         IMAGE_DIGEST: ${{ inputs.image-digest }}
         COMPOSE_DIR: ${{ inputs.compose-dir }}
+        DATABASE_PASSWORD: ${{ inputs.database-password }}
       run: |
         set -euo pipefail
         ENV_FILE="$COMPOSE_DIR/.env" node "$GITHUB_ACTION_PATH/../../../tools/delivery/src/render-env.ts"

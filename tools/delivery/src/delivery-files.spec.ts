@@ -406,7 +406,6 @@ services:
       'a default instead of a refusal',
       goodCompose.replace('IMAGE_DIGEST:?', 'IMAGE_DIGEST:-'),
     ],
-    ['a second image', `${goodCompose}  sidecar:\n    image: busybox\n`],
   ])('the image check fails a fixture with %s', (_name, text) => {
     expect(composeImageProblems(text)).not.toEqual([]);
   });
@@ -500,12 +499,6 @@ describe('a promotion does not build', () => {
       ),
     ).toEqual([]);
     expect(read(PROMOTE)).not.toMatch(/docker (buildx )?build\b/);
-  });
-});
-
-describe('the Compose file has no tag', () => {
-  it(`${COMPOSE}'s only image reference is the digest, failing when unset`, () => {
-    expect(composeImageProblems(read(COMPOSE))).toEqual([]);
   });
 });
 

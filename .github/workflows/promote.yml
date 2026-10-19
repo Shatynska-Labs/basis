@@ -117,6 +117,7 @@ jobs:
           target: production
           deploy-host: ${{ vars.MAIN_PRODUCTION_DEPLOY_HOST }}
           deploy-ssh-key: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
+          database-password: ${{ secrets.BASIS_API_DATABASE_PASSWORD }}
           tailscale-oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
           tailscale-oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
           base-domain: ${{ vars.BASE_DOMAIN }}

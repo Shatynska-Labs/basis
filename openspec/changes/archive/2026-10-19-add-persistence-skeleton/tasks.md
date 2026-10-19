@@ -33,7 +33,7 @@
 ## 6. Ship
 
 - [x] 6.1 Operator: provision `basis-api`'s database on `main-staging` and store `BASIS_API_DATABASE_PASSWORD` in `staging` (infrastructure `docs/onboard-an-application.md` §3.2), before the merge — done 2026-10-19 on the operator's instruction, by the recipe verbatim through `ops-claude`; checks: database owned by `basis-api`, `pgexporter` has no `CONNECT`, no role statement in `docker logs`
-- [ ] 6.2 Merge the implementation; staging's Deploy run succeeds
-- [ ] 6.3 Confirm on staging: the `migrate` container exited `0` and `drizzle.__drizzle_migrations` in `basis-api` holds the baseline
-- [ ] 6.4 Operator: provision `basis-api`'s database on `main-production` and store `BASIS_API_DATABASE_PASSWORD` in `production`; promote; the promotion's wait passes
-- [ ] 6.5 Archive; delete nothing from `docs/backlog.md` except as the archive re-read directs
+- [x] 6.2 Merge the implementation; staging's Deploy run succeeds — pull request #26, merged 2026-10-19 as `ebc0b22`; staging's Deploy run 39292414549 succeeded
+- [x] 6.3 Confirm on staging: the `migrate` container exited `0` and `drizzle.__drizzle_migrations` in `basis-api` holds the baseline — confirmed by the operator on 2026-10-19: `migrate` exited `0` ("Migrations applied."), one migration recorded, no table outside `drizzle`, `/health` named `ebc0b22`
+- [x] 6.4 Operator: provision `basis-api`'s database on `main-production` and store `BASIS_API_DATABASE_PASSWORD` in `production`; promote; the promotion's wait passes — provisioned by the operator with the recipe on 2026-10-19 (checks as for staging pass); promotion run 39293600189 of `ebc0b22` succeeded; on production `migrate` exited `0`, one migration recorded, no table outside `drizzle`
+- [x] 6.5 Archive; delete nothing from `docs/backlog.md` except as the archive re-read directs

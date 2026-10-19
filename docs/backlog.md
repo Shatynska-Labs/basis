@@ -46,7 +46,7 @@ ADR-0007 states that LLM suggestions "always require human confirmation". The PR
 
 ADR-0006 puts PostgreSQL, Redis/BullMQ and Object Storage "within the existing Hetzner infrastructure". The infrastructure repository forbids that for durable data: its shared PostgreSQL instance holds only data whose loss is tolerable, and any other store on the host needs a stated reason it needs no backup, or an off-host logical backup and a rehearsed restore before it holds anything (`Shatynska-Labs/infrastructure`: `iac-safety-hardening`, _No Store on This Host Holds Data Requiring Backup_; `docs/onboard-an-application.md` §3.1, §4.3). Basis's metrics, daily statuses, goals and photos are durable. Decide where they live, an external managed service or a dedicated store on the host with off-host backups and a rehearsed restore, and record it in an ADR superseding ADR-0006 in part, deciding Redis and Object Storage in the same ADR.
 
-Interim decision (operator, 2026-10-17): until then, Basis uses its own database in the production host's shared PostgreSQL instance, and everything it holds there is treated as data whose loss is tolerable.
+Interim decision (operator, 2026-10-17): until then, Basis uses its own database in the production host's shared PostgreSQL instance, and everything it holds there is treated as data whose loss is tolerable. `add-persistence-skeleton` put it in place: a `basis-api` database in each host's shared instance, migrated on every delivery, holding no table yet. Moving to durable storage is a change of `DATABASE_URL`'s rendering and of provisioning, not of the migrations.
 
 **Kind**: `change`. It needs the operator's storage decision and an ADR.
 
@@ -78,7 +78,7 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 **Kind**: `change`. It needs a decision on the library and amends ADR-0012's tables.
 
-**Waits on**: `add-persistence-skeleton`. Must be done by the first change that adds a Drizzle repository (`identity` or `metrics`, roadmap Phase 1).
+**Waits on**: `nothing` (`add-persistence-skeleton` is archived). Must be done by the first change that adds a Drizzle repository (`identity` or `metrics`, roadmap Phase 1).
 
 **Design with**: `nothing`.
 
@@ -92,7 +92,7 @@ The infrastructure repository asks an application with a database in the shared 
 
 **Kind**: `change`. It owes an `api-delivery` delta and the operator's storing of the probe keys.
 
-**Waits on**: `add-persistence-skeleton`.
+**Waits on**: `nothing` (`add-persistence-skeleton` is archived; the `migrate` service and `basis-api`'s databases exist on both hosts).
 
 **Design with**: `nothing`.
 

@@ -242,6 +242,7 @@ export default [
       '**/tests/**',
       '**/vitest.config.*',
       '**/vite.config.*',
+      '**/jest.config.*',
       '**/eslint.config.*',
     ],
     rules: {

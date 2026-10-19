@@ -134,6 +134,7 @@ describe('Shared test arrangement: production code cannot import it', () => {
   it.each([
     'libs/shared/core/vitest.config.mts',
     'libs/shared/core/eslint.config.mjs',
+    'apps/api/jest.config.ts',
   ])(
     'test and lint configuration %s may import it (derived from the requirement title and design decision 3)',
     async (path) => {

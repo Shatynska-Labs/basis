@@ -64,4 +64,5 @@ One entry. No shared arrangement exists (AGENTS.md states none yet), so no near-
 ## Notes for the implementation step
 
 - The tests must go from failing to passing for tasks 1.1 (library exists, spec collected), 2.1 (`type:testing` row with no dependencies; `type:testing` listed in every library and app row) and 2.2 (`no-restricted-imports` ban outside `**/*.spec.{ts,tsx}`, `**/tests/**`, `vitest.config.*`, `vite.config.*`, `eslint.config.*`), and finally 3.1 (all 20 green, no `eslint-disable`). The `vitest.config.*`/`eslint.config.*` config-file tests also rely on the ban exempting those two filenames inside a library.
+- Folded in after code review: the requirement names a Jest configuration file, which the ban did not exempt. `jest.config.*` was added to the exemptions and one case, `apps/api/jest.config.ts`, to the config-file `it.each` (21 tests); it fails with the exemption removed.
 - This manifest is not an artifact the OpenSpec schema knows about; it will not appear among `openspec instructions apply`'s context files and must be read on purpose.

@@ -23,7 +23,7 @@
 
 ## 5. Ship
 
-- [ ] 5.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
-- [ ] 5.2 Confirm on staging: the API's container log lines are JSON, and `GET /no-such-route` answers a `404` problem document
+- [x] 5.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy (operator: merged as a1abd0b, staging deployed, 2026-10-20)
+- [x] 5.2 Confirm on staging: the API's container log lines are JSON, and `GET /no-such-route` answers a `404` problem document (2026-10-20: operator observed the 404 problem document and an unchanged `/health` naming a1abd0b; all 8 log lines of `basis-api-api-1` on main-staging parse as JSON with `level` and `message`, none carrying a connection string or password)
 - [ ] 5.3 Promote, on the operator's act, and wait for the smoke wait to pass
 - [ ] 5.4 Archive, updating `docs/backlog.md` entries this change touches

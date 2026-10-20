@@ -27,6 +27,7 @@ Roadmap Phase 1's outcome is "device data reaches the server", and data reaching
 - `api-delivery`: the delivery renders the client IDs and the allowlist from the Environment.
 - `shared-domain`: `DomainErrorKind` gains `unauthenticated`.
 - `api-http-errors`: `toResponse` answers kind `unauthenticated` with `401` and `WWW-Authenticate: Bearer`; a problem can carry response headers.
+- `api-persistence`: the baseline still creates nothing; later tables are in their context's schema, the first being `identity`'s.
 - `shared-infrastructure` (specified by `share-the-database-connection`, merged and not yet archived): `Public` and `CurrentUser`.
 
 ## Impact
@@ -36,7 +37,7 @@ Roadmap Phase 1's outcome is "device data reaches the server", and data reaching
 - `apps/api`: configuration, `ProblemFilter` (headers), `HealthController` (`@Public()`), `AppModule` imports `IdentityModule`, `src/database/schema.ts` re-exports `identity`'s tables, a new migration, `README.md`.
 - Root `eslint.config.mjs`: `jose` joins the framework and SDK packages; the buildable-library rule is off for specs and test configuration; a context's `driving/` may not import its `driven/`.
 - `deploy.yml`, `promote.yml`, `.github/actions/deliver-api`, `tools/delivery/src/render-env.ts`.
-- New dependencies: `@nestjs/cqrs`, `jose`.
+- New dependencies: `@nestjs/cqrs`, `jose`; `@nestjs/testing` for `apps/api`'s specs.
 - **Operator prerequisite before merging**: a Google Cloud OAuth client, and in both Environments the variable `BASIS_API_GOOGLE_CLIENT_IDS` and the secret `BASIS_API_SIGNUP_ALLOWED_EMAILS`. Without the variable the delivery is refused.
 - ADR-0012 §6 (`shared/infrastructure` row), `docs/product/06-risks-and-open-questions.md` (question 4 answered; a DPIA-lite row for account data), `docs/backlog.md` gains `invite-users-to-sign-up` and `add-identity-profile`.
 - Out of scope: the profile (time zone, heart-rate zones; the next change), web and mobile sign-in, invitations, account deletion, rate limiting, listing or revoking other sessions.

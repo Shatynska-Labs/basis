@@ -2,9 +2,8 @@
 // ("Only the configuration reads the API's environment") before
 // implementation. Provenance of each assertion is recorded in that change's
 // test-plan.md. The scenarios describe the repository ESLint configuration's
-// behaviour, so each lints a sample source through ESLint's Node API against
-// the root `eslint.config.mjs`, as libs/shared/testing/src/boundaries.spec.ts
-// does. Sample sources are virtual: they are given a path inside apps/api/src
+// behaviour, so each lints a sample source through ESLint's Node API with
+// the configuration ESLint finds for the sample's path. Sample sources are virtual: they are given a path inside apps/api/src
 // and are never written to disk.
 import { fileURLToPath } from 'node:url';
 
@@ -13,10 +12,10 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = fileURLToPath(new URL('../../../../', import.meta.url));
 
-const eslint = new ESLint({
-  cwd: repoRoot,
-  overrideConfigFile: `${repoRoot}eslint.config.mjs`,
-});
+// No config file is forced: ESLint looks it up from each sample's path, as
+// `nx lint` and lint-staged do (changed after code review, which found the
+// rule applied only when the root config was forced).
+const eslint = new ESLint({ cwd: repoRoot });
 
 // --- Declared locally (see "Missing shared arrangement" in test-plan.md) ---
 

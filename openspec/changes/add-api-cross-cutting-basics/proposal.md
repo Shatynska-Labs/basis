@@ -32,6 +32,6 @@ None. `api-persistence`'s refusal to start without `DATABASE_URL` and `api-healt
 - `apps/api`: `main.ts`, `app.module.ts`, new `src/config/`, `src/logging/`, `src/http/`; `database.module.ts` and `health.controller.ts` take configuration by injection; `package.json` gains `zod`; `README.md`.
 - New project `libs/shared/domain` (tags `scope:shared`, `type:domain`). It is not built, because nothing shipped imports it at runtime yet.
 - `libs/shared/infrastructure`: `src/driving/` (first files), `@nestjs/common` dependency, and its README.
-- `eslint.config.mjs`: the `process.env` restriction for `apps/api/src`.
+- `apps/api/eslint.config.mjs`: the `process.env` restriction for `apps/api/src`.
 - The API's stdout changes from text to JSON lines. Nothing parses it today.
 - Out of scope: a per-request access log, JSON output from the migration process, a configurable log level, and any context endpoint or `contracts` library.

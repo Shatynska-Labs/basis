@@ -2,7 +2,7 @@
 
 - [x] 1.1 Add `zod` to `apps/api`'s `dependencies` (the workspace's resolved version). Add `apps/api/src/config/` with `loadConfig(env)`, `ConfigError`, the `APP_CONFIG` token, the `AppConfig` type and a global `ConfigModule` (design decision 1)
 - [x] 1.2 Make `DatabaseModule`'s pool factory and `HealthController` inject `APP_CONFIG`. Import `ConfigModule` in `AppModule`. Keep `readDatabaseUrl` for `migrate.ts`
-- [x] 1.3 Add the `process.env` restriction for `apps/api/src/**` to `eslint.config.mjs` (design decision 2)
+- [x] 1.3 Add the `process.env` restriction for `src/**` to `apps/api/eslint.config.mjs` (design decision 2, as amended)
 
 ## 2. Logging and startup
 

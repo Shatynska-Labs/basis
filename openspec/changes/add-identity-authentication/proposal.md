@@ -28,7 +28,7 @@ Roadmap Phase 1's outcome is "device data reaches the server", and data reaching
 - `shared-domain`: `DomainErrorKind` gains `unauthenticated`.
 - `api-http-errors`: `toResponse` answers kind `unauthenticated` with `401` and `WWW-Authenticate: Bearer`; a problem can carry response headers.
 - `api-persistence`: the baseline still creates nothing; later tables are in their context's schema, the first being `identity`'s.
-- `shared-infrastructure` (specified by `share-the-database-connection`, merged and not yet archived): `Public` and `CurrentUser`.
+- `shared-infrastructure` (specified by `share-the-database-connection`): `Public` and `CurrentUser`.
 
 ## Impact
 

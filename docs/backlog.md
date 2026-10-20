@@ -72,20 +72,6 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 **Re-checked**: 2026-10-19.
 
-## `share-the-database-connection`
-
-`add-persistence-skeleton` gives `apps/api` a global Nest database module providing the `pg` pool and the Drizzle database under injection tokens declared in `apps/api/src/database/`. A context's `infrastructure` library cannot import from an app (ADR-0012 §7), so the first Drizzle repository has nowhere to take the token from. Decide where the token, and later ADR-0011's `TransactionManager` adapter, live (a shared infrastructure library is not in ADR-0012 §6's table, so it needs that table amended), and move them there.
-
-**Kind**: `change`. It needs a decision on the library and amends ADR-0012's tables.
-
-**Waits on**: `nothing` (`add-persistence-skeleton` is archived). Must be done by the first change that adds a Drizzle repository (`identity` or `metrics`, roadmap Phase 1).
-
-**Design with**: `nothing`.
-
-**Recorded by**: `add-persistence-skeleton`, which adds no repository and so had no consumer to design the location against.
-
-**Re-checked**: 2026-10-19.
-
 ## `probe-the-database-before-delivery`
 
 The infrastructure repository asks an application with a database in the shared instance to probe it before delivering (`Shatynska-Labs/infrastructure` `docs/onboard-an-application.md` §4.5): one `ssh` with a second, probe-only key, answering one of `window-open`, `unreachable`, `absent`, `credential-refused`, `empty`, `populated`. Both hosts already declare `basis-api`'s probe key. Without it, a reset shared instance surfaces as a failed `migrate` service with `password authentication failed`, indistinguishable from a stale secret. Add the probe to `.github/actions/deliver-api/action.yml` before delivery, matching the whole token set and refusing anything but `empty` and `populated`, with the table `drizzle.__drizzle_migrations`; store `BASIS_API_PROBE_SSH_KEY` in each Environment.

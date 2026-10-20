@@ -19,7 +19,7 @@
 
 ## 5. Ship
 
-- [ ] 5.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
-- [ ] 5.2 Confirm on staging, or record a waiver
-- [ ] 5.3 Promote, on the operator's act, and wait for the smoke wait to pass
-- [ ] 5.4 Delete `share-the-database-connection` from `docs/backlog.md`, and update the entries it unblocks, in the archive pull request
+- [x] 5.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
+- [x] 5.2 Confirm on staging, or record a waiver. Confirmed by the operator on 2026-10-20 together with 5.3
+- [x] 5.3 Promote, on the operator's act, and wait for the smoke wait to pass. Operator reported on 2026-10-20 that the promotion ran and was checked
+- [x] 5.4 Delete `share-the-database-connection` from `docs/backlog.md`, and update the entries it unblocks, in the archive pull request

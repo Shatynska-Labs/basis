@@ -9,3 +9,7 @@ d097c93b7b2af1cfd3205629d273f18852ee4e67:tools/delivery/src/check-compose.spec.t
 # The same made-up commit SHA in an image tag, the fixture for "the resolved
 # image differs" in the derived tests of add-persistence-skeleton.
 2c7d35ba37bfa314c947fdcfcd19e4061d63591e:tools/delivery/src/check-compose-migrate.spec.ts:generic-api-key:27
+
+# A made-up value under the key `api_key`, the fixture for "every secret name
+# is redacted" in the derived tests of add-api-cross-cutting-basics.
+d39ebaf04ded6f2d3b2cdd7e9f4914fdf52f0356:apps/api/src/logging/logger.spec.ts:generic-api-key:71

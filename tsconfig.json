@@ -7,6 +7,9 @@
       "path": "./libs/shared/core"
     },
     {
+      "path": "./libs/shared/domain"
+    },
+    {
       "path": "./libs/shared/testing"
     },
     {

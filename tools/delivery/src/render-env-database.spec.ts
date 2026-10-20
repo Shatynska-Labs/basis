@@ -21,6 +21,9 @@ import { describe, expect, it } from 'vitest';
 
 import { renderEnv } from './render-env.ts';
 
+// Since add-identity-authentication rendering also takes the Google client IDs
+// and the sign-up allowlist; these specs pass valid ones and assert as before.
+const CLIENT_IDS = '1-web.apps.googleusercontent.com';
 const script = fileURLToPath(new URL('./render-env.ts', import.meta.url));
 
 const DIGEST = `sha256:${'0123456789abcdef'.repeat(4)}`;
@@ -48,6 +51,7 @@ const runCommand = (env: Record<string, string>) => {
         PATH: process.env.PATH,
         ENV_FILE: envFile,
         GITHUB_OUTPUT: output,
+        GOOGLE_CLIENT_IDS: CLIENT_IDS,
         ...env,
       },
     });
@@ -72,6 +76,8 @@ describe('a password is rendered into the URL', () => {
         baseDomain: BASE_DOMAIN,
         imageDigest: DIGEST,
         databasePassword: '3f9a0c',
+        googleClientIds: CLIENT_IDS,
+        signupAllowedEmails: '',
       });
 
       expect(lineOf(content, 'DATABASE_URL')).toEqual([
@@ -88,6 +94,8 @@ describe('characters a URL would otherwise interpret', () => {
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
       databasePassword: 'a@b:c/d%e',
+      googleClientIds: CLIENT_IDS,
+      signupAllowedEmails: '',
     });
 
     expect(lineOf(content, 'DATABASE_URL')).toEqual([
@@ -104,6 +112,8 @@ describe('no password', () => {
         baseDomain: BASE_DOMAIN,
         imageDigest: DIGEST,
         databasePassword: '',
+        googleClientIds: CLIENT_IDS,
+        signupAllowedEmails: '',
       }),
     ).toThrow(/DATABASE_PASSWORD/);
   });
@@ -159,6 +169,8 @@ describe('the rendered environment names a digest (with a database password)', (
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
       databasePassword: '3f9a0c',
+      googleClientIds: CLIENT_IDS,
+      signupAllowedEmails: '',
     });
 
     expect(lineOf(content, 'IMAGE_DIGEST')).toEqual([
@@ -179,6 +191,8 @@ describe('a malformed digest is refused (with a database password)', () => {
           baseDomain: BASE_DOMAIN,
           imageDigest,
           databasePassword: '3f9a0c',
+          googleClientIds: CLIENT_IDS,
+          signupAllowedEmails: '',
         }),
       ).toThrow(/IMAGE_DIGEST/);
     },

@@ -3,7 +3,10 @@
 // the image digest and the Traefik rule, built from the target's server and
 // the base domain, so no hostname is written down anywhere; and the database
 // URL, built from the target's database password (add-persistence-skeleton
-// design decision 6), which is written to `.env` and printed nowhere. Every value goes
+// design decision 6), which is written to `.env` and printed nowhere; and the
+// Google client IDs and the sign-up allowlist, unchanged
+// (add-identity-authentication design decision 11), the allowlist printed
+// nowhere either. Every value goes
 // through renderLine, the infrastructure repository's escaping rule, so one
 // added later is escaped by construction.
 //
@@ -49,11 +52,15 @@ export const renderEnv = ({
   baseDomain,
   imageDigest,
   databasePassword,
+  googleClientIds,
+  signupAllowedEmails,
 }: {
   target: string;
   baseDomain: string;
   imageDigest: string;
   databasePassword: string;
+  googleClientIds: string;
+  signupAllowedEmails: string;
 }): { content: string; technicalHostname: string; routerRule: string } => {
   const server = Object.hasOwn(SERVERS, target) ? SERVERS[target] : undefined;
   if (server === undefined) {
@@ -72,6 +79,10 @@ export const renderEnv = ({
   if (!databasePassword) {
     throw new Error('DATABASE_PASSWORD is empty.');
   }
+  // A delivered host never has sign-in disabled; the API validates each entry.
+  if (googleClientIds.split(',').every((entry) => entry.trim() === '')) {
+    throw new Error('GOOGLE_CLIENT_IDS names no client.');
+  }
   const databaseUrl = `postgres://${DATABASE_ROLE}:${encodeURIComponent(databasePassword)}@${DATABASE_HOST}/${DATABASE_NAME}`;
   const technicalHostname = `${SERVICE}.${server}.${baseDomain}`;
   // The one alias is production's, and follows the domain.
@@ -85,6 +96,8 @@ export const renderEnv = ({
       renderLine('IMAGE_DIGEST', imageDigest),
       renderLine('ROUTER_RULE', routerRule),
       renderLine('DATABASE_URL', databaseUrl),
+      renderLine('GOOGLE_CLIENT_IDS', googleClientIds),
+      renderLine('SIGNUP_ALLOWED_EMAILS', signupAllowedEmails),
     ].join('\n')}\n`,
     technicalHostname,
     routerRule,
@@ -100,6 +113,8 @@ if (import.meta.main) {
       baseDomain: process.env['BASE_DOMAIN'] ?? '',
       imageDigest: process.env['IMAGE_DIGEST'] ?? '',
       databasePassword: process.env['DATABASE_PASSWORD'] ?? '',
+      googleClientIds: process.env['GOOGLE_CLIENT_IDS'] ?? '',
+      signupAllowedEmails: process.env['SIGNUP_ALLOWED_EMAILS'] ?? '',
     });
   } catch (error) {
     console.log(`::error::${(error as Error).message} Nothing was written.`);

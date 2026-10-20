@@ -282,5 +282,27 @@ export default [
       ],
     },
   },
+  // Only the API's configuration reads its environment, so nothing bypasses
+  // validation (add-api-cross-cutting-basics design decision 2). The migration
+  // process reads DATABASE_URL on its own (api-persistence).
+  {
+    files: ['apps/api/src/**/*.ts'],
+    ignores: [
+      'apps/api/src/config/**',
+      'apps/api/src/migrate.ts',
+      '**/*.spec.ts',
+    ],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'process',
+          property: 'env',
+          message:
+            "Take the API's configuration from APP_CONFIG (apps/api/src/config) instead of reading process.env.",
+        },
+      ],
+    },
+  },
   eslintConfigPrettier,
 ];

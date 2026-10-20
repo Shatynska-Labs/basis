@@ -1,34 +1,34 @@
 ## 1. Foundations
 
-- [ ] 1.1 Give `libs/shared/core` and `libs/shared/domain` builds, as `libs/shared/infrastructure` has (design decision 12). In the root `eslint.config.mjs`, set `enforceBuildableLibDependency: false` in `boundaries(false)`, add `jose` to `frameworkAndSdkPackages` (decision 13), and forbid `libs/*/infrastructure/src/driving/**` importing from `driven/`, in two blocks: non-spec files repeating the shared-testing patterns, specs with only the `/driven/` pattern (decision 5)
-- [ ] 1.2 Add `unauthenticated` to `DomainErrorKind`, and `401` to `toResponse`'s status map (decision 9)
-- [ ] 1.3 Add optional `headers` to `ProblemException`, sent by `ProblemFilter` (decision 7)
-- [ ] 1.4 Make `toResponse` set `WWW-Authenticate: Bearer` for kind `unauthenticated` (decision 9)
-- [ ] 1.5 Add `libs/shared/infrastructure/src/driving/authentication.ts` with `Public`, `CurrentUser` and `AuthenticatedUser`, exported from the index (decision 7)
+- [x] 1.1 Give `libs/shared/core` and `libs/shared/domain` builds, as `libs/shared/infrastructure` has (design decision 12). In the root `eslint.config.mjs`, set `enforceBuildableLibDependency: false` in `boundaries(false)`, add `jose` to `frameworkAndSdkPackages` (decision 13), and forbid `libs/*/infrastructure/src/driving/**` importing from `driven/`, in two blocks: non-spec files repeating the shared-testing patterns, specs with only the `/driven/` pattern (decision 5)
+- [x] 1.2 Add `unauthenticated` to `DomainErrorKind`, and `401` to `toResponse`'s status map (decision 9)
+- [x] 1.3 Add optional `headers` to `ProblemException`, sent by `ProblemFilter` (decision 7)
+- [x] 1.4 Make `toResponse` set `WWW-Authenticate: Bearer` for kind `unauthenticated` (decision 9)
+- [x] 1.5 Add `libs/shared/infrastructure/src/driving/authentication.ts` with `Public`, `CurrentUser` and `AuthenticatedUser`, exported from the index (decision 7)
 
 ## 2. Configuration
 
-- [ ] 2.1 Add `GOOGLE_CLIENT_IDS` and `SIGNUP_ALLOWED_EMAILS` to `loadConfig` and `AppConfig` (decision 10)
-- [ ] 2.2 Log the disabled-sign-in warning at startup when `googleClientIds` is empty (decision 10)
+- [x] 2.1 Add `GOOGLE_CLIENT_IDS` and `SIGNUP_ALLOWED_EMAILS` to `loadConfig` and `AppConfig` (decision 10)
+- [x] 2.2 Log the disabled-sign-in warning at startup when `googleClientIds` is empty (decision 10)
 
 ## 3. The identity context
 
-- [ ] 3.1 Create `libs/identity/contracts`, `libs/identity/application` and `libs/identity/infrastructure` (tags `scope:identity` and their `type:`), built, as `dependencies` of `apps/api`. Add `@nestjs/cqrs` and `jose` at exact versions. Run `pnpm install` and `pnpm nx sync` (decisions 5 and 13)
-- [ ] 3.2 Contracts: `SignInWithGoogleRequest`, `SessionResponse`, `CurrentUserResponse` (decision 5)
-- [ ] 3.3 Application: ports, failures, and the `SignInWithGoogle`, `SignOut`, `AuthenticateSession` and `GetCurrentUser` handlers (decisions 2, 3, 4, 5 and 6)
-- [ ] 3.4 Infrastructure, driven: the `identity` schema's tables, the repositories, `JoseGoogleIdTokenVerifier` and the system clock (decisions 1, 4 and 14)
-- [ ] 3.5 Infrastructure, driving: `SessionGuard`, `AuthController` and `MeController`; the composition root `src/identity.module.ts` with `IdentityModule.forRootAsync`, registering the guard as `APP_GUARD` (decisions 5, 7 and 8)
-- [ ] 3.6 Wire `IdentityModule` into `AppModule` from `APP_CONFIG`; mark `HealthController` `@Public()`; re-export `identity`'s tables from `apps/api/src/database/schema.ts` and generate migration `0001` with `pnpm nx run api:db-generate` (decisions 5, 7 and 14)
+- [x] 3.1 Create `libs/identity/contracts`, `libs/identity/application` and `libs/identity/infrastructure` (tags `scope:identity` and their `type:`), built, as `dependencies` of `apps/api`. Add `@nestjs/cqrs` and `jose` at exact versions. Run `pnpm install` and `pnpm nx sync` (decisions 5 and 13)
+- [x] 3.2 Contracts: `SignInWithGoogleRequest`, `SessionResponse`, `CurrentUserResponse` (decision 5)
+- [x] 3.3 Application: ports, failures, and the `SignInWithGoogle`, `SignOut`, `AuthenticateSession` and `GetCurrentUser` handlers (decisions 2, 3, 4, 5 and 6)
+- [x] 3.4 Infrastructure, driven: the `identity` schema's tables, the repositories, `JoseGoogleIdTokenVerifier` and the system clock (decisions 1, 4 and 14)
+- [x] 3.5 Infrastructure, driving: `SessionGuard`, `AuthController` and `MeController`; the composition root `src/identity.module.ts` with `IdentityModule.forRootAsync`, registering the guard as `APP_GUARD` (decisions 5, 7 and 8)
+- [x] 3.6 Wire `IdentityModule` into `AppModule` from `APP_CONFIG`; mark `HealthController` `@Public()`; re-export `identity`'s tables from `apps/api/src/database/schema.ts` and generate migration `0001` with `pnpm nx run api:db-generate` (decisions 5, 7 and 14)
 
 ## 4. Delivery
 
-- [ ] 4.1 Add the `google-client-ids` (required) and `signup-allowed-emails` (optional) inputs to `.github/actions/deliver-api/action.yml`, render them in `tools/delivery/src/render-env.ts`, and pass them from `deploy.yml` and `promote.yml` (decision 11)
+- [x] 4.1 Add the `google-client-ids` (required) and `signup-allowed-emails` (optional) inputs to `.github/actions/deliver-api/action.yml`, render them in `tools/delivery/src/render-env.ts`, and pass them from `deploy.yml` and `promote.yml` (decision 11)
 
 ## 5. Record and verify
 
-- [ ] 5.1 Update `apps/api/README.md` (sign-in, sessions, the allowlist and its limits, the new variables, how to obtain a test ID token), `libs/shared/infrastructure/README.md`, a README for each new library, ADR-0012 §6's `shared/infrastructure` row, and `docs/product/06-risks-and-open-questions.md`: question 4 answered (Google only), and a DPIA-lite row for account data (Google subject, email, display name, session digests). Record `invite-users-to-sign-up` and `add-identity-profile` in `docs/backlog.md`
-- [ ] 5.2 Dispose of `test-plan.md`'s _Missing shared arrangement_ entries
-- [ ] 5.3 Verify with `pnpm nx run-many -t lint typecheck test build`, `pnpm nx run-many -t integration`, `pnpm nx e2e api-e2e`, `pnpm format:check`, `pnpm nx sync:check` and `openspec validate --all --strict`
+- [x] 5.1 Update `apps/api/README.md` (sign-in, sessions, the allowlist and its limits, the new variables, how to obtain a test ID token), `libs/shared/infrastructure/README.md`, a README for each new library, ADR-0012 §6's `shared/infrastructure` row, and `docs/product/06-risks-and-open-questions.md`: question 4 answered (Google only), and a DPIA-lite row for account data (Google subject, email, display name, session digests). Record `invite-users-to-sign-up` and `add-identity-profile` in `docs/backlog.md`
+- [x] 5.2 Dispose of `test-plan.md`'s _Missing shared arrangement_ entries
+- [x] 5.3 Verify with `pnpm nx run-many -t lint typecheck test build`, `pnpm nx run-many -t integration`, `pnpm nx e2e api-e2e`, `pnpm format:check`, `pnpm nx sync:check` and `openspec validate --all --strict`
 
 ## 6. Ship
 

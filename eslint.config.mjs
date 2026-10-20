@@ -104,9 +104,15 @@ const depConstraints = ({ withExternalImports }) => {
         'type:util',
         'type:testing',
       ],
+      // Nx tests the banned list before the allowed one, and an allowed list
+      // admits nothing else, so the exception is written into the ban: every
+      // `@nestjs/*` package but `common` and `cqrs` (ADR-0012 §7). Nx turns
+      // each `*` into `.*` and keeps the rest as a regular expression.
       ...external({
-        bannedExternalImports: frameworkAndSdkPackages,
-        allowedExternalImports: ['@nestjs/common', '@nestjs/cqrs'],
+        bannedExternalImports: [
+          ...frameworkAndSdkPackages.filter((name) => name !== '@nestjs/*'),
+          '@nestjs/(?!(common|cqrs)(/|$))*',
+        ],
       }),
     },
     // With the scope rows, a context's infrastructure reaches only the shared

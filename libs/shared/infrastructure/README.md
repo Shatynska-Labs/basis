@@ -1,0 +1,11 @@
+# shared-infrastructure
+
+Infrastructure every context's `infrastructure` library may use (`scope:shared`, `type:infrastructure`; `share-the-database-connection`).
+
+- Sources are split into `src/driving/` (what calls in) and `src/driven/` (what is called), as in a context's `infrastructure` (ADR-0012 §1); `src/index.ts` only re-exports.
+- **The database** (`src/driven/database.ts`): the `DATABASE` injection token and the `Database` type. `apps/api`'s database module provides the Drizzle database under the token; the pool, `DATABASE_URL` and migrations stay in `apps/api`. `Database` carries no schema type, so repositories use the query builder over their own context's tables.
+- **`TransactionManager`** (ADR-0011 rule 2), when first needed: its AsyncLocalStorage adapter goes in `src/driven/`; each context's `application` declares the port, which the adapter satisfies structurally, bound in the context's infrastructure module.
+- Only `type:infrastructure` libraries and `apps/api` may depend on it (`eslint.config.mjs`).
+- It is built to `dist/` and its package exports the build, because the API imports it at runtime and ships it in its image. Targets that resolve it depend on `^build`; a consumer declares it as a `dependency` (`workspace:*`).
+
+Tests: `pnpm nx test shared-infrastructure`.

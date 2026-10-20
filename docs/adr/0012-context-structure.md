@@ -61,13 +61,14 @@ Expected failures are returned as `Result<F, S>` (`failure` / `success`) by `dom
 
 ### 6. `libs/shared` is a Shared Kernel
 
-| Library             | Holds                                                               | Tag                |
-| ------------------- | ------------------------------------------------------------------- | ------------------ |
-| `shared/core`       | additions where the language falls short, starting with `Result`    | `type:core`        |
-| `shared/domain`     | `Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`     | `type:domain`      |
-| `shared/util`       | dates, time zones, units                                            | `type:util`        |
-| `shared/api-client` | the typed client and TanStack Query hooks                           | `type:data-access` |
-| `shared/testing`    | shared test arrangement (builders, fixtures, fakes), for specs only | `type:testing`     |
+| Library                 | Holds                                                                                  | Tag                   |
+| ----------------------- | -------------------------------------------------------------------------------------- | --------------------- |
+| `shared/core`           | additions where the language falls short, starting with `Result`                       | `type:core`           |
+| `shared/domain`         | `Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`                        | `type:domain`         |
+| `shared/util`           | dates, time zones, units                                                               | `type:util`           |
+| `shared/api-client`     | the typed client and TanStack Query hooks                                              | `type:data-access`    |
+| `shared/testing`        | shared test arrangement (builders, fixtures, fakes), for specs only                    | `type:testing`        |
+| `shared/infrastructure` | infrastructure contexts share, split into `driving/` and `driven/`: the database token | `type:infrastructure` |
 
 `core`, `domain` and `util` are usable from any context's `domain` and from the web and mobile apps.
 
@@ -75,20 +76,20 @@ Expected failures are returned as `Result<F, S>` (`failure` / `success`) by `dom
 
 Supersedes ADR-0005's boundary-rule table.
 
-| Tag                       | May depend on                                                                                                                                                         |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type:core`               | nothing                                                                                                                                                               |
-| `type:util`               | `type:core`, `type:util`                                                                                                                                              |
-| `type:contracts`          | `type:contracts`, `type:core`, `type:util`                                                                                                                            |
-| `type:domain`             | `type:domain` of the same scope or `scope:shared`, `type:core`, `type:util`                                                                                           |
-| `type:application`        | `type:domain` and `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util`                     |
-| `type:infrastructure`     | `type:application`, `type:domain`, `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util`    |
-| `type:data-access`        | `type:contracts`, `type:core`, `type:util`                                                                                                                            |
-| `type:testing`            | nothing; any library or app may import it, but only from specs, `tests/` and test configuration (file-level ESLint rule)                                              |
-| `scope:<context>`         | its own scope, `scope:shared`, and only `type:contracts` of other contexts                                                                                            |
-| `scope:shared`            | its own scope; `type:data-access` (`shared/api-client`) may also depend on `type:contracts` of any scope                                                              |
-| `apps/api`                | any library                                                                                                                                                           |
-| `apps/web`, `apps/mobile` | `type:contracts`, `type:data-access`, `type:core`, `type:util`, and `type:domain` of `scope:shared` — never `application` or `infrastructure`, which hold server code |
+| Tag                       | May depend on                                                                                                                                                                                |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type:core`               | nothing                                                                                                                                                                                      |
+| `type:util`               | `type:core`, `type:util`                                                                                                                                                                     |
+| `type:contracts`          | `type:contracts`, `type:core`, `type:util`                                                                                                                                                   |
+| `type:domain`             | `type:domain` of the same scope or `scope:shared`, `type:core`, `type:util`                                                                                                                  |
+| `type:application`        | `type:domain` and `type:contracts` of the same scope; `type:domain` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util`                                            |
+| `type:infrastructure`     | `type:application`, `type:domain`, `type:contracts` of the same scope; `type:domain` and `type:infrastructure` of `scope:shared`; `type:contracts` of other scopes; `type:core`, `type:util` |
+| `type:data-access`        | `type:contracts`, `type:core`, `type:util`                                                                                                                                                   |
+| `type:testing`            | nothing; any library or app may import it, but only from specs, `tests/` and test configuration (file-level ESLint rule)                                                                     |
+| `scope:<context>`         | its own scope, `scope:shared`, and only `type:contracts` of other contexts                                                                                                                   |
+| `scope:shared`            | its own scope; `type:data-access` (`shared/api-client`) may also depend on `type:contracts` of any scope                                                                                     |
+| `apps/api`                | any library                                                                                                                                                                                  |
+| `apps/web`, `apps/mobile` | `type:contracts`, `type:data-access`, `type:core`, `type:util`, and `type:domain` of `scope:shared` — never `application` or `infrastructure`, which hold server code                        |
 
 External imports are constrained in the same `depConstraints`:
 

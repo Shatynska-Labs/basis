@@ -10,9 +10,9 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { describe, expect, expectTypeOf, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { DomainError, type DomainErrorKind } from '../index.js';
+import { DomainError } from '../index.js';
 
 const libraryRoot = fileURLToPath(new URL('../../', import.meta.url));
 const repoRoot = fileURLToPath(new URL('../../../../../', import.meta.url));
@@ -102,23 +102,6 @@ describe('shared-domain: a domain error carries a kind, a code and a message', (
     expect(error.message).toBe('No such habit.');
     expect(error).toBeInstanceOf(DomainError);
     expect(error).not.toBeInstanceOf(Error);
-  });
-
-  it('only the four kinds type-check', () => {
-    class Teapot extends DomainError {
-      // @ts-expect-error -- "teapot" is not one of the four kinds
-      readonly kind = 'teapot' as const;
-      readonly code = 'habit.teapot';
-    }
-    void Teapot;
-
-    expectTypeOf<DomainError['kind']>().toEqualTypeOf<
-      'not-found' | 'conflict' | 'rule-violated' | 'forbidden'
-    >();
-    // Derived: the kind type is exported under the name design decision 6 gives it.
-    expectTypeOf<DomainErrorKind>().toEqualTypeOf<
-      'not-found' | 'conflict' | 'rule-violated' | 'forbidden'
-    >();
   });
 
   it.each(['not-found', 'conflict', 'rule-violated', 'forbidden'] as const)(

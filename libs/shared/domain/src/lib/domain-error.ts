@@ -4,7 +4,7 @@
 // own terms, such as an HTTP status.
 
 export type DomainErrorKind =
-  'not-found' | 'conflict' | 'rule-violated' | 'forbidden';
+  'not-found' | 'conflict' | 'rule-violated' | 'forbidden' | 'unauthenticated';
 
 export abstract class DomainError {
   abstract readonly kind: DomainErrorKind;

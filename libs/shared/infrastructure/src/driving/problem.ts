@@ -35,12 +35,17 @@ export const problem = (
   ...extras,
 });
 
-/** Answers the request with {@link problem}, rendered by the API's exception filter. */
+/**
+ * Answers the request with {@link problem}, and any {@link headers}, rendered
+ * by the API's exception filter.
+ */
 export class ProblemException extends HttpException {
   readonly problem: Problem;
+  readonly headers?: Readonly<Record<string, string>>;
 
-  constructor(problem: Problem) {
+  constructor(problem: Problem, headers?: Readonly<Record<string, string>>) {
     super(problem, problem.status);
     this.problem = problem;
+    this.headers = headers;
   }
 }

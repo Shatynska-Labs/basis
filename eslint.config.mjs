@@ -32,6 +32,8 @@ const frameworkAndSdkPackages = [
   'openai',
   '@anthropic-ai/*',
   '@google/*',
+  // add-identity-authentication design decision 13: it fetches Google's keys.
+  'jose',
 ];
 
 const contexts = [
@@ -197,10 +199,37 @@ const sharedTestingMessage =
   'Shared test arrangement is for specs, tests/ and test configuration only.';
 const sharedTestingSpecifier = String.raw`/^@basis\/shared-testing(\/|$)/`;
 
+const productionIgnores = [
+  '**/*.spec.ts',
+  '**/*.spec.tsx',
+  '**/tests/**',
+  '**/vitest.config.*',
+  '**/vite.config.*',
+  '**/jest.config.*',
+  '**/eslint.config.*',
+];
+
+const sharedTestingPatterns = {
+  group: ['@basis/shared-testing', '@basis/shared-testing/*'],
+  message: sharedTestingMessage,
+};
+
+// ADR-0012 §1: a driving adapter reaches a driven one only through
+// `application`; the composition root at the library's `src/` binds them
+// (add-identity-authentication design decision 5).
+const drivenPattern = {
+  regex: '(^|/)driven(/|$)',
+  message:
+    "A driving adapter reaches a driven one only through the context's application (ADR-0012 §1).",
+};
+
+// Specs are excluded from every library's build output, so the buildable-
+// library rule, which keeps built code from importing unbuilt sources, holds
+// for production files only (add-identity-authentication design decision 12).
 const boundaries = (withExternalImports) => [
   'error',
   {
-    enforceBuildableLibDependency: true,
+    enforceBuildableLibDependency: withExternalImports,
     // A project's own ESLint configuration extends the root one by path.
     allow: withExternalImports ? [] : ['^(\\.\\./)+eslint\\.config\\.mjs$'],
     depConstraints: depConstraints({ withExternalImports }),
@@ -230,6 +259,7 @@ export default [
     files: [
       '**/*.spec.ts',
       '**/*.spec.tsx',
+      '**/tests/**',
       '**/vitest.config.*',
       '**/vite.config.*',
       '**/eslint.config.*',
@@ -249,27 +279,9 @@ export default [
       '**/*.cjs',
       '**/*.mjs',
     ],
-    ignores: [
-      '**/*.spec.ts',
-      '**/*.spec.tsx',
-      '**/tests/**',
-      '**/vitest.config.*',
-      '**/vite.config.*',
-      '**/jest.config.*',
-      '**/eslint.config.*',
-    ],
+    ignores: productionIgnores,
     rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@basis/shared-testing', '@basis/shared-testing/*'],
-              message: sharedTestingMessage,
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': ['error', { patterns: [sharedTestingPatterns] }],
       // `no-restricted-imports` sees only static imports and re-exports.
       'no-restricted-syntax': [
         'error',
@@ -286,6 +298,24 @@ export default [
           message: sharedTestingMessage,
         },
       ],
+    },
+  },
+  // Flat config replaces a rule configured twice for one file, so the
+  // driving folder's production files repeat the shared-testing pattern.
+  {
+    files: ['**/infrastructure/src/driving/**/*.ts'],
+    ignores: productionIgnores,
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [sharedTestingPatterns, drivenPattern] },
+      ],
+    },
+  },
+  {
+    files: ['**/infrastructure/src/driving/**/*.spec.ts'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [drivenPattern] }],
     },
   },
   eslintConfigPrettier,

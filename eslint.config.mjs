@@ -301,9 +301,11 @@ export default [
     },
   },
   // Flat config replaces a rule configured twice for one file, so the
-  // driving folder's production files repeat the shared-testing pattern.
+  // driving folder's production files repeat the shared-testing pattern. The
+  // globs start at `src/`, so they match from a library's own configuration,
+  // which resolves them against the library's directory, as from the root.
   {
-    files: ['**/infrastructure/src/driving/**/*.ts'],
+    files: ['**/src/driving/**/*.ts'],
     ignores: productionIgnores,
     rules: {
       'no-restricted-imports': [
@@ -313,7 +315,7 @@ export default [
     },
   },
   {
-    files: ['**/infrastructure/src/driving/**/*.spec.ts'],
+    files: ['**/src/driving/**/*.spec.ts'],
     rules: {
       'no-restricted-imports': ['error', { patterns: [drivenPattern] }],
     },

@@ -26,6 +26,15 @@
     },
     {
       "path": "./libs/shared/infrastructure"
+    },
+    {
+      "path": "./libs/identity/infrastructure"
+    },
+    {
+      "path": "./libs/identity/application"
+    },
+    {
+      "path": "./libs/identity/contracts"
     }
   ]
 }

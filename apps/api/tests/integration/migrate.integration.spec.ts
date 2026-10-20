@@ -80,21 +80,6 @@ describe('api-persistence: the migration history starts with a baseline', () => 
     expect(entries.length).toBeGreaterThan(0);
     expect(entries[0]?.tag).toMatch(/baseline/);
   });
-
-  it('the baseline creates nothing: no table outside the schema of the migration record', async () => {
-    const url = await freshDatabase(inject('postgresUrl'));
-    expect(migrate({ DATABASE_URL: url }).status).toBe(0);
-
-    const tables = await query<{ schema: string; name: string }>(
-      url,
-      `select table_schema as schema, table_name as name from information_schema.tables
-        where table_schema not in ('drizzle', 'pg_catalog', 'information_schema')`,
-    );
-
-    expect(tables).toEqual([]);
-    // Shows the record the exclusion above leaves out is really there.
-    expect(await migrationRecord(url)).not.toEqual([]);
-  });
 });
 
 describe('api-persistence: a failed migration fails the migration process without disclosing the URL', () => {

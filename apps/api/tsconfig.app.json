@@ -16,13 +16,22 @@
       "path": "../../libs/shared/infrastructure/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/testing/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/shared/domain/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/core/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/identity/infrastructure/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/identity/contracts/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/identity/application/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/testing/tsconfig.lib.json"
     }
   ],
   "exclude": [

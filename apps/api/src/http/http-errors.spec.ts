@@ -19,7 +19,7 @@ import { STATUS_CODES } from 'node:http';
 
 import { failure, success } from '@basis/shared-core';
 import { DomainError, type DomainErrorKind } from '@basis/shared-domain';
-import { toResponse } from '@basis/shared-infrastructure';
+import { Public, toResponse } from '@basis/shared-infrastructure';
 import {
   Body,
   Controller,
@@ -102,6 +102,9 @@ const bodySchema = z.object({
 });
 const querySchema = z.object({ limit: z.coerce.number().int() });
 
+// Every route requires a session since add-identity-authentication; the probe
+// is declared public so these tests still reach their routes.
+@Public()
 @Controller('probe')
 class ProbeController {
   @Get('success')

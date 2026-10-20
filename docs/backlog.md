@@ -99,3 +99,17 @@ The infrastructure repository asks an application with a database in the shared 
 **Recorded by**: `add-persistence-skeleton`, kept out to bound that change's deploy risk.
 
 **Re-checked**: 2026-10-19.
+
+## `consolidate-spec-helpers`
+
+Several spec helpers are copied between test files because no change has moved them into `libs/shared/testing`: linting a virtual source against the root ESLint config (`libs/shared/testing/src/boundaries.spec.ts`, `libs/shared/infrastructure/src/boundaries.spec.ts`, `apps/api/src/config/environment-access.spec.ts`), reading a manifest's runtime dependencies (`libs/shared/core/src/lib/result.spec.ts`, `libs/shared/domain/src/lib/domain-error.spec.ts`), reading Nx's view of a project (`libs/shared/infrastructure/src/project.spec.ts`, `domain-error.spec.ts`), and checking that nothing listens at an address (`apps/api-e2e/src/database-startup.spec.ts`, `apps/api-e2e/src/json-logs.spec.ts`). Move each into `libs/shared/testing` (generic; it may take `eslint` as a dependency) or `apps/api-e2e/src/support/`, and move the specs onto it, changing only where they take their arrangement from.
+
+**Kind**: `fix`. It moves test arrangement, owes no specification delta and needs no decision, though it touches specs of several archived changes.
+
+**Waits on**: `nothing`.
+
+**Design with**: `nothing`.
+
+**Recorded by**: `add-api-cross-cutting-basics`, whose derived tests added the second or third copy of each; moving the existing copies edits other changes' tests, outside its scope.
+
+**Re-checked**: 2026-10-20.

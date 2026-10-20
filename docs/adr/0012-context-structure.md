@@ -61,14 +61,14 @@ Expected failures are returned as `Result<F, S>` (`failure` / `success`) by `dom
 
 ### 6. `libs/shared` is a Shared Kernel
 
-| Library                 | Holds                                                                                  | Tag                   |
-| ----------------------- | -------------------------------------------------------------------------------------- | --------------------- |
-| `shared/core`           | additions where the language falls short, starting with `Result`                       | `type:core`           |
-| `shared/domain`         | `Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`                        | `type:domain`         |
-| `shared/util`           | dates, time zones, units                                                               | `type:util`           |
-| `shared/api-client`     | the typed client and TanStack Query hooks                                              | `type:data-access`    |
-| `shared/testing`        | shared test arrangement (builders, fixtures, fakes), for specs only                    | `type:testing`        |
-| `shared/infrastructure` | infrastructure contexts share, split into `driving/` and `driven/`: the database token | `type:infrastructure` |
+| Library                 | Holds                                                                                                                      | Tag                   |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `shared/core`           | additions where the language falls short, starting with `Result`                                                           | `type:core`           |
+| `shared/domain`         | `Entity`, `AggregateRoot`, `ValueObject`, `DomainError`, `Rule`                                                            | `type:domain`         |
+| `shared/util`           | dates, time zones, units                                                                                                   | `type:util`           |
+| `shared/api-client`     | the typed client and TanStack Query hooks                                                                                  | `type:data-access`    |
+| `shared/testing`        | shared test arrangement (builders, fixtures, fakes), for specs only                                                        | `type:testing`        |
+| `shared/infrastructure` | infrastructure contexts share, split into `driving/` and `driven/`: the database token, problem documents and `toResponse` | `type:infrastructure` |
 
 `core`, `domain` and `util` are usable from any context's `domain` and from the web and mobile apps.
 

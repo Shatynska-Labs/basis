@@ -9,16 +9,17 @@ import {
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 
-import { APPLICATION_NAME, readDatabaseUrl } from './database-url.js';
+import { APP_CONFIG, type AppConfig } from '../config/index.js';
+import { APPLICATION_NAME } from './database-url.js';
 
 /** The `pg` pool behind {@link DATABASE}. */
 export const DATABASE_POOL = Symbol('DATABASE_POOL');
 
 // A pool opens no connection until its first query, so starting the API does
 // not depend on the database (add-persistence-skeleton design decision 1).
-const createPool = (): pg.Pool => {
+const createPool = (config: AppConfig): pg.Pool => {
   const pool = new pg.Pool({
-    connectionString: readDatabaseUrl(process.env),
+    connectionString: config.databaseUrl,
     application_name: APPLICATION_NAME,
   });
   // An idle client's failure is logged, by class and code only, instead of
@@ -38,7 +39,7 @@ const createPool = (): pg.Pool => {
 @Global()
 @Module({
   providers: [
-    { provide: DATABASE_POOL, useFactory: createPool },
+    { provide: DATABASE_POOL, inject: [APP_CONFIG], useFactory: createPool },
     {
       provide: DATABASE,
       inject: [DATABASE_POOL],

@@ -1,4 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
+
+import { APP_CONFIG, type AppConfig } from '../config/index.js';
 
 export interface HealthReport {
   status: 'ok';
@@ -6,13 +8,14 @@ export interface HealthReport {
 }
 
 // The build identifier the process was started with, baked into the image
-// (deploy-api-skeleton design decision 2), read once.
-const version = process.env['APP_VERSION'] || 'unknown';
-
+// (deploy-api-skeleton design decision 2), taken from the validated
+// configuration.
 @Controller('health')
 export class HealthController {
+  constructor(@Inject(APP_CONFIG) private readonly config: AppConfig) {}
+
   @Get()
   report(): HealthReport {
-    return { status: 'ok', version };
+    return { status: 'ok', version: this.config.appVersion };
   }
 }

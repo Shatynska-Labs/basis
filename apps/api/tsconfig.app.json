@@ -17,6 +17,12 @@
     },
     {
       "path": "../../libs/shared/testing/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/domain/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/core/tsconfig.lib.json"
     }
   ],
   "exclude": [

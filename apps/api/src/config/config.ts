@@ -11,6 +11,10 @@ export interface AppConfig {
   port: number;
   /** The build identifier `/health` reports. */
   appVersion: string;
+  /** The audiences a Google ID token may name; empty disables sign-in. */
+  googleClientIds: string[];
+  /** Lowercased emails that may create an account; empty admits nobody new. */
+  signupAllowedEmails: string[];
 }
 
 /** An invalid variable and what it must be. */
@@ -41,7 +45,31 @@ const DESCRIPTIONS: Record<string, string> = {
   DATABASE_URL: 'must be set to a PostgreSQL connection URL',
   PORT: 'must be a whole number from 1 to 65535, without a leading zero',
   APP_VERSION: 'must be a string',
+  GOOGLE_CLIENT_IDS:
+    'must be a comma-separated list of Google OAuth client IDs (*.apps.googleusercontent.com)',
+  SIGNUP_ALLOWED_EMAILS: 'must be a comma-separated list of email addresses',
 };
+
+const CLIENT_ID = /^[A-Za-z0-9.-]+\.apps\.googleusercontent\.com$/;
+const EMAIL = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
+
+// Unset, empty and separators alone are no entries; each entry is trimmed and
+// blanks between commas are skipped (add-identity-authentication design
+// decision 10).
+const list = (entry: z.ZodString, normalise = (value: string) => value) =>
+  z.preprocess(
+    unsetIfEmpty,
+    z
+      .string()
+      .default('')
+      .transform((value) =>
+        value
+          .split(',')
+          .map((item) => normalise(item.trim()))
+          .filter((item) => item !== ''),
+      )
+      .pipe(z.array(entry)),
+  );
 
 const schema = z.object({
   DATABASE_URL: z.string().min(1),
@@ -55,6 +83,10 @@ const schema = z.object({
       .default(3000),
   ),
   APP_VERSION: z.preprocess(unsetIfEmpty, z.string().default('unknown')),
+  GOOGLE_CLIENT_IDS: list(z.string().regex(CLIENT_ID)),
+  SIGNUP_ALLOWED_EMAILS: list(z.string().regex(EMAIL), (email) =>
+    email.toLowerCase(),
+  ),
 });
 
 export const loadConfig = (
@@ -72,6 +104,18 @@ export const loadConfig = (
       })),
     );
   }
-  const { DATABASE_URL, PORT, APP_VERSION } = parsed.data;
-  return { databaseUrl: DATABASE_URL, port: PORT, appVersion: APP_VERSION };
+  const {
+    DATABASE_URL,
+    PORT,
+    APP_VERSION,
+    GOOGLE_CLIENT_IDS,
+    SIGNUP_ALLOWED_EMAILS,
+  } = parsed.data;
+  return {
+    databaseUrl: DATABASE_URL,
+    port: PORT,
+    appVersion: APP_VERSION,
+    googleClientIds: GOOGLE_CLIENT_IDS,
+    signupAllowedEmails: SIGNUP_ALLOWED_EMAILS,
+  };
 };

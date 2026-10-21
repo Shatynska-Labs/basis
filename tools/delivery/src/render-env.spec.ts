@@ -20,6 +20,9 @@ import { describe, expect, it } from 'vitest';
 
 import { renderEnv, renderLine } from './render-env.ts';
 
+// Since add-identity-authentication rendering also takes the Google client IDs
+// and the sign-up allowlist; these specs pass valid ones and assert as before.
+const CLIENT_IDS = '1-web.apps.googleusercontent.com';
 const script = fileURLToPath(new URL('./render-env.ts', import.meta.url));
 
 const DIGEST = `sha256:${'0123456789abcdef'.repeat(4)}`;
@@ -51,6 +54,7 @@ const runCommand = (env: Record<string, string>) => {
         PATH: process.env.PATH,
         ENV_FILE: envFile,
         GITHUB_OUTPUT: output,
+        GOOGLE_CLIENT_IDS: CLIENT_IDS,
         DATABASE_PASSWORD,
         ...env,
       },
@@ -75,6 +79,8 @@ describe('the rendered environment names a digest', () => {
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
       databasePassword: DATABASE_PASSWORD,
+      googleClientIds: CLIENT_IDS,
+      signupAllowedEmails: '',
     });
     expect(lineOf(content, 'IMAGE_DIGEST')).toEqual([
       `IMAGE_DIGEST="${DIGEST}"`,
@@ -94,6 +100,8 @@ describe('a malformed digest is refused', () => {
           baseDomain: BASE_DOMAIN,
           imageDigest,
           databasePassword: DATABASE_PASSWORD,
+          googleClientIds: CLIENT_IDS,
+          signupAllowedEmails: '',
         }),
       ).toThrow(/IMAGE_DIGEST/);
     },
@@ -120,6 +128,8 @@ describe("staging's rule", () => {
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
       databasePassword: DATABASE_PASSWORD,
+      googleClientIds: CLIENT_IDS,
+      signupAllowedEmails: '',
     });
     expect(lineOf(content, 'ROUTER_RULE')).toEqual([
       `ROUTER_RULE="${STAGING_RULE}"`,
@@ -135,6 +145,8 @@ describe("production's rule", () => {
       baseDomain: BASE_DOMAIN,
       imageDigest: DIGEST,
       databasePassword: DATABASE_PASSWORD,
+      googleClientIds: CLIENT_IDS,
+      signupAllowedEmails: '',
     });
     expect(lineOf(content, 'ROUTER_RULE')).toEqual([
       `ROUTER_RULE="${PRODUCTION_RULE}"`,
@@ -155,6 +167,8 @@ describe('a missing or malformed base domain', () => {
           baseDomain,
           imageDigest: DIGEST,
           databasePassword: DATABASE_PASSWORD,
+          googleClientIds: CLIENT_IDS,
+          signupAllowedEmails: '',
         }),
       ).toThrow(/BASE_DOMAIN/);
     },
@@ -180,6 +194,8 @@ describe('an unknown target', () => {
         baseDomain: BASE_DOMAIN,
         imageDigest: DIGEST,
         databasePassword: DATABASE_PASSWORD,
+        googleClientIds: CLIENT_IDS,
+        signupAllowedEmails: '',
       }),
     ).toThrow(/target|preview/i);
   });
@@ -213,6 +229,8 @@ describe('the command, on success', () => {
         baseDomain: BASE_DOMAIN,
         imageDigest: DIGEST,
         databasePassword: DATABASE_PASSWORD,
+        googleClientIds: CLIENT_IDS,
+        signupAllowedEmails: '',
       }).content,
     );
     expect(run.content.endsWith('\n')).toBe(true);

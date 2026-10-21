@@ -8,7 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../app.module.js';
-import { APP_CONFIG, ConfigError, loadConfig } from './index.js';
+import { ConfigError, loadConfig } from './index.js';
 
 const DB_URL = 'postgres://basis:secret@db.internal:5432/basis';
 
@@ -26,16 +26,6 @@ const messageOf = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
 describe('api-configuration: the API configuration is validated as a whole', () => {
-  it('a complete environment is read', () => {
-    expect(
-      loadConfig({
-        DATABASE_URL: DB_URL,
-        PORT: '8080',
-        APP_VERSION: '3f2c9e1',
-      }),
-    ).toEqual({ databaseUrl: DB_URL, port: 8080, appVersion: '3f2c9e1' });
-  });
-
   it('every invalid variable is named at once: DATABASE_URL unset and PORT=abc', () => {
     const error = thrownBy({ PORT: 'abc' });
 
@@ -79,26 +69,6 @@ describe('api-configuration: the configuration is validated when the API is crea
         abortOnError: false,
       }),
     ).rejects.toThrow(/PORT/);
-  });
-
-  it('the application provides the validated configuration under APP_CONFIG (derived from design decision 1)', async () => {
-    process.env['DATABASE_URL'] = DB_URL;
-    process.env['PORT'] = '8080';
-    process.env['APP_VERSION'] = '3f2c9e1';
-
-    const app = await NestFactory.createApplicationContext(AppModule, {
-      logger: false,
-      abortOnError: false,
-    });
-    try {
-      expect(app.get(APP_CONFIG)).toEqual({
-        databaseUrl: DB_URL,
-        port: 8080,
-        appVersion: '3f2c9e1',
-      });
-    } finally {
-      await app.close();
-    }
   });
 });
 

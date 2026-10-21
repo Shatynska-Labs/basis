@@ -88,7 +88,7 @@ The infrastructure repository asks an application with a database in the shared 
 
 ## `consolidate-spec-helpers`
 
-Several spec helpers are copied between test files because no change has moved them into `libs/shared/testing`: linting a virtual source against the root ESLint config (`libs/shared/testing/src/boundaries.spec.ts`, `libs/shared/infrastructure/src/boundaries.spec.ts`, `apps/api/src/config/environment-access.spec.ts`), reading a manifest's runtime dependencies (`libs/shared/core/src/lib/result.spec.ts`, `libs/shared/domain/src/lib/domain-error.spec.ts`), reading Nx's view of a project (`libs/shared/infrastructure/src/project.spec.ts`, `domain-error.spec.ts`), and checking that nothing listens at an address (`apps/api-e2e/src/database-startup.spec.ts`, `apps/api-e2e/src/json-logs.spec.ts`). Move each into `libs/shared/testing` (generic; it may take `eslint` as a dependency) or `apps/api-e2e/src/support/`, and move the specs onto it, changing only where they take their arrangement from.
+Several spec helpers are copied between test files because no change has moved them into `libs/shared/testing`: linting a virtual source against the root ESLint config (`libs/shared/testing/src/boundaries.spec.ts`, `libs/shared/infrastructure/src/boundaries.spec.ts`, `apps/api/src/config/environment-access.spec.ts`), reading a manifest's runtime dependencies (`libs/shared/core/src/lib/result.spec.ts`, `libs/shared/domain/src/lib/domain-error.spec.ts`), reading Nx's view of a project (`libs/shared/infrastructure/src/project.spec.ts`, `domain-error.spec.ts`), and checking that nothing listens at an address (`apps/api-e2e/src/database-startup.spec.ts`, `apps/api-e2e/src/json-logs.spec.ts`). `add-identity-authentication` added more: a capturing Nest logger (`apps/api/src/http/http-errors.spec.ts`, `http-errors-unauthenticated.spec.ts`, `apps/api/tests/integration/identity-authentication.integration.spec.ts`), capturing standard output (`apps/api/src/logging/logger.spec.ts`, the same integration spec), running the migration process (`apps/api/tests/integration/migrate.integration.spec.ts`, `identity-authentication.integration.spec.ts`, `migration-schemas.integration.spec.ts`), running the rendering command (`tools/delivery/src/render-env*.spec.ts`), and parsing the built API's JSON log lines (`apps/api-e2e/src/identity-authentication.spec.ts`). Move each into `libs/shared/testing` (generic; it may take `eslint` as a dependency) or `apps/api-e2e/src/support/`, and move the specs onto it, changing only where they take their arrangement from.
 
 **Kind**: `fix`. It moves test arrangement, owes no specification delta and needs no decision, though it touches specs of several archived changes.
 
@@ -97,5 +97,33 @@ Several spec helpers are copied between test files because no change has moved t
 **Design with**: `nothing`.
 
 **Recorded by**: `add-api-cross-cutting-basics`, whose derived tests added the second or third copy of each; moving the existing copies edits other changes' tests, outside its scope.
+
+**Re-checked**: 2026-10-20 (by `add-identity-authentication`).
+
+## `add-identity-profile`
+
+`identity`'s profile: the user's time zone, which every day and week is computed in (Conventions, Time), and the heart-rate zone parameters `hr_zone_minutes` needs (`docs/product/04-domain-model.md` §1). PRD open question 3 (max heart rate from an age formula or entered by the user) is the operator's to answer. It extends `identity.users`, or adds a profile table, behind `GET /me` or a profile route.
+
+**Kind**: `change`. It owes an `identity` delta and the operator's answer to open question 3.
+
+**Waits on**: `nothing` (`add-identity-authentication` gives users an identity).
+
+**Design with**: `nothing`.
+
+**Recorded by**: `add-identity-authentication`, which the operator split into authentication first and the profile next.
+
+**Re-checked**: 2026-10-20.
+
+## `invite-users-to-sign-up`
+
+Sign-up is restricted to the deployment's `SIGNUP_ALLOWED_EMAILS` (`add-identity-authentication` design decision 3), so admitting someone takes editing an Environment secret and a redeploy. Let an existing user create a single-use, expiring invitation link instead, so that a Google sign-in carrying a valid invitation creates the account. Decide who may invite (every user, or administrators named per deployment), and whether the allowlist stays as a bootstrap.
+
+**Kind**: `change`. It owes an `identity-authentication` delta and the operator's decision on who may invite.
+
+**Waits on**: `nothing`.
+
+**Design with**: `nothing`.
+
+**Recorded by**: `add-identity-authentication`, where the operator chose a configuration allowlist first and invitations later, to keep that change small.
 
 **Re-checked**: 2026-10-20.

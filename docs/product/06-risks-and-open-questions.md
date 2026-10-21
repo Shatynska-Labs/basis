@@ -26,6 +26,7 @@
 | Body photos                                                                                              | Very high                         | Object Storage, encrypted                  | Data owner only by default                         | No                                                                                                                                                   |
 | Lab results                                                                                              | Very high (GDPR special category) | Postgres, encrypted                        | Data owner only by default                         | No (no AI interpretation in MVP)                                                                                                                     |
 | LLM traces (graph inputs and outputs: health context, and meal photos as Object Storage references only) | High                              | Self-hosted Langfuse on Hetzner (ADR-0013) | System operator only, for debugging; access logged | No; kept for a bounded retention period (set when Langfuse is deployed) and deleted with the account, including any media in Langfuse's blob storage |
+| Account: Google subject, email, display name; session token digests                                      | Medium (identifying)              | Postgres (`identity` schema)               | Data owner; the system operator                    | No; a session token is returned once and stored only as its SHA-256 digest                                                                           |
 | monobank token                                                                                           | Critical                          | Encrypted (KMS/secret store)               | No one                                             | Only to the monobank API                                                                                                                             |
 | monobank transactions                                                                                    | High (financial)                  | Only relevant ones (transfers to the jar)  | Data owner; referee — "settled" status only        | No                                                                                                                                                   |
 
@@ -41,7 +42,7 @@ Requirements:
 1. What exactly does the reference device (Galaxy Watch) write to Health Connect (Phase 0)?
 2. Does the wearable detect strength workouts automatically, or only when started manually?
 3. Max heart rate for zones — age-based formula or a value entered by the user?
-4. Authentication: magic link, Google OAuth, or both?
+4. ~~Authentication: magic link, Google OAuth, or both?~~ — **Google only**, with sign-up restricted to a per-deployment allowlist (`add-identity-authentication`).
 5. Which AI provider for vision (quality, price, data retention terms)?
 6. Is post-meal reflection ("why did I eat?") part of MVP?
 7. Day closing time — 10:00 or something else?

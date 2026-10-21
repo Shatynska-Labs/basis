@@ -44,6 +44,18 @@ inputs:
       The host's database password, from which .env's DATABASE_URL is
       rendered (add-persistence-skeleton design decision 6)
     required: true
+  google-client-ids:
+    description: >-
+      The Google OAuth client IDs ID tokens may name, comma-separated
+      (add-identity-authentication design decision 11)
+    required: true
+  signup-allowed-emails:
+    description: >-
+      The emails that may create an account, comma-separated; may be empty.
+      Personal data, never printed (add-identity-authentication design
+      decision 11)
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -61,10 +73,11 @@ runs:
         COMMIT: ${{ inputs.commit }}
         COMPOSE_DIR: ${{ inputs.compose-dir }}
         DATABASE_PASSWORD: ${{ inputs.database-password }}
+        GOOGLE_CLIENT_IDS: ${{ inputs.google-client-ids }}
       run: |
         set -euo pipefail
         missing=''
-        for name in TARGET DEPLOY_HOST DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET BASE_DOMAIN IMAGE_DIGEST COMMIT COMPOSE_DIR DATABASE_PASSWORD; do
+        for name in TARGET DEPLOY_HOST DEPLOY_SSH_KEY TAILSCALE_OAUTH_CLIENT_ID TAILSCALE_OAUTH_SECRET BASE_DOMAIN IMAGE_DIGEST COMMIT COMPOSE_DIR DATABASE_PASSWORD GOOGLE_CLIENT_IDS; do
           if [ -z "${!name:-}" ]; then
             missing="$missing $name"
           fi
@@ -96,6 +109,8 @@ runs:
         IMAGE_DIGEST: ${{ inputs.image-digest }}
         COMPOSE_DIR: ${{ inputs.compose-dir }}
         DATABASE_PASSWORD: ${{ inputs.database-password }}
+        GOOGLE_CLIENT_IDS: ${{ inputs.google-client-ids }}
+        SIGNUP_ALLOWED_EMAILS: ${{ inputs.signup-allowed-emails }}
       run: |
         set -euo pipefail
         ENV_FILE="$COMPOSE_DIR/.env" node "$GITHUB_ACTION_PATH/../../../tools/delivery/src/render-env.ts"

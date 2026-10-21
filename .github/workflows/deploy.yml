@@ -142,6 +142,8 @@ jobs:
           deploy-host: ${{ vars.MAIN_STAGING_DEPLOY_HOST }}
           deploy-ssh-key: ${{ secrets.BASIS_API_DEPLOY_SSH_KEY }}
           database-password: ${{ secrets.BASIS_API_DATABASE_PASSWORD }}
+          google-client-ids: ${{ vars.BASIS_API_GOOGLE_CLIENT_IDS }}
+          signup-allowed-emails: ${{ secrets.BASIS_API_SIGNUP_ALLOWED_EMAILS }}
           tailscale-oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
           tailscale-oauth-secret: ${{ secrets.TAILSCALE_OAUTH_SECRET }}
           base-domain: ${{ vars.BASE_DOMAIN }}

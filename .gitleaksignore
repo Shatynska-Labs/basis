@@ -13,3 +13,7 @@ d097c93b7b2af1cfd3205629d273f18852ee4e67:tools/delivery/src/check-compose.spec.t
 # A made-up value under the key `api_key`, the fixture for "every secret name
 # is redacted" in the derived tests of add-api-cross-cutting-basics.
 d39ebaf04ded6f2d3b2cdd7e9f4914fdf52f0356:apps/api/src/logging/logger.spec.ts:generic-api-key:71
+
+# A made-up, unsigned ID token, the fixture for "a refused sign-in is not
+# logged with its token" in the derived tests of add-identity-authentication.
+e819e4dc2a7f0693f6bd90e77f9df2a032b50b3a:apps/api/tests/integration/identity-authentication.integration.spec.ts:generic-api-key:862

@@ -36,4 +36,4 @@
 - [x] 6.2 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
 - [x] 6.3 Confirm on staging: `GET /me` without a session answers `401`; an allowlisted Google account's ID token from the OAuth Playground signs in, `GET /me` answers it, sign-out makes the token answer `401`; a Google account not on the list answers `403`
 - [x] 6.4 Promote, on the operator's act, and wait for the smoke wait to pass
-- [ ] 6.5 Archive, updating `docs/backlog.md` entries this change touches
+- [x] 6.5 Archive, updating `docs/backlog.md` entries this change touches

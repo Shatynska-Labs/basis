@@ -106,13 +106,13 @@ Several spec helpers are copied between test files because no change has moved t
 
 **Kind**: `change`. It owes an `identity` delta and the operator's answer to open question 3.
 
-**Waits on**: `nothing` (`add-identity-authentication` gives users an identity).
+**Waits on**: `nothing` (`add-identity-authentication`, archived, gives users an identity).
 
 **Design with**: `nothing`.
 
 **Recorded by**: `add-identity-authentication`, which the operator split into authentication first and the profile next.
 
-**Re-checked**: 2026-10-20.
+**Re-checked**: 2026-10-21.
 
 ## `invite-users-to-sign-up`
 
@@ -126,4 +126,4 @@ Sign-up is restricted to the deployment's `SIGNUP_ALLOWED_EMAILS` (`add-identity
 
 **Recorded by**: `add-identity-authentication`, where the operator chose a configuration allowlist first and invitations later, to keep that change small.
 
-**Re-checked**: 2026-10-20.
+**Re-checked**: 2026-10-21.

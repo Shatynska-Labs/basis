@@ -641,3 +641,27 @@ describe('health-connect-intake: malformed values do not fail the summary', () =
     expect(summary.types['sleep']).toBeUndefined();
   });
 });
+
+// Added during apply, after the code review: design decision 5 reads a time
+// only as an ISO 8601 instant with an offset.
+describe('health-connect-intake: a time without an offset is not read', () => {
+  it.each(['2026-10-22T08:00:00', '2026-10-22', 'Thu, 22 Oct 2026 08:00:00'])(
+    '%s contributes no record time and no delay',
+    (time) => {
+      const summary = summarize([
+        delivery({
+          steps: [
+            {
+              end_time: time,
+              metadata: { last_modified_time: '2026-10-22T08:10:00Z' },
+            },
+          ],
+        }),
+      ]);
+
+      expect(summary.types['steps']?.firstRecordAt).toBeNull();
+      expect(summary.types['steps']?.lastRecordAt).toBeNull();
+      expect(summary.delays['steps']).toBeUndefined();
+    },
+  );
+});

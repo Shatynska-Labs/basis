@@ -27,9 +27,15 @@ const isObject = (value: unknown): value is Json =>
 const stringOf = (value: unknown): string | undefined =>
   typeof value === 'string' ? value : undefined;
 
-/** Milliseconds since the epoch of an ISO 8601 string, if it is one. */
+const ISO_INSTANT =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/;
+
+/**
+ * Milliseconds since the epoch of an ISO 8601 instant with an offset, if it
+ * is one; a time without an offset would depend on the server's time zone.
+ */
 const instantOf = (value: unknown): number | undefined => {
-  if (typeof value !== 'string') return undefined;
+  if (typeof value !== 'string' || !ISO_INSTANT.test(value)) return undefined;
   const ms = Date.parse(value);
   return Number.isNaN(ms) ? undefined : ms;
 };

@@ -21,6 +21,15 @@
       "path": "../../libs/shared/core/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/metrics/infrastructure/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/metrics/contracts/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/metrics/application/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/identity/infrastructure/tsconfig.lib.json"
     },
     {

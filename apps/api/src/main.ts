@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module.js';
 import { APP_CONFIG, type AppConfig, ConfigError } from './config/index.js';
+import { useBodyParsers } from './http/body-parsers.js';
 import { createLogger } from './logging/index.js';
 
 // The logger comes first, so every entry, startup's included, is a JSON line
@@ -20,6 +21,7 @@ const start = async (): Promise<void> => {
   // Exit with status 0 after a clean close on SIGTERM, rather than re-raising
   // the signal (deploy-api-skeleton design decision 3, task 1.3).
   app.enableShutdownHooks([], { useProcessExit: true });
+  useBodyParsers(app);
   await app.listen(app.get<AppConfig>(APP_CONFIG).port);
 };
 

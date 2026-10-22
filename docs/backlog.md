@@ -88,7 +88,7 @@ The infrastructure repository asks an application with a database in the shared 
 
 ## `consolidate-spec-helpers`
 
-Several spec helpers are copied between test files because no change has moved them into `libs/shared/testing`: linting a virtual source against the root ESLint config (`libs/shared/testing/src/boundaries.spec.ts`, `libs/shared/infrastructure/src/boundaries.spec.ts`, `apps/api/src/config/environment-access.spec.ts`), reading a manifest's runtime dependencies (`libs/shared/core/src/lib/result.spec.ts`, `libs/shared/domain/src/lib/domain-error.spec.ts`), reading Nx's view of a project (`libs/shared/infrastructure/src/project.spec.ts`, `domain-error.spec.ts`), and checking that nothing listens at an address (`apps/api-e2e/src/database-startup.spec.ts`, `apps/api-e2e/src/json-logs.spec.ts`). `add-identity-authentication` added more: a capturing Nest logger (`apps/api/src/http/http-errors.spec.ts`, `http-errors-unauthenticated.spec.ts`, `apps/api/tests/integration/identity-authentication.integration.spec.ts`), capturing standard output (`apps/api/src/logging/logger.spec.ts`, the same integration spec), running the migration process (`apps/api/tests/integration/migrate.integration.spec.ts`, `identity-authentication.integration.spec.ts`, `migration-schemas.integration.spec.ts`), running the rendering command (`tools/delivery/src/render-env*.spec.ts`), and parsing the built API's JSON log lines (`apps/api-e2e/src/identity-authentication.spec.ts`). Move each into `libs/shared/testing` (generic; it may take `eslint` as a dependency) or `apps/api-e2e/src/support/`, and move the specs onto it, changing only where they take their arrangement from.
+Several spec helpers are copied between test files because no change has moved them into `libs/shared/testing`: linting a virtual source against the root ESLint config (`libs/shared/testing/src/boundaries.spec.ts`, `libs/shared/infrastructure/src/boundaries.spec.ts`, `apps/api/src/config/environment-access.spec.ts`), reading a manifest's runtime dependencies (`libs/shared/core/src/lib/result.spec.ts`, `libs/shared/domain/src/lib/domain-error.spec.ts`), reading Nx's view of a project (`libs/shared/infrastructure/src/project.spec.ts`, `domain-error.spec.ts`), and checking that nothing listens at an address (`apps/api-e2e/src/database-startup.spec.ts`, `apps/api-e2e/src/json-logs.spec.ts`). `add-identity-authentication` added more: a capturing Nest logger (`apps/api/src/http/http-errors.spec.ts`, `http-errors-unauthenticated.spec.ts`, `apps/api/tests/integration/identity-authentication.integration.spec.ts`), capturing standard output (`apps/api/src/logging/logger.spec.ts`, the same integration spec), running the migration process (`apps/api/tests/integration/migrate.integration.spec.ts`, `identity-authentication.integration.spec.ts`, `migration-schemas.integration.spec.ts`), running the rendering command (`tools/delivery/src/render-env*.spec.ts`), and parsing the built API's JSON log lines (`apps/api-e2e/src/identity-authentication.spec.ts`). `validate-health-connect-data` added more: a valid HC Webhook delivery of a given size (`apps/api/src/health-connect-intake.spec.ts`, `apps/api/tests/integration/health-connect-intake.integration.spec.ts`, `apps/api-e2e/src/health-connect-intake.spec.ts`), a JSON object of a given size (`health-connect-intake.spec.ts`, `apps/api/src/http/http-errors.spec.ts`), and further copies of running the migration process, of rows from a query (`identity-authentication.integration.spec.ts`), of the capturing Nest logger and of capturing standard output (`health-connect-intake.integration.spec.ts`, `metrics-migration-schemas.integration.spec.ts`). Move each into `libs/shared/testing` (generic; it may take `eslint` as a dependency) or `apps/api-e2e/src/support/`, and move the specs onto it, changing only where they take their arrangement from.
 
 **Kind**: `fix`. It moves test arrangement, owes no specification delta and needs no decision, though it touches specs of several archived changes.
 
@@ -98,7 +98,7 @@ Several spec helpers are copied between test files because no change has moved t
 
 **Recorded by**: `add-api-cross-cutting-basics`, whose derived tests added the second or third copy of each; moving the existing copies edits other changes' tests, outside its scope.
 
-**Re-checked**: 2026-10-20 (by `add-identity-authentication`).
+**Re-checked**: 2026-10-22 (by `validate-health-connect-data`).
 
 ## `add-identity-profile`
 
@@ -127,3 +127,59 @@ Sign-up is restricted to the deployment's `SIGNUP_ALLOWED_EMAILS` (`add-identity
 **Recorded by**: `add-identity-authentication`, where the operator chose a configuration allowlist first and invitations later, to keep that change small.
 
 **Re-checked**: 2026-10-21.
+
+## `record-phase-0-findings`
+
+Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsung Health) has sent several days of data through the temporary intake, read `GET /health-connect/deliveries/summary` on production and record what Health Connect provides: which metrics of `docs/product/04-domain-model.md` §1 can be automated (steps, heart-rate zones, workouts, sleep with stages, resting heart rate), which app and device write each, how strength workouts are recorded, and how late data arrives. Confirm or adjust ADR-0001, answer open questions 1 and 2 and revise risk R1 in `docs/product/06-risks-and-open-questions.md`, and note anything Phase 1's ingestion must handle (resends, aggregates, late records).
+
+**Kind**: `change`. A documentation change carrying the operator's reading of the data and possibly an ADR adjustment.
+
+**Waits on**: `validate-health-connect-data` in production, and several days of the bridge sending to it.
+
+**Design with**: `retire-the-health-connect-intake`.
+
+**Recorded by**: `validate-health-connect-data`, whose operator chose to keep the findings out of it, since they need days of data after it ships.
+
+**Re-checked**: 2026-10-22.
+
+## `retire-the-health-connect-intake`
+
+`validate-health-connect-data` added a temporary intake: `POST /health-connect/deliveries` and `GET /health-connect/deliveries/summary` in `libs/metrics`, the table `metrics.health_connect_deliveries`, a 10 MB body limit for that route (`apps/api/src/http/body-parsers.ts`), and README instructions for HC Webhook. Phase 1's idempotent ingestion, with Health Connect translated in a driving anti-corruption layer, replaces it. Remove the routes, the summary and the body limit, decide whether the stored deliveries are kept, replayed into the new ingestion or dropped (a forward-only migration), and remove the README section.
+
+**Kind**: `change`. It owes a `health-connect-intake` removal delta and the operator's decision on the stored deliveries.
+
+**Waits on**: `record-phase-0-findings`, and Phase 1's Health Connect ingestion.
+
+**Design with**: `record-phase-0-findings`.
+
+**Recorded by**: `validate-health-connect-data`, which is temporary by design.
+
+**Re-checked**: 2026-10-22.
+
+## `issue-ingestion-keys`
+
+The temporary intake authenticates HC Webhook with an ordinary 30-day session token pasted into the bridge (`validate-health-connect-data` design decision 1). If a third-party bridge stays a data source after Phase 1, beside or instead of Basis's own mobile client, give each user a long-lived, revocable key that is valid only for sending data, stored as a digest like sessions.
+
+**Kind**: `change`. It owes an `identity-authentication` delta and the operator's decision that bridges remain a source.
+
+**Waits on**: `record-phase-0-findings` and the Phase 1 decision on data sources.
+
+**Design with**: `nothing`.
+
+**Recorded by**: `validate-health-connect-data`, where the operator chose the session token for Phase 0, since ADR-0001's own client needs no separate key.
+
+**Re-checked**: 2026-10-22.
+
+## `keep-query-parameters-out-of-defect-logs`
+
+Drizzle 0.45's `DrizzleQueryError` message is `Failed query: <sql>` followed by `params: <params>`, and `ProblemFilter` logs a defect's message and stack (`api-http-errors`). A failed query therefore writes its parameters to the log. `identity`'s session insert carries a session token's digest, which `identity-authentication` forbids logging, and its user upsert carries an email. `validate-health-connect-data` guarded only its own insert (`HealthConnectDeliveryNotStored`). Fix it once: have `ProblemFilter` log a `DrizzleQueryError` without its parameters (or log the SQL and the cause's code only), or wrap each repository's queries, and test that a failing insert logs no parameter.
+
+**Kind**: `fix`. It restores what `identity-authentication` and `api-http-errors` already require, with no new delta, though it touches the filter every context relies on.
+
+**Waits on**: `nothing`.
+
+**Design with**: `nothing`.
+
+**Recorded by**: `validate-health-connect-data`'s plan review, which found the exposure for its own insert; `identity`'s is outside that change.
+
+**Re-checked**: 2026-10-22.

@@ -1,4 +1,5 @@
 import { IdentityModule } from '@basis/identity-infrastructure';
+import { MetricsModule } from '@basis/metrics-infrastructure';
 import { Module } from '@nestjs/common';
 
 import { APP_CONFIG, type AppConfig, ConfigModule } from './config/index.js';
@@ -20,6 +21,7 @@ import { HttpModule } from './http/index.js';
         signupAllowedEmails: config.signupAllowedEmails,
       }),
     }),
+    MetricsModule,
   ],
   controllers: [HealthController],
 })

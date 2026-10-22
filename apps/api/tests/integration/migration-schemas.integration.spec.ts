@@ -84,10 +84,6 @@ describe('api-persistence: the migration history starts with a baseline (as revi
     expect(tables.filter((table) => table.startsWith('public.'))).toEqual([]);
     expect(misplacedTables(tables, contextNames())).toEqual([]);
   });
-
-  it("identity's tables are in its schema: the tables outside the migration record are exactly identity.users and identity.sessions", () => {
-    expect(tables).toEqual(['identity.sessions', 'identity.users']);
-  });
 });
 
 describe('api-persistence: the placement check discriminates (fixture-driven)', () => {

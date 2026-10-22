@@ -35,6 +35,15 @@
     },
     {
       "path": "./libs/identity/contracts"
+    },
+    {
+      "path": "./libs/metrics/infrastructure"
+    },
+    {
+      "path": "./libs/metrics/application"
+    },
+    {
+      "path": "./libs/metrics/contracts"
     }
   ]
 }

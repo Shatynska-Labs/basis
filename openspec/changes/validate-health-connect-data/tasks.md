@@ -19,7 +19,7 @@
 
 ## 4. Ship
 
-- [ ] 4.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
+- [x] 4.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
 - [ ] 4.2 Confirm on staging: with HC Webhook pointed at staging with a staging session token, a manual sync answers `2xx` in the bridge's log, and the summary shows records written by Samsung Health from the watch
 - [ ] 4.3 Promote, on the operator's act, and wait for the smoke wait to pass; the operator points the bridge at production
 - [ ] 4.4 Archive, updating `docs/backlog.md` entries this change touches

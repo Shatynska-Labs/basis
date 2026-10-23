@@ -20,6 +20,7 @@
 ## 4. Ship
 
 - [x] 4.1 Merge the implementation pull request and wait for the operator's word that staging's deploy is healthy
-- [ ] 4.2 Confirm on staging: with HC Webhook pointed at staging with a staging session token, a manual sync answers `2xx` in the bridge's log, and the summary shows records written by Samsung Health from the watch
+- [x] 4.2 Confirm on staging: with HC Webhook pointed at staging with a staging session token, a manual sync answers `2xx` in the bridge's log, and the summary shows records written by Samsung Health from the watch
+  - _Confirmed by the operator on 2026-10-23._ HC Webhook v1.9.29 delivered with `204`; staging stored real records of steps, distance and active calories, steps from Samsung Health (`com.sec.android.app.shealth`, one record per day, 4160, matching Samsung Health) and from Android's built-in phone pedometer (`com.android.healthconnect.phone…`, 40 records). No record names the watch as its device. Heart rate, sleep and exercise did not arrive: HC Webhook closed while its type list was being edited. Both are inputs to `record-phase-0-findings`.
 - [ ] 4.3 Promote, on the operator's act, and wait for the smoke wait to pass; the operator points the bridge at production
 - [ ] 4.4 Archive, updating `docs/backlog.md` entries this change touches

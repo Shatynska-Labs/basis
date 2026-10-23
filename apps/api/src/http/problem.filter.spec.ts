@@ -41,7 +41,10 @@ describe('ProblemFilter: a failed query', () => {
   const failed = () =>
     new DrizzleQueryError(
       query,
-      ['d1gest-n0t-for-logs', 'email-n0t-for-logs@example.com'],
+      [
+        'd1gest-n0t-for-logs\n    at n0t-for-logs',
+        'email-n0t-for-logs@example.com',
+      ],
       Object.assign(new Error('duplicate key: d1gest-n0t-for-logs'), {
         code: '23505',
       }),
@@ -51,6 +54,7 @@ describe('ProblemFilter: a failed query', () => {
     const logged = loggedErrors(failed());
 
     expect(logged).toContain(query.replaceAll('"', '\\"'));
+    expect(logged).toContain(`${failed().name}: Failed query:`);
     expect(logged).toContain('23505');
     expect(logged).toMatch(/\\n\s+at /);
   });

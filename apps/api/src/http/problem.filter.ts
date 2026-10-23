@@ -50,9 +50,16 @@ const causeCodeOf = ({ cause }: DrizzleQueryError): string => {
   return typeof code === 'string' ? ` (cause code ${code})` : '';
 };
 
-/** An error's stack frames, without the message its stack begins with. */
-const framesOf = ({ stack }: Error): string[] =>
-  (stack ?? '').split('\n').filter((line) => /^\s+at /.test(line));
+/**
+ * An error's stack frames, after the message its stack begins with; none when
+ * the stack does not begin with it, since a parameter may span lines.
+ */
+const framesOf = ({ name, message, stack }: Error): string[] => {
+  const prefix = `${name}: ${message}\n`;
+  return stack?.startsWith(prefix)
+    ? stack.slice(prefix.length).split('\n')
+    : [];
+};
 
 @Catch()
 export class ProblemFilter implements ExceptionFilter {

@@ -11,12 +11,14 @@ import {
   HttpException,
   Logger,
 } from '@nestjs/common';
+import { DrizzleQueryError } from 'drizzle-orm';
 
 // Every error response is a problem document (add-api-cross-cutting-basics
 // design decisions 5 and 8). A defect, and an HTTP exception of 500 or above,
 // discloses nothing to the client and is logged; a 4xx is not logged. A
 // problem's own headers, such as a 401's `WWW-Authenticate`, are sent with it
-// (add-identity-authentication design decision 7).
+// (add-identity-authentication design decision 7). A failed query is logged
+// without its parameters, which may hold a session token's digest or an email.
 
 /** The part of Express's response the filter uses. */
 interface ProblemResponse {
@@ -38,6 +40,19 @@ const exposedClientStatus = (thrown: unknown): number | undefined => {
     ? code
     : undefined;
 };
+
+/**
+ * A failed query's cause, such as PostgreSQL's SQLSTATE, by its code only: its
+ * message may quote a parameter (`invalid input syntax for type integer: "…"`).
+ */
+const causeCodeOf = ({ cause }: DrizzleQueryError): string => {
+  const code = (cause as { code?: unknown } | undefined)?.code;
+  return typeof code === 'string' ? ` (cause code ${code})` : '';
+};
+
+/** An error's stack frames, without the message its stack begins with. */
+const framesOf = ({ stack }: Error): string[] =>
+  (stack ?? '').split('\n').filter((line) => /^\s+at /.test(line));
 
 @Catch()
 export class ProblemFilter implements ExceptionFilter {
@@ -73,7 +88,10 @@ export class ProblemFilter implements ExceptionFilter {
 
   // Any other thrown value may hold anything, so only its type is logged.
   private logDefect(thrown: unknown): void {
-    if (thrown instanceof Error) {
+    if (thrown instanceof DrizzleQueryError) {
+      const header = `${thrown.name}: Failed query: ${thrown.query}${causeCodeOf(thrown)}`;
+      this.logger.error(header, [header, ...framesOf(thrown)].join('\n'));
+    } else if (thrown instanceof Error) {
       this.logger.error(`${thrown.name}: ${thrown.message}`, thrown.stack);
     } else {
       this.logger.error(`A value of type ${typeof thrown} was thrown.`);

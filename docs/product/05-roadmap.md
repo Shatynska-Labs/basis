@@ -12,6 +12,8 @@ Phases are indicative; each feature within a phase is implemented as a separate 
 - Verify background sync under aggressive battery optimization.
 - **Outcome:** ADR-0001 confirmed or adjusted; list of metrics available for automation.
 
+The remaining work and its order: [`validate-the-data-source`](../workstreams/validate-the-data-source.md).
+
 ## Phase 1 — Foundation
 
 - Nx monorepo (pnpm workspaces), `shared` libraries, module boundary rules, CI with `nx affected`.
@@ -20,6 +22,8 @@ Phases are indicative; each feature within a phase is implemented as a separate 
 - Expo dev build: reading Health Connect, background sync.
 - Deployment on Hetzner (Postgres, Redis, Object Storage).
 - **Outcome:** device data reaches the server; the calibration period starts.
+
+The remaining work and its order: [`reach-the-calibration-period`](../workstreams/reach-the-calibration-period.md).
 
 ## Phase 2 — Habits core
 

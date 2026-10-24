@@ -4,11 +4,11 @@ Changes this project has identified and not yet archived. Each entry is a change
 
 An entry's heading is the change's name in kebab-case — the name its branch and change directory are expected to take, though the session that opens the change may rename it if the work turns out different. A fix takes the name as its branch's only. Refer to an entry only by that name.
 
-The order of entries carries no meaning. What an entry waits on, and which entries share a design with it, it states in its own fields.
+The order of entries carries no meaning. What an entry waits on, how urgent it is, and which entries share a design with it, it states in its own fields.
 
 Keep an entry short: what is needed and why, naming files, specifications and changes as pointers. Leave out line numbers, census tables and step-by-step plans; they go stale first, and the session that takes the entry up redoes them.
 
-Delete an entry when its change is archived, when the operator takes it as a fix rather than a change, when a change makes it obsolete, or when the operator decides the change will not be made. When a change is archived, also update the entries it unblocked or made stale, and set their **Re-checked** date. Keep this file when it has no entries.
+Delete an entry when its change is archived, when the operator takes it as a fix rather than a change, when a change makes it obsolete, or when the operator decides the change will not be made. When a change is archived, also update the entries it unblocked, unparked or made stale, and set their **Re-checked** date. Keep this file when it has no entries.
 
 An entry takes this shape:
 
@@ -17,11 +17,15 @@ An entry takes this shape:
 
 What the change is and why it is needed, written for a session that has not seen the work that found it.
 
+**Priority**: `high`, `normal`, or `parked until` a condition that can be checked, and why. `high` needs evidence of harm happening now — an incident, a measurement, an observation; `parked` is an entry that could be taken but is not worth taking until its condition holds, and is not folded into another change before then. When the condition holds the entry becomes `normal`, or `high` with evidence; when a `high` entry's evidence no longer holds it becomes `normal`. An entry without this field is `normal`.
+
 **Kind**: `fix` or `change`, and why. A fix owes no specification delta, needs no decision from the operator, and fits one review sitting; anything else is a change, and says which delta it owes, which decision it needs, or that it is too large.
 
 **Waits on**: `nothing`, or something that can be checked: a change by name, a person's answer, an event.
 
 **Design with**: the entries that share a design with this one, by name, or `nothing`.
+
+**Workstream**: the workstream this entry is a step of or serves, by name, or `nothing`. An entry recorded by a change in a workstream takes that workstream unless it serves another goal. An entry without this field is `nothing`.
 
 **Recorded by**: the change that identified it, and why it was not done there.
 
@@ -54,6 +58,8 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 **Design with**: `nothing`.
 
+**Workstream**: `reach-the-calibration-period`.
+
 **Recorded by**: the session that opened `deploy-api-skeleton`; the storage decision was outside that change.
 
 **Re-checked**: 2026-10-19.
@@ -82,6 +88,8 @@ The infrastructure repository asks an application with a database in the shared 
 
 **Design with**: `nothing`.
 
+**Workstream**: `reach-the-calibration-period`.
+
 **Recorded by**: `add-persistence-skeleton`, kept out to bound that change's deploy risk.
 
 **Re-checked**: 2026-10-19.
@@ -102,13 +110,15 @@ Several spec helpers are copied between test files because no change has moved t
 
 ## `add-identity-profile`
 
-`identity`'s profile: the user's time zone, which every day and week is computed in (Conventions, Time), and the heart-rate zone parameters `hr_zone_minutes` needs (`docs/product/04-domain-model.md` §1). PRD open question 3 (max heart rate from an age formula or entered by the user) is the operator's to answer. It extends `identity.users`, or adds a profile table, behind `GET /me` or a profile route.
+`identity`'s profile: the user's time zone, which every day and week is computed in (Conventions, Time), and the heart-rate zone parameters `hr_zone_minutes` needs (`docs/product/04-domain-model.md` §1). Open question 3 of `docs/product/06-risks-and-open-questions.md` (max heart rate from an age formula or entered by the user) is the operator's to answer. It extends `identity.users`, or adds a profile table, behind `GET /me` or a profile route.
 
 **Kind**: `change`. It owes an `identity` delta and the operator's answer to open question 3.
 
 **Waits on**: `nothing` (`add-identity-authentication`, archived, gives users an identity).
 
 **Design with**: `nothing`.
+
+**Workstream**: `reach-the-calibration-period`.
 
 **Recorded by**: `add-identity-authentication`, which the operator split into authentication first and the profile next.
 
@@ -138,6 +148,8 @@ Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsu
 
 **Design with**: `retire-the-health-connect-intake`.
 
+**Workstream**: `validate-the-data-source`.
+
 **Recorded by**: `validate-health-connect-data`, whose operator chose to keep the findings out of it, since they need days of data after it ships.
 
 **Re-checked**: 2026-10-22.
@@ -152,6 +164,8 @@ Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsu
 
 **Design with**: `record-phase-0-findings`.
 
+**Workstream**: `reach-the-calibration-period`.
+
 **Recorded by**: `validate-health-connect-data`, which is temporary by design.
 
 **Re-checked**: 2026-10-22.
@@ -165,6 +179,8 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 **Waits on**: `record-phase-0-findings` and the Phase 1 decision on data sources.
 
 **Design with**: `nothing`.
+
+**Workstream**: `reach-the-calibration-period`.
 
 **Recorded by**: `validate-health-connect-data`, where the operator chose the session token for Phase 0, since ADR-0001's own client needs no separate key.
 

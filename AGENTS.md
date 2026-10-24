@@ -1,5 +1,5 @@
 <!-- prettier-ignore-start -->
-<!-- ai-toolkit:development-workflow v10 -->
+<!-- ai-toolkit:development-workflow v11 -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong below the closing marker. -->
 
@@ -33,9 +33,11 @@ Where this project binds these two rules to a particular service, the binding is
 
 On entering a working tree, before anything else, and again as the last thing said before stopping, report the change's status as one line, in this exact form, with `|` as a plain-text field separator without header rows:
 
-`| <change> | <stage> | <task progress> | <commits> |`
+`| <workstream> | <change> | <stage> | <task progress> | <commits> |`
 
-For example: `| some-change | plan:explore | 0/0 | 1 |`
+For example: `| none | some-change | plan:explore | 0/0 | 1 |`
+
+The workstream is the open one whose steps name the change; else the workstream its proposal names; else the one its backlog entry names; else `none`.
 
 Each field is a short value, not a sentence — nothing else belongs on that line.
 
@@ -58,6 +60,8 @@ Always write the family prefix: `plan:reviewing` and `build:reviewing` dispatch 
 **explore** — a change with no proposal yet. Auxiliary artifacts such as a handoff may exist.
 
 **draft** — use a specification-driven change process for non-trivial features, changes and significant architectural decisions. Do not begin implementing without a proposal recording what is intended and why. A change's artifacts are read before implementation, not written afterwards to describe what was done.
+
+Where a workstream in `docs/workstreams/` names this change among its steps, or the change serves one's goal, the proposal names that workstream; otherwise it states that the change advances none. Where the change is one of several a goal needs and no workstream holds them, propose opening one, as that directory's README directs.
 
 **review → fix → approve** — dispatch review against the complete artifact set, never a package still being written. Fix and re-review until the verdict permits proceeding, bounded at six rounds; on reaching it, report where the loop stands and what is outstanding, and ask before continuing. A conditional pass is permission conditional on the fixes it names: apply them and continue without a further round. Where the reviewer judges the concept unsound rather than the artifacts defective, stop and raise it immediately, whatever the count.
 
@@ -104,7 +108,7 @@ Two classes cannot answer that gate and are waivable. Say so plainly, name the c
 
 A recorded waiver completes **confirm**: `ship:confirmed` is true of a waived change.
 
-**archive** — once the effect is confirmed or the gate waived, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog.md` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as the file directs, in the commit that carries the record.
+**archive** — once the effect is confirmed or the gate waived, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog.md` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as the file directs, in the commit that carries the record. Where the change advanced a workstream, re-read it the same way: place the entries attached to it, revise the steps the change made obsolete, and archive it once what finishes it holds, as `docs/workstreams/README.md` directs, in the same commit.
 
 Two is a floor. Where the deploy is unhealthy, or the effect is absent through a defect, the change is not delivered and its record is not written: fix it and re-enter at `build`'s review gate; the fix takes a pull request of its own.
 

@@ -63,7 +63,7 @@ Steps 3, 5 and 6 of `reach-the-calibration-period` (`move-to-durable-data-storag
 
 The README has a workstream committed with the plan of the first change that advances it, or as work too small to be a change. Neither fits here: the README itself does not exist on the trunk until this change adds it, so the two files are opened by the change that adopts it, as commerce-ops's `adopt-workstreams` did.
 
-**4. The Workstream line.** Each backlog entry named as a step above gains `**Workstream**: <name>`, placed before **Recorded by**. No other line of any entry changes. `reconcile-ai-suggestion-confirmation`, `move-portfolio-to-main-production-deploy-host`, `consolidate-spec-helpers`, `invite-users-to-sign-up` and `scope-the-secret-scan-to-its-own-history` serve neither and gain nothing.
+**4. The Workstream line.** Each backlog entry named as a step above gains `**Workstream**: <name>`, placed before **Recorded by**. No other line of any entry changes. `reconcile-ai-suggestion-confirmation`, `move-portfolio-to-main-production-deploy-host`, `consolidate-spec-helpers`, `invite-users-to-sign-up` and `require-gitleaks-in-provisioning` serve neither and gain nothing (`scope-the-secret-scan-to-its-own-history`, in the first draft of this list, was closed on the trunk by its own fix, which recorded `require-gitleaks-in-provisioning`).
 
 **5. Pointers.** `docs/README.md` lists `docs/workstreams/`. `docs/product/05-roadmap.md` carries no progress, so it keeps its content; Phases 0 and 1 each gain a one-line pointer to their workstream for the order of the remaining work.
 

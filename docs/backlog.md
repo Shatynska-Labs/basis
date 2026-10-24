@@ -169,3 +169,17 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 **Recorded by**: `validate-health-connect-data`, where the operator chose the session token for Phase 0, since ADR-0001's own client needs no separate key.
 
 **Re-checked**: 2026-10-22.
+
+## `scope-the-secret-scan-to-its-own-history`
+
+CI's `secrets` job checks out with `fetch-depth: 0`, which fetches every branch, and `gitleaks git` scans `--all` by default (`.github/workflows/ci.yml`). A false positive pushed on any branch therefore fails `secrets` on every pull request until its `.gitleaksignore` line reaches that pull request's branch, as `keep-query-parameters-out-of-defect-logs`'s fixture did to `fix-body-parser-and-multer-advisories`. Scan only the history the run judges (for a pull request, its head's ancestry, e.g. `--log-opts=HEAD`; for `main`, `main`), keeping the full-history guarantee for what reaches `main`. Also consider making `gitleaks` a required provisioning step, so the pre-commit hook catches such fixtures before they are pushed.
+
+**Kind**: `fix`. It changes CI's scan scope, owes no specification delta, and fits one review sitting, unless the operator wants every branch scanned on purpose.
+
+**Waits on**: `nothing`.
+
+**Design with**: `nothing`.
+
+**Recorded by**: `fix-body-parser-and-multer-advisories`, whose `secrets` check failed on another branch's fixture; changing CI was outside that fix.
+
+**Re-checked**: 2026-10-24.

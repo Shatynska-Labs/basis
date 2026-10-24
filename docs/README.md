@@ -20,6 +20,10 @@ Discovery-phase outputs — the top-level source of truth for every OpenSpec cha
 
 - [Identified changes not yet opened](backlog.md)
 
+## Workstreams
+
+- [Goals that take more than one change, with their ordered steps](workstreams/README.md)
+
 ## How to use
 
 - New feature → take a user story from the PRD → create an OpenSpec change.

@@ -186,16 +186,16 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 
 **Re-checked**: 2026-10-22.
 
-## `scope-the-secret-scan-to-its-own-history`
+## `require-gitleaks-in-provisioning`
 
-CI's `secrets` job checks out with `fetch-depth: 0`, which fetches every branch, and `gitleaks git` scans `--all` by default (`.github/workflows/ci.yml`). A false positive pushed on any branch therefore fails `secrets` on every pull request until its `.gitleaksignore` line reaches that pull request's branch, as `keep-query-parameters-out-of-defect-logs`'s fixture did to `fix-body-parser-and-multer-advisories`. Scan only the history the run judges (for a pull request, its head's ancestry, e.g. `--log-opts=HEAD`; for `main`, `main`), keeping the full-history guarantee for what reaches `main`. Also consider making `gitleaks` a required provisioning step, so the pre-commit hook catches such fixtures before they are pushed.
+The pre-commit hook runs `gitleaks` only if it is on `PATH` and otherwise skips with a note (`.husky/pre-commit`), and `AGENTS.md`'s Provisioning lists it as optional, so a made-up secret in a test fixture is first caught by CI's `secrets` job after it is pushed, as the fixtures of `keep-query-parameters-out-of-defect-logs` were. Decide whether `gitleaks` becomes a required provisioning step, pinned to the version CI checks against its checksum, and whether the hook then fails rather than skips when it is missing.
 
-**Kind**: `fix`. It changes CI's scan scope, owes no specification delta, and fits one review sitting, unless the operator wants every branch scanned on purpose.
+**Kind**: `change`. It needs the operator's decision on making a local tool mandatory for every working tree.
 
 **Waits on**: `nothing`.
 
 **Design with**: `nothing`.
 
-**Recorded by**: `fix-body-parser-and-multer-advisories`, whose `secrets` check failed on another branch's fixture; changing CI was outside that fix.
+**Recorded by**: `scope-the-secret-scan-to-its-own-history`, whose entry suggested it; it changes provisioning and the hook, not CI's scan scope.
 
 **Re-checked**: 2026-10-24.

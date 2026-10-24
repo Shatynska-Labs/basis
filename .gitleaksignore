@@ -1,6 +1,6 @@
 # Findings gitleaks reports that are not secrets, one fingerprint per line,
-# each with its reason. CI scans the whole history, so a false positive in a
-# commit is silenced here rather than by rewriting history.
+# each with its reason. CI scans the whole history of what it judges, so a
+# false positive in a commit is silenced here rather than by rewriting history.
 
 # A made-up 40-character commit SHA in an image tag, the fixture for
 # "the resolved image differs" (move-api-deploys-to-staging-with-promotion).

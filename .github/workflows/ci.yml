@@ -141,8 +141,13 @@ jobs:
           echo "$GITLEAKS_SHA256  $RUNNER_TEMP/$archive" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" gitleaks
 
+      # HEAD's ancestry only: the pull request's merge commit, or the pushed
+      # commit on main. gitleaks would otherwise scan --all, and the full
+      # fetch brings every branch, so a finding on one branch would fail
+      # every other pull request until its .gitleaksignore line reached them.
+      # Everything that reaches main is still scanned in full.
       - name: gitleaks
-        run: '"$RUNNER_TEMP/gitleaks" git --redact --no-banner --verbose'
+        run: '"$RUNNER_TEMP/gitleaks" git --log-opts=HEAD --redact --no-banner --verbose'
 
   commits:
     name: commits

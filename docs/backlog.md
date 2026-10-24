@@ -58,6 +58,8 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 **Design with**: `nothing`.
 
+**Workstream**: `reach-the-calibration-period`.
+
 **Recorded by**: the session that opened `deploy-api-skeleton`; the storage decision was outside that change.
 
 **Re-checked**: 2026-10-19.
@@ -85,6 +87,8 @@ The infrastructure repository asks an application with a database in the shared 
 **Waits on**: `nothing` (`add-persistence-skeleton` is archived; the `migrate` service and `basis-api`'s databases exist on both hosts).
 
 **Design with**: `nothing`.
+
+**Workstream**: `reach-the-calibration-period`.
 
 **Recorded by**: `add-persistence-skeleton`, kept out to bound that change's deploy risk.
 
@@ -114,6 +118,8 @@ Several spec helpers are copied between test files because no change has moved t
 
 **Design with**: `nothing`.
 
+**Workstream**: `reach-the-calibration-period`.
+
 **Recorded by**: `add-identity-authentication`, which the operator split into authentication first and the profile next.
 
 **Re-checked**: 2026-10-21.
@@ -142,6 +148,8 @@ Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsu
 
 **Design with**: `retire-the-health-connect-intake`.
 
+**Workstream**: `validate-the-data-source`.
+
 **Recorded by**: `validate-health-connect-data`, whose operator chose to keep the findings out of it, since they need days of data after it ships.
 
 **Re-checked**: 2026-10-22.
@@ -156,6 +164,8 @@ Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsu
 
 **Design with**: `record-phase-0-findings`.
 
+**Workstream**: `reach-the-calibration-period`.
+
 **Recorded by**: `validate-health-connect-data`, which is temporary by design.
 
 **Re-checked**: 2026-10-22.
@@ -169,6 +179,8 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 **Waits on**: `record-phase-0-findings` and the Phase 1 decision on data sources.
 
 **Design with**: `nothing`.
+
+**Workstream**: `reach-the-calibration-period`.
 
 **Recorded by**: `validate-health-connect-data`, where the operator chose the session token for Phase 0, since ADR-0001's own client needs no separate key.
 

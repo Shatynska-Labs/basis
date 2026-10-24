@@ -2,6 +2,7 @@
 <!-- ai-toolkit:development-workflow v11 -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong below the closing marker. -->
+
 ## Development workflow
 
 The unit of work is a **change**: a feature, a modification, or a decision with design content, carried from proposal to record. These rules describe its life in three stages — `plan`, `build`, `ship` — and what holds throughout.

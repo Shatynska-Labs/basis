@@ -110,7 +110,7 @@ Several spec helpers are copied between test files because no change has moved t
 
 ## `add-identity-profile`
 
-`identity`'s profile: the user's time zone, which every day and week is computed in (Conventions, Time), and the heart-rate zone parameters `hr_zone_minutes` needs (`docs/product/04-domain-model.md` §1). PRD open question 3 (max heart rate from an age formula or entered by the user) is the operator's to answer. It extends `identity.users`, or adds a profile table, behind `GET /me` or a profile route.
+`identity`'s profile: the user's time zone, which every day and week is computed in (Conventions, Time), and the heart-rate zone parameters `hr_zone_minutes` needs (`docs/product/04-domain-model.md` §1). Open question 3 of `docs/product/06-risks-and-open-questions.md` (max heart rate from an age formula or entered by the user) is the operator's to answer. It extends `identity.users`, or adds a profile table, behind `GET /me` or a profile route.
 
 **Kind**: `change`. It owes an `identity` delta and the operator's answer to open question 3.
 

@@ -23,6 +23,10 @@ overrides:
   # GHSA-w293-vg96-wgc3 affect; 7.29.1 fixes both. Drop this once nx
   # depends on a fixed undici.
   undici@7.29.0: 7.30.1
+  # @nestjs/platform-express 12.1.3 pins multer 2.4.0, which
+  # GHSA-q7qp-rjg7-q26m affects, as 12.2.0 still does; 2.5.0 fixes it. Drop
+  # this once @nestjs/platform-express depends on a fixed multer.
+  multer@2.4.0: 2.5.0
 
 auditConfig:
   ignoreGhsas:

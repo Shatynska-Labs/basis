@@ -17,3 +17,7 @@ d39ebaf04ded6f2d3b2cdd7e9f4914fdf52f0356:apps/api/src/logging/logger.spec.ts:gen
 # A made-up, unsigned ID token, the fixture for "a refused sign-in is not
 # logged with its token" in the derived tests of add-identity-authentication.
 e819e4dc2a7f0693f6bd90e77f9df2a032b50b3a:apps/api/tests/integration/identity-authentication.integration.spec.ts:generic-api-key:862
+
+# A made-up cause message after the word "key", the fixture for "a failed
+# query is logged without its cause message" (keep-query-parameters-out-of-defect-logs).
+0a07ee81869d57c7eeadc6d1083ea96b0b43e4a1:apps/api/src/http/problem.filter.spec.ts:generic-api-key:45

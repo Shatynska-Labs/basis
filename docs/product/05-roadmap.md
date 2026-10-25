@@ -12,7 +12,7 @@ Phases are indicative; each feature within a phase is implemented as a separate 
 - Verify background sync under aggressive battery optimization.
 - **Outcome:** ADR-0001 confirmed or adjusted; list of metrics available for automation.
 
-The remaining work and its order: [`validate-the-data-source`](../workstreams/validate-the-data-source.md).
+Done on 2026-10-25: the findings are in [ADR-0001](../adr/0001-health-connect-as-data-source.md#phase-0-findings), and the workstream is archived as [`validate-the-data-source`](../workstreams/archive/2026-10-25-validate-the-data-source.md). Background sync under battery optimization is verified with `sync-health-connect-from-the-mobile-app` in Phase 1.
 
 ## Phase 1 — Foundation
 

@@ -15,6 +15,9 @@
 
 ## 4. Ship
 
-- [ ] 4.1 Open the pull request and let CI run; wait for the operator's word that it merged and that staging's deploy is healthy
-- [ ] 4.2 Confirm: the operator reads ADR-0001's findings and `06-risks-and-open-questions.md` on `main` and agrees they match what was observed
-- [ ] 4.3 Record the operator's waiver of **promote**; then, in the archive commit, close `record-phase-0-findings` in `docs/backlog.md`, clear it from the Waits on of `retire-the-health-connect-intake` and `issue-ingestion-keys` and from the former's Design with (set to `nothing`), set **Re-checked** on both, move `validate-the-data-source` to `docs/workstreams/archive/<date>-validate-the-data-source.md`, and re-point `docs/product/05-roadmap.md`'s Phase 0 link to it
+- [x] 4.1 Open the pull request and let CI run; wait for the operator's word that it merged and that staging's deploy is healthy
+  - _Confirmed by the operator on 2026-10-25._ #42 merged on 2026-10-25; staging's deploy of the merge is healthy.
+- [x] 4.2 Confirm: the operator reads ADR-0001's findings and `06-risks-and-open-questions.md` on `main` and agrees they match what was observed
+  - _Confirmed by the operator on 2026-10-25._ The recorded findings match what was observed in Health Connect.
+- [x] 4.3 Record the operator's waiver of **promote**; then, in the archive commit, close `record-phase-0-findings` in `docs/backlog.md`, clear it from the Waits on of `retire-the-health-connect-intake` and `issue-ingestion-keys` and from the former's Design with (set to `nothing`), set **Re-checked** on both, move `validate-the-data-source` to `docs/workstreams/archive/<date>-validate-the-data-source.md`, and re-point `docs/product/05-roadmap.md`'s Phase 0 link to it
+  - _**Promote** waived by the operator on 2026-10-25._ The change is documentation only and does not go to production; nothing intended succeeds it.

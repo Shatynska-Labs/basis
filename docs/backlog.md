@@ -138,37 +138,21 @@ Sign-up is restricted to the deployment's `SIGNUP_ALLOWED_EMAILS` (`add-identity
 
 **Re-checked**: 2026-10-21.
 
-## `record-phase-0-findings`
-
-Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsung Health) has sent several days of data through the temporary intake, read `GET /health-connect/deliveries/summary` on production and record what Health Connect provides: which metrics of `docs/product/04-domain-model.md` §1 can be automated (steps, heart-rate zones, workouts, sleep with stages, resting heart rate), which app and device write each, how strength workouts are recorded, and how late data arrives. Confirm or adjust ADR-0001, answer open questions 1 and 2 and revise risk R1 in `docs/product/06-risks-and-open-questions.md`, and note anything Phase 1's ingestion must handle (resends, aggregates, late records).
-
-**Kind**: `change`. A documentation change carrying the operator's reading of the data and possibly an ADR adjustment.
-
-**Waits on**: several days of the bridge sending to production. `validate-health-connect-data` reached production on 2026-10-24. On staging, heart rate, sleep and exercise never arrived because HC Webhook closed while its type list was being edited; check that every type is enabled before counting the days.
-
-**Design with**: `retire-the-health-connect-intake`.
-
-**Workstream**: `validate-the-data-source`.
-
-**Recorded by**: `validate-health-connect-data`, whose operator chose to keep the findings out of it, since they need days of data after it ships.
-
-**Re-checked**: 2026-10-25 (by `validate-health-connect-data`).
-
 ## `retire-the-health-connect-intake`
 
 `validate-health-connect-data` added a temporary intake: `POST /health-connect/deliveries` and `GET /health-connect/deliveries/summary` in `libs/metrics`, the table `metrics.health_connect_deliveries`, a 10 MB body limit for that route (`apps/api/src/http/body-parsers.ts`), and README instructions for HC Webhook. Phase 1's idempotent ingestion, with Health Connect translated in a driving anti-corruption layer, replaces it. Remove the routes, the summary and the body limit, decide whether the stored deliveries are kept, replayed into the new ingestion or dropped (a forward-only migration), and remove the README section.
 
 **Kind**: `change`. It owes a `health-connect-intake` removal delta and the operator's decision on the stored deliveries.
 
-**Waits on**: `record-phase-0-findings`, and Phase 1's Health Connect ingestion.
+**Waits on**: Phase 1's Health Connect ingestion (`ingest-health-connect-metrics`).
 
-**Design with**: `record-phase-0-findings`.
+**Design with**: `nothing`.
 
 **Workstream**: `reach-the-calibration-period`.
 
 **Recorded by**: `validate-health-connect-data`, which is temporary by design.
 
-**Re-checked**: 2026-10-22.
+**Re-checked**: 2026-10-25 (by `record-phase-0-findings`).
 
 ## `issue-ingestion-keys`
 
@@ -176,7 +160,7 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 
 **Kind**: `change`. It owes an `identity-authentication` delta and the operator's decision that bridges remain a source.
 
-**Waits on**: `record-phase-0-findings` and the Phase 1 decision on data sources.
+**Waits on**: the Phase 1 decision on data sources (`reach-the-calibration-period`'s open question).
 
 **Design with**: `nothing`.
 
@@ -184,7 +168,7 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 
 **Recorded by**: `validate-health-connect-data`, where the operator chose the session token for Phase 0, since ADR-0001's own client needs no separate key.
 
-**Re-checked**: 2026-10-22.
+**Re-checked**: 2026-10-25 (by `record-phase-0-findings`).
 
 ## `require-gitleaks-in-provisioning`
 

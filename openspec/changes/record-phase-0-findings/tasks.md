@@ -1,17 +1,17 @@
 ## 1. Findings
 
-- [ ] 1.1 Add a **Phase 0 findings** section to `docs/adr/0001-health-connect-as-data-source.md` with the observation table, its source and date, and the unverified points of decision 4, naming a writer only for Exercise; leave Status and Decision unchanged (design decisions 1–3). Verify by reading against the design's table
-- [ ] 1.2 In `docs/product/06-risks-and-open-questions.md`, answer open question 1 pointing at ADR-0001, mark open question 2 as owed by `sync-health-connect-from-the-mobile-app`, and keep R1 at Medium with the revised mitigation (decisions 4 and 6). Verify by reading
+- [x] 1.1 Add a **Phase 0 findings** section to `docs/adr/0001-health-connect-as-data-source.md` with the observation table, its source and date, and the unverified points of decision 4, naming a writer only for Exercise; leave Status and Decision unchanged (design decisions 1–3). Verify by reading against the design's table
+- [x] 1.2 In `docs/product/06-risks-and-open-questions.md`, answer open question 1 pointing at ADR-0001, mark open question 2 as owed by `sync-health-connect-from-the-mobile-app`, and keep R1 at Medium with the revised mitigation (decisions 4 and 6). Verify by reading
 
 ## 2. Workstreams and backlog
 
-- [ ] 2.1 Revise `docs/workstreams/validate-the-data-source.md`'s Done when to open question 1 only (decision 5). Verify by reading
-- [ ] 2.2 Add open question 2 and the other unverified points of decision 4 to `docs/workstreams/reach-the-calibration-period.md`'s Open questions as owed by `sync-health-connect-from-the-mobile-app` (decision 4). Verify by reading
+- [x] 2.1 Revise `docs/workstreams/validate-the-data-source.md`'s Done when to open question 1 only (decision 5). Verify by reading
+- [x] 2.2 Add open question 2 and the other unverified points of decision 4 to `docs/workstreams/reach-the-calibration-period.md`'s Open questions as owed by `sync-health-connect-from-the-mobile-app` (decision 4). Verify by reading
 
 ## 3. Verify
 
-- [ ] 3.1 `openspec validate --all --strict` and `pnpm format:check` pass
-- [ ] 3.2 Confirm with `tools/change-scope` that every changed path is documentation
+- [x] 3.1 `openspec validate --all --strict` and `pnpm format:check` pass
+- [x] 3.2 Confirm with `tools/change-scope` that every changed path is documentation
 
 ## 4. Ship
 

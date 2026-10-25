@@ -7,8 +7,8 @@
 **Steps**:
 
 1. `add-identity-profile` — the user's time zone and heart-rate zone parameters.
-2. `choose-durable-data-storage` — where durable data lives, in an ADR.
-3. `move-to-durable-data-storage` — render `DATABASE_URL` and provision for the chosen storage on both hosts.
+2. `choose-durable-data-storage` — where durable data lives, in ADR-0014.
+3. `move-to-durable-data-storage` — production's own PostgreSQL container, its two off-host backups and their rehearsed restores, a copy of the shared-instance database into it, then production's `DATABASE_URL`; staging stays in its shared instance.
 4. `probe-the-database-before-delivery` — the infrastructure repository's probe before delivery.
 5. `ingest-health-connect-metrics` — `metrics`' idempotent ingestion behind the Health Connect anti-corruption layer.
 6. `sync-health-connect-from-the-mobile-app` — the Expo dev build reading Health Connect and syncing in the background, verified by hand under battery optimization on the reference device.
@@ -17,10 +17,10 @@
 
 The order is intended, not a wait; what one step must wait on is in its backlog entry's **Waits on**.
 
-**Not in scope**: `invite-users-to-sign-up`; the `habits` evaluation of the calibration period itself (roadmap Phase 2); provisioning Redis and Object Storage (roadmap Phase 1's deployment line), which `choose-durable-data-storage` decides and the phase that first uses each provisions.
+**Not in scope**: `invite-users-to-sign-up`; the `habits` evaluation of the calibration period itself (roadmap Phase 2); provisioning Redis and Object Storage for photos (roadmap Phase 1's deployment line), which ADR-0014 decides and the phase that first uses each provisions.
 
-**Open questions**: does a third-party bridge stay a data source after Phase 1? If not, `issue-ingestion-keys` is removed from the steps and its entry deleted. Does `probe-the-database-before-delivery` still apply once `choose-durable-data-storage` decides? If Basis's data leaves the shared instance, the step is removed and its entry closed. Open question 3 of `docs/product/06-risks-and-open-questions.md` (max heart rate), owed by `add-identity-profile`. Open question 2 of the same file (strength workout detection) and the other points ADR-0001's Phase 0 findings leave unverified (heart-rate sample density, resting heart rate, the writer per type, the full set of sleep stages, record shapes, resends, latency), owed by `sync-health-connect-from-the-mobile-app`.
+**Open questions**: does a third-party bridge stay a data source after Phase 1? If not, `issue-ingestion-keys` is removed from the steps and its entry deleted. Open question 3 of `docs/product/06-risks-and-open-questions.md` (max heart rate), owed by `add-identity-profile`. Open question 2 of the same file (strength workout detection) and the other points ADR-0001's Phase 0 findings leave unverified (heart-rate sample density, resting heart rate, the writer per type, the full set of sleep stages, record shapes, resends, latency), owed by `sync-health-connect-from-the-mobile-app`.
 
-**Decisions**: [ADR-0001](../adr/0001-health-connect-as-data-source.md), [ADR-0006](../adr/0006-data-and-infra.md), `docs/product/05-roadmap.md` Phase 1, `docs/product/04-domain-model.md` §1.
+**Decisions**: [ADR-0001](../adr/0001-health-connect-as-data-source.md), [ADR-0006](../adr/0006-data-and-infra.md), [ADR-0014](../adr/0014-durable-data-storage.md), `docs/product/05-roadmap.md` Phase 1, `docs/product/04-domain-model.md` §1.
 
 **Opened**: 2026-10-24, by the operator, through `adopt-workstreams`.

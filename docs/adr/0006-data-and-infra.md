@@ -1,6 +1,6 @@
 # ADR-0006: PostgreSQL, Redis/BullMQ, Hetzner Object Storage
 
-**Status:** accepted · **Date:** 2026-10-17
+**Status:** accepted; superseded in part by [ADR-0014](0014-durable-data-storage.md) — where PostgreSQL runs and how its data is kept, how photos are protected, and Redis's classification · **Date:** 2026-10-17
 
 ## Context
 

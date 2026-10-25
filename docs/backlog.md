@@ -64,6 +64,22 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 **Re-checked**: 2026-10-19.
 
+## `move-to-durable-data-storage`
+
+Move production's durable data out of `main-production`'s shared PostgreSQL instance into a PostgreSQL container of Basis's own, as ADR-0014 decides (`choose-durable-data-storage` design). It owes: the container in Basis's production Compose stack, its data on the host's data volume, at the shared instance's major version (18); a daily encrypted `pg_dump` and continuous WAL archiving with base backups, both off-host in Hetzner Object Storage in a location other than `hel1`, expired by bucket lifecycle rules (current and noncurrent versions, and delete markers) under a credential that can write but not delete, with the initial targets ADR-0014 states; verification of those bucket features before relying on them; a restore from each backup rehearsed on representative data and checked, both procedures written down, before durable data lands; a copy of the shared-instance `basis-api` database into the container (its users and any Phase 0 Health Connect deliveries), then production's `DATABASE_URL` pointed at the container. Staging stays in its shared instance. **It must not** drop or discard the shared-instance database's contents unless the operator decides so against `retire-the-health-connect-intake`.
+
+**Kind**: `change`. It owes `api-delivery` and `api-persistence` deltas, and an `integration-testing` delta should production's major version diverge.
+
+**Waits on**: a change in `Shatynska-Labs/infrastructure` that records Basis's container and its backups and restores (_No Store on This Host Holds Data Requiring Backup_), takes up `decide-whether-the-data-volume-should-survive-a-server-toggle` for `main-production`, and wires the backup-age alert. Retiring production's shared-instance `basis-api` database, role and probe key, owed by that repository after the move, does not gate it.
+
+**Design with**: `retire-the-health-connect-intake`, which decides what happens to the copied deliveries.
+
+**Workstream**: `reach-the-calibration-period`.
+
+**Recorded by**: `choose-durable-data-storage`, which decided the storage and left provisioning to this step.
+
+**Re-checked**: 2026-10-25.
+
 ## `move-portfolio-to-main-production-deploy-host`
 
 `Shatynska-Labs` holds main-production's tailnet address twice: the organisation variable `DEPLOY_HOST`, which `portfolio`'s deploy reads, and `MAIN_PRODUCTION_DEPLOY_HOST`, named for its host so that more hosts can follow, which Basis reads (`deploy-api-skeleton` design decision 8). Move `portfolio`'s deploy to `vars.MAIN_PRODUCTION_DEPLOY_HOST`, confirm a deploy through it, then delete `DEPLOY_HOST` from the organisation after checking nothing else reads it. The change belongs to the `portfolio` repository; it is recorded here because Basis's change surfaced it. **It must not** delete `DEPLOY_HOST` before `portfolio` reads the new name, or `portfolio`'s deploy breaks.
@@ -80,7 +96,7 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 ## `probe-the-database-before-delivery`
 
-The infrastructure repository asks an application with a database in the shared instance to probe it before delivering (`Shatynska-Labs/infrastructure` `docs/onboard-an-application.md` §4.5): one `ssh` with a second, probe-only key, answering one of `window-open`, `unreachable`, `absent`, `credential-refused`, `empty`, `populated`. Both hosts already declare `basis-api`'s probe key. Without it, a reset shared instance surfaces as a failed `migrate` service with `password authentication failed`, indistinguishable from a stale secret. Add the probe to `.github/actions/deliver-api/action.yml` before delivery, matching the whole token set and refusing anything but `empty` and `populated`, with the table `drizzle.__drizzle_migrations`; store `BASIS_API_PROBE_SSH_KEY` in each Environment.
+The infrastructure repository asks an application with a database in the shared instance to probe it before delivering (`Shatynska-Labs/infrastructure` `docs/onboard-an-application.md` §4.5): one `ssh` with a second, probe-only key, answering one of `window-open`, `unreachable`, `absent`, `credential-refused`, `empty`, `populated`. Both hosts already declare `basis-api`'s probe key. Without it, a reset shared instance surfaces as a failed `migrate` service with `password authentication failed`, indistinguishable from a stale secret. Add the probe to `.github/actions/deliver-api/action.yml` before delivery, matching the whole token set and refusing anything but `empty` and `populated`, with the table `drizzle.__drizzle_migrations`; store `BASIS_API_PROBE_SSH_KEY` in each Environment. Once `move-to-durable-data-storage` takes production out of the shared instance, the probe applies to staging only (ADR-0014); until then it applies to both hosts.
 
 **Kind**: `change`. It owes an `api-delivery` delta and the operator's storing of the probe keys.
 
@@ -92,7 +108,7 @@ The infrastructure repository asks an application with a database in the shared 
 
 **Recorded by**: `add-persistence-skeleton`, kept out to bound that change's deploy risk.
 
-**Re-checked**: 2026-10-19.
+**Re-checked**: 2026-10-25.
 
 ## `consolidate-spec-helpers`
 
@@ -146,13 +162,13 @@ Sign-up is restricted to the deployment's `SIGNUP_ALLOWED_EMAILS` (`add-identity
 
 **Waits on**: Phase 1's Health Connect ingestion (`ingest-health-connect-metrics`).
 
-**Design with**: `nothing`.
+**Design with**: `move-to-durable-data-storage`, which copies the stored deliveries into production's own database.
 
 **Workstream**: `reach-the-calibration-period`.
 
 **Recorded by**: `validate-health-connect-data`, which is temporary by design.
 
-**Re-checked**: 2026-10-25 (by `record-phase-0-findings`).
+**Re-checked**: 2026-10-25 (by `choose-durable-data-storage`).
 
 ## `issue-ingestion-keys`
 

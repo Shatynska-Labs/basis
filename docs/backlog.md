@@ -66,7 +66,7 @@ Interim decision (operator, 2026-10-17): until then, Basis uses its own database
 
 ## `move-to-durable-data-storage`
 
-Move production's durable data out of `main-production`'s shared PostgreSQL instance into a PostgreSQL container of Basis's own, as ADR-0014 decides (`choose-durable-data-storage` design). It owes: the container in Basis's production Compose stack, its data on the host's data volume, at the shared instance's major version (18); a daily encrypted `pg_dump` and continuous WAL archiving with base backups, both off-host in Hetzner Object Storage in a location other than `hel1`, expired by bucket lifecycle rules (current and noncurrent versions) under a credential that can write but not delete, with the initial targets ADR-0014 states; verification of those bucket features before relying on them; a restore from each backup rehearsed on representative data and checked, both procedures written down, before durable data lands; a copy of the shared-instance `basis-api` database into the container (its users and any Phase 0 Health Connect deliveries), then production's `DATABASE_URL` pointed at the container. Staging stays in its shared instance. **It must not** drop or discard the shared-instance database's contents unless the operator decides so against `retire-the-health-connect-intake`.
+Move production's durable data out of `main-production`'s shared PostgreSQL instance into a PostgreSQL container of Basis's own, as ADR-0014 decides (`choose-durable-data-storage` design). It owes: the container in Basis's production Compose stack, its data on the host's data volume, at the shared instance's major version (18); a daily encrypted `pg_dump` and continuous WAL archiving with base backups, both off-host in Hetzner Object Storage in a location other than `hel1`, expired by bucket lifecycle rules (current and noncurrent versions, and delete markers) under a credential that can write but not delete, with the initial targets ADR-0014 states; verification of those bucket features before relying on them; a restore from each backup rehearsed on representative data and checked, both procedures written down, before durable data lands; a copy of the shared-instance `basis-api` database into the container (its users and any Phase 0 Health Connect deliveries), then production's `DATABASE_URL` pointed at the container. Staging stays in its shared instance. **It must not** drop or discard the shared-instance database's contents unless the operator decides so against `retire-the-health-connect-intake`.
 
 **Kind**: `change`. It owes `api-delivery` and `api-persistence` deltas, and an `integration-testing` delta should production's major version diverge.
 
@@ -184,7 +184,7 @@ The temporary intake authenticates HC Webhook with an ordinary 30-day session to
 
 **Recorded by**: `validate-health-connect-data`, where the operator chose the session token for Phase 0, since ADR-0001's own client needs no separate key.
 
-**Re-checked**: 2026-10-25 (by `choose-durable-data-storage`).
+**Re-checked**: 2026-10-25 (by `record-phase-0-findings`).
 
 ## `require-gitleaks-in-provisioning`
 

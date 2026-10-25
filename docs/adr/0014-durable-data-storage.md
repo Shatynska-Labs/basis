@@ -12,14 +12,14 @@ Until this decision, Basis's `basis-api` database sat in each host's shared inst
 
 ## Decision
 
-**PostgreSQL.** In production, Basis's durable relational data, including the LangGraph.js checkpointer, lives in a **PostgreSQL container of Basis's own on `main-production`**, defined in Basis's production Compose stack, its data on the host's attached data volume. Its major version stays equal to the shared instance's (18), which staging and the integration runs use, until a change decides otherwise. **Staging stays in its host's shared instance**; production data is never copied to staging.
+**PostgreSQL.** In production, Basis's durable relational data, including the LangGraph.js checkpointer, lives in a **PostgreSQL container of Basis's own on `main-production`**, defined in Basis's production Compose stack, its data on the host's attached data volume. Its major version stays equal to the shared instance's (18), which staging and the integration runs use, until a change decides otherwise; its upgrade schedule is otherwise its own. **Staging stays in its host's shared instance**; production data is never copied to staging.
 
 **Backups.** Two kinds, both encrypted before they leave the host and written to Hetzner Object Storage in a location other than the server's (`hel1`):
 
 - a daily **logical dump** (`pg_dump`) of `basis-api`, the form the infrastructure repository's rule names;
 - **continuous archiving** of the write-ahead log with periodic base backups, for point-in-time restore between dumps.
 
-Initial targets: at most 5 minutes of data lost; point-in-time restore over 30 days, backups kept 30 days plus one base-backup interval; dumps kept 30 days. Expiry, of current and noncurrent versions alike, is enforced by the bucket's lifecycle rules; the backup credential can write but not delete, and versioning or object lock protects what it wrote. Backup age is alerted on through the platform's alerting.
+Initial targets, adjustable by the operator: at most 5 minutes of data lost; point-in-time restore over 30 days, backups kept 30 days plus one base-backup interval; dumps kept 30 days, so an erased account leaves no copy much older than that. Expiry, of current and noncurrent versions and delete markers alike, is enforced by the bucket's lifecycle rules rather than by the backup tool; the backup credential can write but not delete, and versioning or object lock protects what it wrote. Backup age is alerted on through the platform's alerting. The continuous-archiving tool (WAL-G, pgBackRest or another) is `move-to-durable-data-storage`'s choice.
 
 **No durable data lands before a rehearsed, checked restore** from each backup — the dump, and a point-in-time restore from the archive — performed on representative data into a fresh instance, its result checked against the source, and both procedures written down.
 
@@ -32,7 +32,7 @@ Initial targets: at most 5 minutes of data lost; point-in-time restore over 30 d
 ## Alternatives considered
 
 - **Scaleway Managed PostgreSQL** — EU-owned, backups owned by the provider; a monthly cost, and a second vendor where Hetzner already hosts everything.
-- **Neon or Supabase** in an EU region — US companies; Neon's free-tier restore window is short, Supabase's backups need a paid plan.
+- **Neon or Supabase** — US companies; Neon's free-tier restore window is short.
 - **Making the shared instance durable** for every application — a policy change for all applications in the infrastructure repository, and a point-in-time restore of a shared cluster rolls back every application at once.
 - **Continuous archiving alone** — does not meet the infrastructure repository's logical-backup rule. **Dumps alone** — up to a day of data lost.
 - **Managed Redis** — a cost with no gain once nothing durable sits in it.

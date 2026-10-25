@@ -21,6 +21,9 @@
 
 ## 5. Ship
 
-- [ ] 5.1 Open the pull request and let CI run; wait for the operator's word that it merged and that staging's deploy is healthy
-- [ ] 5.2 Confirm: a new session prints the v11 status row, and the **workstreams** operation reports both workstreams
-- [ ] 5.3 Record the operator's waiver of **promote** and archive
+- [x] 5.1 Open the pull request and let CI run; wait for the operator's word that it merged and that staging's deploy is healthy
+  - _Confirmed by the operator on 2026-10-25._ #39 merged on 2026-10-24; staging's deploy of the merge succeeded.
+- [x] 5.2 Confirm: a new session prints the v11 status row, and the **workstreams** operation reports both workstreams
+  - _Confirmed by the operator on 2026-10-25._ A new session printed the status row in the v11 form and reported both workstreams with each step's status.
+- [x] 5.3 Record the operator's waiver of **promote** and archive
+  - _**Promote** waived by the operator on 2026-10-25._ The change is documentation only and does not go to production; nothing intended succeeds it.

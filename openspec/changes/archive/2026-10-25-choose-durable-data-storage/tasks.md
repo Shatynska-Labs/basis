@@ -19,6 +19,9 @@
 
 ## 5. Ship
 
-- [ ] 5.1 Open the pull request and let CI run; wait for the operator's word that it merged and that staging's deploy is healthy
-- [ ] 5.2 Confirm: the operator reads ADR-0014 on `main` and agrees it records the decision of 2026-10-25
-- [ ] 5.3 Record the operator's waiver of **promote**; then, in the archive commit, close `choose-durable-data-storage` in `docs/backlog.md`, update the entries it unblocked and set their **Re-checked**
+- [x] 5.1 Open the pull request and let CI run; wait for the operator's word that it merged and that staging's deploy is healthy
+  - _Merge confirmed by the operator on 2026-10-25._ #44 merged on 2026-10-25 as `d502ae9`; CI and staging's Deploy run on it succeeded.
+- [x] 5.2 Confirm: the operator reads ADR-0014 on `main` and agrees it records the decision of 2026-10-25
+  - _Confirmed by the operator on 2026-10-25_, including the initial backup targets (at most 5 minutes of data lost, 30-day point-in-time restore).
+- [x] 5.3 Record the operator's waiver of **promote**; then, in the archive commit, close `choose-durable-data-storage` in `docs/backlog.md`, update the entries it unblocked and set their **Re-checked**
+  - _**Promote** waived by the operator on 2026-10-25._ The change is documentation only and does not go to production; `move-to-durable-data-storage` succeeds it.

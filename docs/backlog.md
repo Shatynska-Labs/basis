@@ -46,24 +46,6 @@ ADR-0007 states that LLM suggestions "always require human confirmation". The PR
 
 **Re-checked**: 2026-10-19.
 
-## `choose-durable-data-storage`
-
-ADR-0006 puts PostgreSQL, Redis/BullMQ and Object Storage "within the existing Hetzner infrastructure". The infrastructure repository forbids that for durable data: its shared PostgreSQL instance holds only data whose loss is tolerable, and any other store on the host needs a stated reason it needs no backup, or an off-host logical backup and a rehearsed restore before it holds anything (`Shatynska-Labs/infrastructure`: `iac-safety-hardening`, _No Store on This Host Holds Data Requiring Backup_; `docs/onboard-an-application.md` §3.1, §4.3). Basis's metrics, daily statuses, goals and photos are durable. Decide where they live, an external managed service or a dedicated store on the host with off-host backups and a rehearsed restore, and record it in an ADR superseding ADR-0006 in part, deciding Redis and Object Storage in the same ADR.
-
-Interim decision (operator, 2026-10-17): until then, Basis uses its own database in the production host's shared PostgreSQL instance, and everything it holds there is treated as data whose loss is tolerable. `add-persistence-skeleton` put it in place: a `basis-api` database in each host's shared instance, migrated on every delivery, holding no table yet. Moving to durable storage is a change of `DATABASE_URL`'s rendering and of provisioning, not of the migrations.
-
-**Kind**: `change`. It needs the operator's storage decision and an ADR.
-
-**Waits on**: `nothing`. Must be done before Basis stores data its user would not accept losing: at the latest, before the calibration period starts (roadmap Phase 1 outcome).
-
-**Design with**: `nothing`.
-
-**Workstream**: `reach-the-calibration-period`.
-
-**Recorded by**: the session that opened `deploy-api-skeleton`; the storage decision was outside that change.
-
-**Re-checked**: 2026-10-19.
-
 ## `move-to-durable-data-storage`
 
 Move production's durable data out of `main-production`'s shared PostgreSQL instance into a PostgreSQL container of Basis's own, as ADR-0014 decides (`choose-durable-data-storage` design). It owes: the container in Basis's production Compose stack, its data on the host's data volume, at the shared instance's major version (18); a daily encrypted `pg_dump` and continuous WAL archiving with base backups, both off-host in Hetzner Object Storage in a location other than `hel1`, expired by bucket lifecycle rules (current and noncurrent versions, and delete markers) under a credential that can write but not delete, with the initial targets ADR-0014 states; verification of those bucket features before relying on them; a restore from each backup rehearsed on representative data and checked, both procedures written down, before durable data lands; a copy of the shared-instance `basis-api` database into the container (its users and any Phase 0 Health Connect deliveries), then production's `DATABASE_URL` pointed at the container. Staging stays in its shared instance. **It must not** drop or discard the shared-instance database's contents unless the operator decides so against `retire-the-health-connect-intake`.

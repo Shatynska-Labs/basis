@@ -144,7 +144,7 @@ Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsu
 
 **Kind**: `change`. A documentation change carrying the operator's reading of the data and possibly an ADR adjustment.
 
-**Waits on**: `validate-health-connect-data` in production, and several days of the bridge sending to it.
+**Waits on**: several days of the bridge sending to production. `validate-health-connect-data` reached production on 2026-10-24. On staging, heart rate, sleep and exercise never arrived because HC Webhook closed while its type list was being edited; check that every type is enabled before counting the days.
 
 **Design with**: `retire-the-health-connect-intake`.
 
@@ -152,7 +152,7 @@ Roadmap Phase 0's outcome: once the reference device (Galaxy Watch through Samsu
 
 **Recorded by**: `validate-health-connect-data`, whose operator chose to keep the findings out of it, since they need days of data after it ships.
 
-**Re-checked**: 2026-10-22.
+**Re-checked**: 2026-10-25 (by `validate-health-connect-data`).
 
 ## `retire-the-health-connect-intake`
 

@@ -69,7 +69,7 @@ The API's migration history SHALL be one drizzle-kit history owned by the API, s
 #### Scenario: Identity's tables are in its schema
 
 - **WHEN** the migration process has migrated an empty database
-- **THEN** the tables outside the schema of the migration record are exactly `identity.users` and `identity.sessions`
+- **THEN** the tables outside the schema of the migration record are exactly `identity.users`, `identity.sessions` and `metrics.health_connect_deliveries`
 
 ### Requirement: A failed migration fails the migration process without disclosing the URL
 

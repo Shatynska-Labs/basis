@@ -26,8 +26,8 @@
   "dependencies": {
     "@basis/shared-core": "workspace:*",
     "@basis/shared-domain": "workspace:*",
-    "@nestjs/common": "12.1.3",
-    "@nestjs/cqrs": "12.1.0",
+    "@nestjs/common": "12.2.0",
+    "@nestjs/cqrs": "12.1.1",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   }

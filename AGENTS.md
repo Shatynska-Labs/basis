@@ -1,7 +1,7 @@
 <!-- prettier-ignore-start -->
-<!-- ai-toolkit:development-workflow v12 -->
+<!-- ai-toolkit:development-workflow 1.0.0 sha256:9d7d126cf4c199c186f05c110ed882aaac09ecdec36c16ac11390c95b5e8031d -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
-     Project-specific conventions belong below the closing marker. -->
+     Project-specific conventions belong outside the markers. -->
 
 ## Development workflow
 
@@ -61,7 +61,7 @@ Always write the family prefix: `plan:reviewing` and `build:reviewing` dispatch 
 
 **draft** — use a specification-driven change process for non-trivial features, changes and significant architectural decisions. Do not begin implementing without a proposal recording what is intended and why. A change's artifacts are read before implementation, not written afterwards to describe what was done.
 
-Where a workstream in `docs/workstreams/` names this change among its steps, or the change serves one's goal, the proposal names that workstream; otherwise it states that the change advances none. Where the change is one of several a goal needs and no workstream holds them, propose opening one, as that directory's README directs.
+Where a workstream in `docs/workstreams/` names this change among its steps, or the change serves one's goal, the proposal names that workstream; otherwise it states that the change advances none. Where the change is one of several a goal needs and no workstream holds them, propose opening one, as that directory's `AGENTS.md` directs.
 
 **review → fix → approve** — dispatch review against the complete artifact set, never a package still being written. Fix and re-review until the verdict permits proceeding, bounded at six rounds; on reaching it, report where the loop stands and what is outstanding, and ask before continuing. A conditional pass is permission conditional on the fixes it names: apply them and continue without a further round. Where the reviewer judges the concept unsound rather than the artifacts defective, stop and raise it immediately, whatever the count.
 
@@ -99,6 +99,8 @@ Every change reaches the trunk through pull requests, and takes at least two. A 
 
 **open pr → merge → deploy** — open the pull request, let continuous integration run, and wait for the operator's confirmation that it merged and that the deploy is healthy. Do not infer a merge, a deploy or a confirmed effect from a green pull request, an approval, or silence.
 
+_Claude Code binding:_ write the pull request's title and description with `ai-toolkit:commits-and-pull-requests`.
+
 **confirm** — a healthy deploy is not the change working. Propose how the effect can be observed — what to look at, what provokes it, what result would mean it worked — and wait for the operator's confirmation.
 
 Two classes cannot answer that gate and are waivable. Say so plainly, name the class, and wait for the operator to waive it; record the waiver in the change's own artifacts — the record is archived on the strength of it, and waiving your own gate is not the confirmation this step exists to obtain. Where a successor is intended, the waiver names its backlog entry or the branch it was opened on:
@@ -108,7 +110,7 @@ Two classes cannot answer that gate and are waivable. Say so plainly, name the c
 
 A recorded waiver completes **confirm**: `ship:confirmed` is true of a waived change.
 
-**archive** — once the effect is confirmed or the gate waived, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog/` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as its README directs, in the commit that carries the record. Where the change advanced a workstream, re-read it the same way: place the entries attached to it, revise the steps the change made obsolete, and archive it once what finishes it holds, as `docs/workstreams/README.md` directs, in the same commit.
+**archive** — once the effect is confirmed or the gate waived, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog/` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as its `AGENTS.md` directs, in the commit that carries the record. Where the change advanced a workstream, re-read it the same way: place the entries attached to it, revise the steps the change made obsolete, and archive it once what finishes it holds, as `docs/workstreams/AGENTS.md` directs, in the same commit.
 
 Two is a floor. Where the deploy is unhealthy, or the effect is absent through a defect, the change is not delivered and its record is not written: fix it and re-enter at `build`'s review gate; the fix takes a pull request of its own.
 
@@ -135,7 +137,7 @@ While applying, the derived tests fail by design until the implementation is com
 
 Such a branch is created and left: it takes no working tree and does not become the branch this session works on.
 
-`docs/backlog/` holds identified changes, one file per entry, each the separate proposed change the scope rule calls for, recorded rather than opened. It sits outside any change, because a note kept inside one is archived with it: it is the change succeeding, not the session ending, that would lose it. Its README states how an entry is written and when it is deleted.
+`docs/backlog/` holds identified changes, one file per entry, each the separate proposed change the scope rule calls for, recorded rather than opened. It sits outside any change, because a note kept inside one is archived with it: it is the change succeeding, not the session ending, that would lose it. Its `AGENTS.md` states how an entry is written and when it is deleted.
 
 **Assumptions.** Do not silently invent a requirement that was not stated and cannot reasonably be inferred; where an important decision cannot be inferred, ask rather than guess. Record significant decisions in this project's own artifacts rather than in conversation history alone.
 

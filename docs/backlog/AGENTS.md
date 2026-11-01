@@ -1,14 +1,18 @@
+<!-- ai-toolkit:backlog 1.0.0 sha256:4320396a1c4cf064d9830b21f605a4a090f20eb9319e104061a9376ef789995a -->
+<!-- Generated. Do not edit inside this block — it is replaced on update.
+     Project-specific conventions belong outside the markers. -->
+
 # Backlog
 
-Changes this project has identified and not yet archived, one file per entry beside this README. Each entry is a change recorded here instead of being folded into the change that found it, or opened on a branch of its own.
+Changes this project has identified and not yet archived, one file per entry beside this file. Each entry is a change recorded here instead of being folded into the change that found it, or opened on a branch of its own.
 
-An entry's file is `<name>.md`, the change's kebab-case name: the name its branch and change directory are expected to take, though the session that opens the change may revise it if the work turns out different. The file's name is the entry's only identifier, and the file carries no heading repeating it. Refer to an entry only by that name. A fix takes the name as its branch's only.
+An entry's file is `<name>.md`, the change's kebab-case name: the name its branch and change directory are expected to take, though the session that opens the change may revise it if the work turns out different. The file's name is the entry's only identifier, and the file carries no heading repeating it. Refer to an entry only by that name. A fix takes the name as its branch's only. `readme`, `agents` and `claude`, in any case, are not an entry name: their files would collide with `README.md`, `AGENTS.md` and `CLAUDE.md` where the filesystem ignores case.
 
 Entries carry no order. What an entry waits on, how urgent it is, and which entries share a design with it, it states in its own fields.
 
 Keep an entry short: what is needed and why, naming files, specifications and changes as pointers. Leave out line numbers, census tables and step-by-step plans; they go stale first, and the session that takes the entry up redoes them.
 
-Delete an entry's file when its change is archived, when the operator takes it as a fix rather than a change, when a change makes it obsolete, or when the operator decides the change will not be made. When a change is archived, also update the entries it unblocked, unparked or made stale, and set their `re_checked` date. Keep this README when there are no entries.
+Delete an entry's file when its change is archived, when the operator takes it as a fix rather than a change, when a change makes it obsolete, or when the operator decides the change will not be made. When a change is archived, also update the entries it unblocked, unparked or made stale, and set their `re_checked` date. Keep this file when there are no entries.
 
 An entry's values are frontmatter, its keys in this order, one per line:
 
@@ -46,3 +50,4 @@ What the change is and why it is needed, written for a session that has not seen
 - **Priority**: on a `high` or parked entry only, the evidence or why it is parked.
 - **Recorded by**: why it was not done there.
 ```
+<!-- /ai-toolkit:backlog -->

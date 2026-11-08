@@ -42,6 +42,10 @@ describe('identity-profile: isTimeZoneName', () => {
     },
   );
 
+  it('an offset signed with U+2212 MINUS SIGN, \u221202:00, is not a time zone name (added for the code review of add-identity-profile: ECMAScript accepts that sign for an offset zone)', () => {
+    expect(isTimeZoneName('\u221202:00')).toBe(false);
+  });
+
   it('the empty string is not a time zone name (derived: Intl refuses it)', () => {
     expect(isTimeZoneName('')).toBe(false);
   });

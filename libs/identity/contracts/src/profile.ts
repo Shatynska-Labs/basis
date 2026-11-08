@@ -3,15 +3,21 @@ import { z } from 'zod';
 // The profile's request and response shapes (add-identity-profile design
 // decisions 4, 5 and 8).
 
+// An ECMAScript offset zone's sign: `+`, `-` or U+2212 MINUS SIGN.
+const OFFSET_SIGN = /^[+\-\u2212]/;
+
 /**
  * A time zone name the runtime recognises, not an ECMAScript offset zone such
- * as `+02:00` (add-identity-profile design decision 5).
+ * as `+02:00` or `−02:00`, by its spelling or by what the runtime resolves it
+ * to (add-identity-profile design decision 5).
  */
 export const isTimeZoneName = (name: string): boolean => {
-  if (name === '' || /^[+-]/.test(name)) return false;
+  if (name === '' || OFFSET_SIGN.test(name)) return false;
   try {
-    new Intl.DateTimeFormat('en', { timeZone: name });
-    return true;
+    const resolved = new Intl.DateTimeFormat('en', {
+      timeZone: name,
+    }).resolvedOptions().timeZone;
+    return !OFFSET_SIGN.test(resolved);
   } catch {
     return false;
   }

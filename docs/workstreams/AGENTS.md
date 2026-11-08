@@ -1,4 +1,4 @@
-<!-- ai-toolkit:workstreams 2.0.0 sha256:c69af4471cffd76f0da67e8a2af39d68d6ea54f37301adbe73e9bca1f78a6005 -->
+<!-- ai-toolkit:workstreams 2.1.0 sha256:9ba8e2a8d82281ae7d83eb2b17a13a86c8d78f56c6dc905f4631c3c9b71cbbf2 -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong outside the markers. -->
 
@@ -14,11 +14,11 @@ A change is a step of one workstream only. Where another workstream's goal also 
 
 Open a workstream when the operator decides a goal needs more than one change. Commit it with the plan of the first change that advances it, or as work too small to be a change.
 
-A change or a backlog entry may name the workstream it serves before any step names it. Place each such change or entry among the steps, or detach it, at the next edit of the workstream, and at the latest at the archive of a change in it.
+A change or a backlog entry may name the workstream it serves before any step names it. Place an entry among the steps when it is recorded, or say that it is left for the archive and why. Place each such change or entry among the steps, or detach it, at the next edit of the workstream other than one placing a recorded entry, and at the latest at the archive of a change in it. Detaching re-points it to another open workstream whose Goal it serves and whose Not in scope does not leave it out, and clears it to `none` only where there is none. A step names a change or an entry only by its own name, the backticked name a numbered step begins with; a mention in a step's description, in Context or in Decisions places nothing.
 
 What finishes a workstream is an effect of its Goal that someone can observe: what to look at in the repository, the forge or production, what provokes it where something must, and what result means the Goal holds. "Every step is done" shows only that the step list was worked through, and a list missing a step meets it all the same. It may stand beside the effect where every step is wanted whatever the effect shows, never in its place.
 
-When a workstream's Done when holds, move its file to `archive/<YYYY-MM-DD>-<name>.md`, dated the day it is archived, in the commit that carries the record of the change that completed it. Before moving it, remove from the steps each step not done, other than the change whose record that commit carries. Where a removed step is still wanted, it is first recorded as a backlog entry naming no workstream if it is not yet in flight, and it continues as its own change if it is. Then re-point or clear every backlog entry still naming it.
+When a workstream's Done when holds, move its file to `archive/<YYYY-MM-DD>-<name>.md`, dated the day it is archived, in the commit that carries the record of the change that completed it. Before moving it, remove from the steps each step not done, other than the change whose record that commit carries. Where a removed step is still wanted, it is first recorded as a backlog entry detached from it if it is not yet in flight, and it continues as its own change if it is. Then re-point or clear every backlog entry still naming it, by detaching it.
 
 The operator may abandon a workstream whose goal will not be met. Add an `- **Abandoned**: <date>, <reason>` item after Opened, deal with its steps and entries as above, and move it to `archive/` the same way, as work too small to be a change.
 

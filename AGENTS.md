@@ -1,5 +1,5 @@
 <!-- prettier-ignore-start -->
-<!-- ai-toolkit:development-workflow 2.0.0 sha256:56cea6309958bc8374aac54cc1f8dbe9c766a4b22c62d123456c5f10cfd6e593 -->
+<!-- ai-toolkit:development-workflow 2.2.0 sha256:9e11101bf719f1e021a42ea9f2c52c735fc852b2e8aa128d1c4f5a8bffd3a5ec -->
 <!-- Generated. Do not edit inside this block — it is replaced on update.
      Project-specific conventions belong outside the markers. -->
 
@@ -65,9 +65,9 @@ Always write the family prefix: `plan:reviewing` and `build:reviewing` dispatch 
 
 Where a workstream in `docs/workstreams/` names this change among its steps, or the change serves one's goal, the proposal names that workstream; otherwise it states that the change advances none. Where the change is one of several a goal needs and no workstream holds them, propose opening one, as that directory's `AGENTS.md` directs.
 
-**review → fix → approve** — dispatch review against the complete artifact set, never a package still being written. Fix and re-review until the verdict permits proceeding, bounded at six rounds; on reaching it, report where the loop stands and what is outstanding, and ask before continuing. A conditional pass is permission conditional on the fixes it names: apply them and continue without a further round. Where the reviewer judges the concept unsound rather than the artifacts defective, stop and raise it immediately, whatever the count.
+**review → fix → approve** — dispatch review against the complete artifact set, with the workstream its proposal names, never a package still being written. Fix and re-review until the verdict permits proceeding, bounded at six rounds; on reaching it, report where the loop stands and what is outstanding, and ask before continuing. A conditional pass is permission conditional on the fixes it names: apply them and continue without a further round. Where the reviewer judges the concept unsound rather than the artifacts defective, stop and raise it immediately, whatever the count.
 
-_Claude Code binding:_ dispatch `ai-toolkit:change-plan-reviewer` once every artifact the change calls for is complete. Do not use `/code-review` for this gate — it reads a diff, and at this point there is none. On `FIX REQUIRED` fix and re-dispatch; on `CONDITIONALLY APPROVED` apply the `[MINOR]` fixes and continue; on `APPROVED` continue; on `REJECTED` stop and raise it.
+_Claude Code binding:_ dispatch `ai-toolkit:change-plan-reviewer` once every artifact the change calls for is complete, supplying the workstream's file where the proposal names one. Do not use `/code-review` for this gate — it reads a diff, and at this point there is none. On `FIX REQUIRED` fix and re-dispatch; on `CONDITIONALLY APPROVED` apply the `[MINOR]` fixes and continue; on `APPROVED` continue; on `REJECTED` stop and raise it.
 
 **commit** — commit the approved plan before tests are derived from it; the tests map to that baseline.
 
@@ -118,7 +118,9 @@ A promotion whose smoke check fails leaves production running the promoted image
 
 Production runs behind the trunk by every merge not yet promoted. That is the pipeline working, not drift. The previous release a change must stay compatible with is the one production runs, not the trunk's last merge, because rollback is a promotion: open a change that removes what the previous release uses only once production runs a release that no longer uses it.
 
-**archive** — once the effect is confirmed on staging or the gate waived, **and the change is in production**, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog/` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as its `AGENTS.md` directs, in the commit that carries the record. Where the change advanced a workstream, re-read it the same way: place the entries attached to it, revise the steps the change made obsolete, and archive it once what finishes it holds, as `docs/workstreams/AGENTS.md` directs, in the same commit.
+**archive** — once the effect is confirmed on staging or the gate waived, **and the change is in production**, bring the branch back to the freshly fetched trunk, commit the change's specification record there, and open a pull request for it: the last of the change's pull requests. The work is on the trunk by now, however it was merged, so bringing the branch back to it discards nothing. Before opening that pull request, re-read `docs/backlog/` for the entries this change completed, made obsolete, unblocked or made stale (including entries naming files or specifications it touched, not only entries naming it) and update each as its `AGENTS.md` directs, in the commit that carries the record. Where the change advanced a workstream, re-read it the same way: place the entries that name it and that no step names, revise the steps the change made obsolete, and archive it once what finishes it holds, as `docs/workstreams/AGENTS.md` directs, in the same commit.
+
+_Claude Code binding:_ carry out the entries' part of this re-read with `ai-toolkit:backlog`'s **sweep**.
 
 A change confirmed on staging and never promoted is not archived: its record would say a thing is delivered that production has never run. Where a change is deliberately not going to production — a documentation-only merge is the ordinary case — say so and archive it on the operator's word, which is a waiver of **promote**, distinct from a waiver of **confirm**, and is recorded the same way.
 
@@ -143,11 +145,17 @@ While applying, the derived tests fail by design until the implementation is com
 - Where the change in progress **depends** on it: record the dependency and the wait in the current change's own artifacts, then at most open the identified change and recommend it be continued in a separate session.
 - Where it **does not**: record it in `docs/backlog/`. That is what is owed; opening the identified change instead is the option.
 
+_Claude Code binding:_ record an entry with `ai-toolkit:backlog`'s **record**.
+
 *Opening* one means a branch of its own and a `handoff.md`, with no proposal — why the change was identified, what bears on it, and what it must not undo. Place it in the new change's own directory in this project's change-record layout — for OpenSpec, `openspec/changes/<name>/handoff.md`. The session that takes it up writes the proposal. Commit that branch at once: the session that opened it is not returning to it, so no later commit of its own will carry the handoff.
 
 Such a branch is created and left: it takes no working tree and does not become the branch this session works on.
 
 `docs/backlog/` holds identified changes, one file per entry, each the separate proposed change the scope rule calls for, recorded rather than opened. It sits outside any change, because a note kept inside one is archived with it: it is the change succeeding, not the session ending, that would lose it. Its `AGENTS.md` states how an entry is written and when it is deleted.
+
+**A workstream's plan.** An independent reviewer checks that a workstream's steps reach what it is for, agree with what it has decided and leave out what it leaves out, and that what finishes it can be observed. This happens before the commit that opens it, and before a commit whose edit adds or removes a step, changes what a step does, or changes what the workstream is for, what finishes it, what it leaves out or what it has decided, whether or not the edit belongs to a change. A commit holding several such edits takes one review. Renaming or reordering steps, adding to what the workstream knows, and archiving it take none, and it adds no stage to a change. Fix and re-review until the verdict permits proceeding, bounded at six rounds; on reaching it, report where the loop stands and what is outstanding, and ask before continuing. A conditional pass is permission conditional on the fixes it names: apply them and continue without a further round. Where the reviewer judges the concept unsound rather than the plan defective, stop and raise it immediately, whatever the count. A fix that changes the plan's substance rather than its wording is the operator's to decide; where the operator decides to leave a defect, commit on that word and say so.
+
+_Claude Code binding:_ dispatch `ai-toolkit:workstream-reviewer`. On `FIX REQUIRED` fix what is the session's to fix, take the rest to the operator, and re-dispatch unless the operator left what remains; on `CONDITIONALLY APPROVED` apply the `[MINOR]` fixes and continue; on `APPROVED` continue; on `REJECTED` stop and raise it.
 
 **Assumptions.** Do not silently invent a requirement that was not stated and cannot reasonably be inferred; where an important decision cannot be inferred, ask rather than guess. Record significant decisions in this project's own artifacts rather than in conversation history alone.
 

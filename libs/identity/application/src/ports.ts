@@ -1,6 +1,7 @@
 import type { Result } from '@basis/shared-core';
 
 import type { InvalidIdToken } from './failures.js';
+import type { StoredProfile } from './profile/heart-rate.js';
 
 // The ports identity's handlers call, each an abstract class that serves as
 // its own injection token. Read and write repositories are kept apart
@@ -61,3 +62,22 @@ export abstract class SessionReader {
 
 /** The lowercased emails that may create an account. */
 export const SIGN_UP_ALLOWLIST = Symbol('SIGN_UP_ALLOWLIST');
+
+export type { StoredProfile };
+
+/** The fields a profile patch changes: absent is unchanged, `null` clears. */
+export interface ProfilePatch {
+  timeZone?: string;
+  birthYear?: number | null;
+  enteredMaxHeartRate?: number | null;
+}
+
+export abstract class ProfileRepository {
+  /** Creates the user's profile or changes only the fields present. */
+  abstract update(userId: string, patch: ProfilePatch, at: Date): Promise<void>;
+}
+
+export abstract class ProfileReader {
+  /** The user's stored profile, every field `null` until set. */
+  abstract profileOf(userId: string): Promise<StoredProfile>;
+}

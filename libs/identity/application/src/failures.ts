@@ -29,3 +29,12 @@ export class InvalidSession extends DomainError {
     super('Authentication is required.');
   }
 }
+
+export class ImplausibleBirthYear extends DomainError {
+  readonly kind = 'rule-violated';
+  readonly code = 'identity.implausible-birth-year';
+
+  constructor() {
+    super('The birth year must be 10 to 120 years before the current year.');
+  }
+}

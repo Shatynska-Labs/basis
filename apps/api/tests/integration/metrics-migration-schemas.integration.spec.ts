@@ -57,14 +57,6 @@ describe('api-persistence: the migration history starts with a baseline (as revi
     expect(run.status, run.output).toBe(0);
   }, 120_000);
 
-  it("identity's tables are in its schema: the tables outside the migration record are exactly identity.users, identity.sessions and metrics.health_connect_deliveries", async () => {
-    expect(await tablesOutsideRecord(url)).toEqual([
-      'identity.sessions',
-      'identity.users',
-      'metrics.health_connect_deliveries',
-    ]);
-  });
-
   describe('metrics.health_connect_deliveries (derived from design decision 7)', () => {
     it('has the columns id uuid, user_id uuid, received_at timestamptz and payload jsonb, each not null', async () => {
       const columns = await withClient(

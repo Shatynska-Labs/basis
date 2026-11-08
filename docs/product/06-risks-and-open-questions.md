@@ -41,7 +41,7 @@ Requirements:
 
 1. ~~What exactly does the reference device (Galaxy Watch) write to Health Connect (Phase 0)?~~ — steps, heart rate, exercise sessions and sleep with stages; see ADR-0001's Phase 0 findings, which list what is still unverified (`record-phase-0-findings`).
 2. Does the wearable detect strength workouts automatically, or only when started manually? — owed by `sync-health-connect-from-the-mobile-app`'s verification on the reference device.
-3. Max heart rate for zones — age-based formula or a value entered by the user?
+3. ~~Max heart rate for zones — age-based formula or a value entered by the user?~~ — **both**: the Tanaka formula, `208 − 0.7 × age`, from the birth year by default, replaced by a value the user enters; zones are five fixed shares of it (`add-identity-profile`).
 4. ~~Authentication: magic link, Google OAuth, or both?~~ — **Google only**, with sign-up restricted to a per-deployment allowlist (`add-identity-authentication`).
 5. Which AI provider for vision (quality, price, data retention terms)?
 6. Is post-meal reflection ("why did I eat?") part of MVP?

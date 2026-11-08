@@ -40,6 +40,8 @@ type MetricRecord = {
 Consistency with Health Connect: steps are the daily total as Health Connect computes it
 (de-duplicated across phone and wearable); sleep counts only asleep stages when the device records them.
 
+Heart-rate zones for `hr_zone_minutes` come from the user's profile (`identity`): the maximum heart rate is the value the user entered, else the Tanaka formula `208 − 0.7 × age` from the birth year, and zones 1–5 start at 50, 60, 70, 80 and 90 % of it, zone 5 open above (`add-identity-profile`).
+
 ## 2. Habit rule — `habits` context
 
 A habit is configuration, not code. A template is a set of rules the user can modify.

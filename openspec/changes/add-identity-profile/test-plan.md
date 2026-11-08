@@ -153,7 +153,14 @@ The dispatch named `libs/shared/testing` (`@basis/shared-testing`: `startPostgre
 | `GoogleAccount`, `RefusedIdToken`, `fakeVerifier` | I           | fake of `GoogleIdTokenVerifier` and its failure                           | I (all, through `newUser`)                       | none                                                           | `apps/api/tests/integration/identity-authentication.integration.spec.ts`                                            | none: port fake, per `AGENTS.md`                                                                                                                                           |
 | `fakeClock`                                       | I           | fake of identity's `Clock` port                                           | I (all)                                          | none                                                           | `apps/api/tests/integration/identity-authentication.integration.spec.ts`                                            | none: port fake, per `AGENTS.md`                                                                                                                                           |
 
-Disposition, to be recorded against each entry by the implementation step: _pending_.
+Dispositions, recorded by the implementation step:
+
+- `profile` (builder): **kept** local. It is an identity-specific value used by one spec, and `libs/shared/testing` holds generic helpers only.
+- `StoredProfile`, `Patch`: **promoted** onto the implementation's own types. `profile.spec.ts` now imports `StoredProfile` and `ProfilePatch` (as `Patch`) from `./ports.js`, and nothing it asserts changed. `EMPTY`: **kept** local, a one-spec value.
+- `memoryProfiles`, `fixedClock`, `GoogleAccount`, `RefusedIdToken`, `fakeVerifier`, `fakeClock`: **kept** local. They are port fakes, which `AGENTS.md` keeps in the spec that uses them until a change decides where such fakes live.
+- `migrate`, `tablesOutsideRecord`: **kept** local. They are `apps/api`-specific, so `libs/shared/testing` cannot hold them, and an `apps/api` test-support module is already the subject of the backlog entry `consolidate-spec-helpers`. The archive's backlog sweep adds these copies to it.
+
+Obsolete test 1 was **deleted**. `identity-profiles-migration.integration.spec.ts` asserts the revised list in full, so rewriting the old test would duplicate that assertion.
 
 ## Baseline
 

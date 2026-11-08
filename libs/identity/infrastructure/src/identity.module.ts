@@ -2,6 +2,8 @@ import {
   Clock,
   GoogleIdTokenVerifier,
   IDENTITY_HANDLERS,
+  ProfileReader,
+  ProfileRepository,
   SessionReader,
   SessionRepository,
   SIGN_UP_ALLOWLIST,
@@ -19,6 +21,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { createRemoteJWKSet } from 'jose';
 
 import {
+  DrizzleProfileReader,
+  DrizzleProfileRepository,
+} from './driven/drizzle-profiles.js';
+import {
   DrizzleSessionReader,
   DrizzleSessionRepository,
 } from './driven/drizzle-sessions.js';
@@ -33,6 +39,7 @@ import {
 import { SystemClock } from './driven/system-clock.js';
 import { AuthController } from './driving/auth.controller.js';
 import { MeController } from './driving/me.controller.js';
+import { ProfileController } from './driving/profile.controller.js';
 import { SessionGuard } from './driving/session.guard.js';
 
 // identity's composition root, outside driving/ and driven/: it binds the
@@ -70,7 +77,7 @@ export class IdentityModule {
     return {
       module: IdentityModule,
       imports: [CqrsModule.forRoot()],
-      controllers: [AuthController, MeController],
+      controllers: [AuthController, MeController, ProfileController],
       providers: [
         {
           provide: IDENTITY_OPTIONS,
@@ -93,6 +100,8 @@ export class IdentityModule {
         { provide: UserReader, useClass: DrizzleUserReader },
         { provide: SessionRepository, useClass: DrizzleSessionRepository },
         { provide: SessionReader, useClass: DrizzleSessionReader },
+        { provide: ProfileRepository, useClass: DrizzleProfileRepository },
+        { provide: ProfileReader, useClass: DrizzleProfileReader },
         ...IDENTITY_HANDLERS,
         { provide: APP_GUARD, useClass: SessionGuard },
       ],

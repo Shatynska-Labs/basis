@@ -30,23 +30,17 @@ import { describe, expect, it } from 'vitest';
 
 import { UpdateProfile } from './commands/update-profile/update-profile.command.js';
 import { UpdateProfileHandler } from './commands/update-profile/update-profile.handler.js';
-import type { Clock, ProfileReader, ProfileRepository } from './ports.js';
+import type {
+  Clock,
+  ProfilePatch as Patch,
+  ProfileReader,
+  ProfileRepository,
+  StoredProfile,
+} from './ports.js';
 import { GetProfile } from './queries/get-profile/get-profile.query.js';
 import { GetProfileHandler } from './queries/get-profile/get-profile.handler.js';
 
 // --- Declared locally (see "Missing shared arrangement" in test-plan.md) ---
-
-interface StoredProfile {
-  timeZone: string | null;
-  birthYear: number | null;
-  enteredMaxHeartRate: number | null;
-}
-
-interface Patch {
-  timeZone?: string;
-  birthYear?: number | null;
-  enteredMaxHeartRate?: number | null;
-}
 
 const EMPTY: StoredProfile = {
   timeZone: null,

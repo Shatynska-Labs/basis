@@ -1,4 +1,4 @@
-import { pgSchema, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgSchema, smallint, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 // identity's tables, in its own schema (ADR-0011; add-identity-authentication
 // design decisions 2, 4 and 14). The API's migration history collects them
@@ -25,4 +25,16 @@ export const sessions = identity.table('sessions', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   revokedAt: timestamp('revoked_at', { withTimezone: true }),
+});
+
+// The user's own profile, apart from what Google gives (add-identity-profile
+// design decision 2). A user without a row has an empty profile.
+export const profiles = identity.table('profiles', {
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  timeZone: text('time_zone'),
+  birthYear: smallint('birth_year'),
+  enteredMaxHeartRate: smallint('entered_max_heart_rate'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 });

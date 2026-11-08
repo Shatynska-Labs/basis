@@ -3,7 +3,7 @@ kind: change
 waits_on: []
 design_with: [retire-the-health-connect-intake]
 workstream: reach-the-calibration-period
-recorded_by: "the operator's backlog and workstream revision of 2026-11-08"
+recorded_by: "the backlog and workstream revision of 2026-11-08"
 re_checked: 2026-11-08
 ---
 
